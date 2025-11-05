@@ -1,0 +1,217 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = AlanyaBusinessGuide
+build_property.RootNamespace = AlanyaBusinessGuide
+build_property.ProjectDir = C:\Users\resuldemir\Source\Repos\AlanyaBusinessGuide\AlanyaBusinessGuide\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\resuldemir\Source\Repos\AlanyaBusinessGuide\AlanyaBusinessGuide
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Areas/Admin/Views/Reservations/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcUmVzZXJ2YXRpb25zXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Account/AccessDenied.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxBY2Nlc3NEZW5pZWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Account/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Account/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxQcm9maWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Admin/Businesses.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQnVzaW5lc3Nlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Admin/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Admin/CreateBusiness.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlQnVzaW5lc3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Admin/DeleteBusiness.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGVsZXRlQnVzaW5lc3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Admin/EditBusiness.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdEJ1c2luZXNzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Admin/Favorites.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRmF2b3JpdGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Admin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Admin/Reviews.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cUmV2aWV3cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Admin/UserDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNlckRldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Admin/Users.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Businesses/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVzaW5lc3Nlc1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Businesses/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVzaW5lc3Nlc1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Businesses/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnVzaW5lc3Nlc1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Categories/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcmllc1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Categories/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcmllc1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Home/Contact.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxDb250YWN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Home/Search.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxTZWFyY2guY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/News/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/News/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xEZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/News/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/News/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/News/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Reservations/AdminIndex.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzZXJ2YXRpb25zXEFkbWluSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Reservations/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzZXJ2YXRpb25zXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Reservations/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzZXJ2YXRpb25zXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Reservations/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVzZXJ2YXRpb25zXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Reviews/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmV2aWV3c1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Reviews/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmV2aWV3c1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Shared/_LoginPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Mb2dpblBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Users/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlcnNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/User/BusinessDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxCdXNpbmVzc0RldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/User/Businesses.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxCdXNpbmVzc2VzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/User/Favorites.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxGYXZvcml0ZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/User/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/User/MyReviews.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxNeVJldmlld3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/User/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxQcm9maWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/resuldemir/Source/Repos/AlanyaBusinessGuide/AlanyaBusinessGuide/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-zbwnkp3zt0

@@ -1,0 +1,70 @@
+﻿@model AlanyaBusinessGuide.Models.Business
+
+@{
+    ViewData["Title"] = "Yeni İşletme Ekle";
+}
+
+<h2>Yeni İşletme Ekle</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Name" class="control-label">Ad</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Address" class="control-label">Adres</label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Phone" class="control-label">Telefon</label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CategoryId" class="control-label">Kategori</label>
+        <select asp-for="CategoryId" class="form-control" asp-items="@(((IEnumerable<AlanyaBusinessGuide.Models.Category>)ViewBag.Categories).Select(c => new SelectListItem { Text = c.Name ?? "Bilinmeyen", Value = c.Id.ToString() }))">
+            <option value="">Kategori Seçin</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ImageUrl" class="control-label">Resim URL</label>
+        <input asp-for="ImageUrl" class="form-control" />
+        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description" class="control-label">Açıklama</label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email" class="control-label">E-posta</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Website" class="control-label">Web Sitesi</label>
+        <input asp-for="Website" class="form-control" />
+        <span asp-validation-for="Website" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="WorkingHours" class="control-label">Çalışma Saatleri</label>
+        <input asp-for="WorkingHours" class="form-control" />
+        <span asp-validation-for="WorkingHours" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PriceRange" class="control-label">Fiyat Aralığı</label>
+        <input asp-for="PriceRange" class="form-control" />
+        <span asp-validation-for="PriceRange" class="text-danger"></span>
+    </div>
+    <div class="form-group mt-3">
+        <input type="submit" value="Kaydet" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary ms-2">Geri Dön</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,135 @@
+﻿@model AlanyaBusinessGuide.Models.News
+@{
+    ViewData["Title"] = "Haber Sil";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 border-danger">
+                <div class="card-header bg-danger text-white py-4">
+                    <h2 class="mb-0 fw-bold">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Haber Silme Onayı
+                    </h2>
+                    <p class="mb-0 mt-2 opacity-75">
+                        <small>Bu işlem geri alınamaz!</small>
+                    </p>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-danger d-flex align-items-start mb-4" role="alert">
+                        <i class="bi bi-exclamation-octagon-fill me-3 fs-4"></i>
+                        <div>
+                            <h5 class="alert-heading mb-2">Bu haberi silmek istediğinizden emin misiniz?</h5>
+                            <p class="mb-0">
+                                Bu işlem geri alınamaz. Haber kalıcı olarak silinecektir.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Haber Bilgileri -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h4 class="card-title fw-bold mb-3">
+                                <i class="bi bi-newspaper me-2 text-primary"></i>
+                                @Model.Title
+                            </h4>
+
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <div class="mb-3">
+                                    <img src="@Model.ImageUrl" alt="@Model.Title" class="img-fluid rounded" style="max-height: 200px; object-fit: cover;">
+                                </div>
+                            }
+
+                            <div class="mb-3">
+                                <strong class="text-muted">İçerik Önizleme:</strong>
+                                <p class="mt-2">
+                                    @{
+                                        var preview = Model.Content.Length > 300
+                                        ? Model.Content.Substring(0, 300) + "..."
+                                        : Model.Content;
+                                    }
+                                    @preview
+                                </p>
+                            </div>
+
+                            <hr>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <i class="bi bi-person-circle text-primary me-2"></i>
+                                    <strong>Yazar:</strong> @(Model.Author?.UserName ?? "Bilinmiyor")
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <i class="bi bi-calendar3 text-primary me-2"></i>
+                                    <strong>Tarih:</strong> @Model.PublishDate.ToString("dd MMMM yyyy")
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <i class="bi bi-eye text-primary me-2"></i>
+                                    <strong>Görüntülenme:</strong> @(Model.ViewCount ?? 0)
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <i class="bi bi-hash text-primary me-2"></i>
+                                    <strong>ID:</strong> @Model.Id
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Onay Formu -->
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="Id" />
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-arrow-left me-2"></i>İptal Et
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg shadow-sm">
+                                <i class="bi bi-trash-fill me-2"></i>Evet, Haberi Sil
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="mt-4 text-center text-muted">
+                        <small>
+                            <i class="bi bi-info-circle me-1"></i>
+                            Silme işleminden sonra bu habere erişilemeyecektir
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a asp-action="Details" asp-route-id="@Model.Id" class="text-decoration-none">
+                    <i class="bi bi-eye me-1"></i>Silmeden Önce Haberi Tekrar Görüntüle
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        border-bottom: none;
+    }
+
+    .btn-lg {
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+
+    .border-danger {
+        border-width: 2px !important;
+    }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>

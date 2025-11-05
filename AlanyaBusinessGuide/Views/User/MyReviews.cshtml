@@ -1,0 +1,126 @@
+@model IEnumerable<AlanyaBusinessGuide.Models.Review>
+
+@{
+    ViewData["Title"] = "Yorumlarım";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Yorumlarım</h1>
+        <span class="badge badge-primary">@Model.Count() yorum</span>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var review in Model)
+            {
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="card-title">@review.Business?.Name</h5>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-tag"></i> @review.Business?.Category
+                                        </small>
+                                    </p>
+                                </div>
+                                <div class="text-warning">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= review.Rating)
+                                        {
+                                            <i class="fas fa-star"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="far fa-star"></i>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(review.Comment))
+                            {
+                                <p class="card-text">@review.Comment</p>
+                            }
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar"></i> @review.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+                                </small>
+                                <div>
+                                    @if (review.IsApproved)
+                                    {
+                                        <span class="badge badge-success">Onaylı</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-warning">Beklemede</span>
+                                    }
+                                    @if (!review.IsActive)
+                                    {
+                                        <span class="badge badge-danger">Pasif</span>
+                                    }
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <a href="@Url.Action("BusinessDetails", new { id = review.BusinessId })" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-eye"></i> İşletmeyi Görüntüle
+                                </a>
+                                <button class="btn btn-outline-danger btn-sm delete-review-btn" data-review-id="@review.Id">
+                                    <i class="fas fa-trash"></i> Sil
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">Henüz yorumunuz yok</h4>
+            <p class="text-muted">İşletmelere yorum yaparak deneyimlerinizi paylaşabilirsiniz.</p>
+            <a href="@Url.Action("Businesses")" class="btn btn-primary">
+                <i class="fas fa-search"></i> İşletmeleri Keşfet
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.delete-review-btn').click(function() {
+                var reviewId = $(this).data('review-id');
+                var button = $(this);
+                var card = button.closest('.col-lg-6');
+                
+                if (confirm('Bu yorumu silmek istediğinizden emin misiniz?')) {
+                    $.ajax({
+                        url: '@Url.Action("DeleteReview")',
+                        type: 'POST',
+                        data: { reviewId: reviewId },
+                        success: function(response) {
+                            if (response.success) {
+                                card.fadeOut(300, function() {
+                                    $(this).remove();
+                                });
+                            }
+                            alert(response.message);
+                        },
+                        error: function() {
+                            alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

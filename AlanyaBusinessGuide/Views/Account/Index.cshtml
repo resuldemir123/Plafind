@@ -1,0 +1,19 @@
+﻿@model AlanyaBusinessGuide.Models.UserProfile
+
+@{
+    ViewData["Title"] = "Hesap Bilgileri";
+}
+
+<h2>Hesap Bilgileri</h2>
+
+@if (Model != null)
+{
+    <p>Ad: @Model.FullName</p>
+    <p>Telefon: @Model.PhoneNumber</p>
+}
+else
+{
+    <p>Profil bilgisi bulunamadı. Lütfen güncelleyin.</p>
+}
+
+<a asp-action="Profile" class="btn btn-primary">Profili Düzenle</a>

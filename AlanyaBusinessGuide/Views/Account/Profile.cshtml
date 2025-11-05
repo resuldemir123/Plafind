@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Profil";
+}
+
+<h2>Profil</h2>
+
+@if (User?.Identity?.IsAuthenticated ?? false)
+{
+    <p>Hoş geldiniz, @(!string.IsNullOrEmpty(User.Identity?.Name) ? User.Identity.Name : "Kullanıcı")!</p>
+
+    @if (ViewBag.IsAdmin != null && (bool)ViewBag.IsAdmin)
+    {
+        <p>Bu bir Admin hesabıdır.</p>
+    }
+    else
+    {
+        <p>Bu bir Kullanıcı hesabıdır.</p>
+    }
+}
+else
+{
+    <p>Lütfen giriş yapın.</p>
+}

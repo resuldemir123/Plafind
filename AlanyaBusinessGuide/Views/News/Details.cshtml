@@ -1,0 +1,177 @@
+﻿@model AlanyaBusinessGuide.Models.News
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Geri Dön Butonu -->
+            <div class="mb-4">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Haberlere Geri Dön
+                </a>
+            </div>
+
+            <!-- Haber Kartı -->
+            <article class="card shadow-lg border-0 mb-4">
+                <!-- Resim Bölümü (varsa) -->
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="news-header-image">
+                        <img src="@Model.ImageUrl" alt="@Model.Title" class="w-100" style="max-height: 400px; object-fit: cover;">
+                    </div>
+                }
+
+                <!-- Başlık Bölümü -->
+                <div class="card-header bg-primary text-white py-4">
+                    <h1 class="display-6 fw-bold mb-3">
+                        <i class="bi bi-newspaper me-2"></i>@Model.Title
+                    </h1>
+                    <div class="d-flex flex-wrap gap-4 text-white-50">
+                        <span>
+                            <i class="bi bi-person-circle me-2"></i>
+                            <strong>Yazar:</strong> @(Model.Author?.UserName ?? "Bilinmiyor")
+                        </span>
+                        <span>
+                            <i class="bi bi-calendar-event me-2"></i>
+                            <strong>Tarih:</strong> @Model.PublishDate.ToString("dd MMMM yyyy, HH:mm")
+                        </span>
+                        <span>
+                            <i class="bi bi-eye me-2"></i>
+                            <strong>Görüntüleme:</strong> @(Model.ViewCount ?? 0)
+                        </span>
+                    </div>
+                </div>
+
+                <!-- İçerik Bölümü -->
+                <div class="card-body p-5">
+                    <div class="news-content">
+                        @Html.Raw(Model.Content.Replace("\n", "<br>"))
+                    </div>
+                </div>
+
+                <!-- Alt Bilgi -->
+                <div class="card-footer bg-light py-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div class="text-muted">
+                            <i class="bi bi-clock-history me-2"></i>
+                            <small>Yayınlanma: @Model.PublishDate.ToString("dd MMMM yyyy, HH:mm")</small>
+                        </div>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <div class="btn-group">
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil me-1"></i>Düzenle
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Bu haberi silmek istediğinizden emin misiniz?');">
+                                    <i class="bi bi-trash me-1"></i>Sil
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </article>
+
+            <!-- Paylaşım Bölümü -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">
+                        <i class="bi bi-share text-primary me-2"></i>Bu Haberi Paylaş
+                    </h5>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=@Url.ActionLink("Details", "News", new { id = Model.Id }, Context.Request.Scheme)"
+                           target="_blank" class="btn btn-primary btn-sm">
+                            <i class="bi bi-facebook me-1"></i>Facebook
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?text=@Model.Title&url=@Url.ActionLink("Details", "News", new { id = Model.Id }, Context.Request.Scheme)"
+                           target="_blank" class="btn btn-info btn-sm text-white">
+                            <i class="bi bi-twitter me-1"></i>Twitter
+                        </a>
+                        <a href="https://wa.me/?text=@Model.Title - @Url.ActionLink("Details", "News", new { id = Model.Id }, Context.Request.Scheme)"
+                           target="_blank" class="btn btn-success btn-sm">
+                            <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                        </a>
+                        <button class="btn btn-secondary btn-sm" onclick="copyToClipboard()">
+                            <i class="bi bi-link-45deg me-1"></i>Linki Kopyala
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diğer Haberler -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-newspaper text-primary me-2"></i>Diğer Haberler
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <a asp-action="Index" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-right me-2"></i>Tüm Haberleri Görüntüle
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function copyToClipboard() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(function() {
+                alert('Link kopyalandı!');
+            }, function(err) {
+                console.error('Link kopyalanamadı: ', err);
+            });
+        }
+    </script>
+
+    <style>
+        .news-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+            .news-content p {
+                margin-bottom: 1.5rem;
+            }
+
+        .card {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            border-bottom: none;
+        }
+
+        article {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+                
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-group .btn {
+            border-radius: 0.25rem;
+        }
+
+            .btn-group .btn:first-child {
+                margin-right: 0.5rem;
+            }
+    </style>
+}

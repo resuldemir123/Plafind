@@ -1,0 +1,64 @@
+@model AlanyaBusinessGuide.Models.Business
+
+@{
+    ViewData["Title"] = "İşletme Sil";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">İşletme Sil</h1>
+        <a href="@Url.Action("Businesses")" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Geri Dön
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-danger">İşletme Silme Onayı</h6>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Dikkat!</strong> Bu işletmeyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>İşletme Bilgileri</h5>
+                    <p><strong>Ad:</strong> @Model.Name</p>
+                    <p><strong>Kategori:</strong> @Model.Category</p>
+                    <p><strong>Adres:</strong> @Model.Address</p>
+                    <p><strong>Telefon:</strong> @Model.Phone</p>
+                    <p><strong>Durum:</strong> 
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge badge-success">Aktif</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-danger">Pasif</span>
+                        }
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h5>İstatistikler</h5>
+                    <p><strong>Toplam Yorum:</strong> @Model.TotalReviews</p>
+                    <p><strong>Ortalama Puan:</strong> @Model.AverageRating.ToString("F1")</p>
+                    <p><strong>Oluşturulma Tarihi:</strong> @Model.CreatedDate.ToString("dd.MM.yyyy")</p>
+                </div>
+            </div>
+
+            <form asp-action="DeleteBusiness" method="post" class="mt-4">
+                <input asp-for="Id" type="hidden" />
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Evet, Sil
+                    </button>
+                    <a href="@Url.Action("Businesses")" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> İptal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+﻿@model AlanyaBusinessGuide.Models.Business
+
+@{
+    ViewData["Title"] = "Yeni İşletme Ekle";
+}
+
+<h2>Yeni İşletme Ekle</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Name" class="control-label">Ad</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Address" class="control-label">Adres</label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Phone" class="control-label">Telefon</label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Category" class="control-label">Kategori</label>
+        <input asp-for="Category" class="form-control" />
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
+    <div class="form-group mt-3">
+        <input type="submit" value="Kaydet" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,96 @@
+﻿@model AlanyaBusinessGuide.Models.Reservation
+
+@{
+    ViewData["Title"] = "Rezervasyon Yap";
+    var business = ViewBag.Business as AlanyaBusinessGuide.Models.Business;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-calendar-check"></i> Rezervasyon Yap</h4>
+                </div>
+                <div class="card-body">
+                    @if (business != null)
+                    {
+                        <div class="alert alert-info">
+                            <h5>@business.Name</h5>
+                            <p class="mb-0"><i class="fas fa-map-marker-alt"></i> @business.Address</p>
+                            @if (!string.IsNullOrEmpty(business.Phone))
+                            {
+                                <p class="mb-0"><i class="fas fa-phone"></i> @business.Phone</p>
+                            }
+                        </div>
+                    }
+
+                    <form asp-action="Create" method="post">
+                        <input type="hidden" asp-for="BusinessId" value="@business?.Id" />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RequestedDate" class="form-label">Tarih</label>
+                                <input asp-for="RequestedDate" type="date" class="form-control" required
+                                       min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="RequestedDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RequestedTime" class="form-label">Saat</label>
+                                <input asp-for="RequestedTime" type="time" class="form-control" required />
+                                <span asp-validation-for="RequestedTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NumberOfPeople" class="form-label">Kişi Sayısı</label>
+                            <input asp-for="NumberOfPeople" type="number" class="form-control"
+                                   min="1" max="50" required />
+                            <span asp-validation-for="NumberOfPeople" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ContactPhone" class="form-label">İletişim Telefonu</label>
+                                <input asp-for="ContactPhone" type="tel" class="form-control"
+                                       placeholder="5XX XXX XX XX" required />
+                                <span asp-validation-for="ContactPhone" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ContactEmail" class="form-label">E-posta (Opsiyonel)</label>
+                                <input asp-for="ContactEmail" type="email" class="form-control" />
+                                <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label">Notlar (Opsiyonel)</label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"
+                                      placeholder="Özel istekleriniz varsa belirtebilirsiniz..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            @if (!User.IsInRole("Admin"))
+                            {
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-check"></i> Rezervasyon Oluştur
+                                </button>
+                            }
+                            <a asp-controller="Home" asp-action="Details" asp-route-id="@business?.Id"
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Geri Dön
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

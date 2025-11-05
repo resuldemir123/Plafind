@@ -1,0 +1,69 @@
+﻿@model RegisterViewModel
+@{
+ ViewData["Title"] = "Kayıt Ol";
+ Layout = "_Layout";
+}
+
+<style>
+ .auth-page {
+ min-height: calc(100vh -80px);
+ background: linear-gradient(135deg, #2b2f420%, #1b2030100%);
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ padding:40px0;
+ position: relative;
+ margin:0;
+ overflow: hidden;
+ }
+
+ .auth-page::before {
+ content: '';
+ position: absolute;
+ top:0; left:0; right:0; bottom:0;
+ background: radial-gradient(circle at20%20%, rgba(255,255,255,0.03)0%, transparent50%), radial-gradient(circle at80%80%, rgba(255,255,255,0.02)0%, transparent50%);
+ animation: backgroundShift20s ease-in-out infinite;
+ z-index:0;
+ }
+
+ @@keyframes backgroundShift {0%,100%{opacity:0.6;}50%{opacity:0.8;} }
+
+ .auth-card { background: rgba(10,14,22,0.72); backdrop-filter: blur(8px); border-radius:16px; box-shadow:08px30px rgba(0,0,0,0.6); padding:36px; max-width:560px; width:92%; position:relative; z-index:1; color:#e6eef8; }
+
+ .auth-header { text-align:center; margin-bottom:30px; }
+ .auth-icon { width:64px; height:64px; margin:0 auto12px; background: linear-gradient(135deg,#667eea,#764ba2); border-radius:50%; display:flex; align-items:center; justify-content:center; }
+ .auth-title { font-size:24px; font-weight:700; color:#f1f5f9; }
+ .auth-subtitle { color:#a8b3c7; font-size:13px; }
+
+ .auth-form-group { margin-bottom:16px; }
+ .auth-form-group label { display:block; margin-bottom:8px; color:#cbd5e1; font-weight:600; font-size:13px; }
+ .auth-form-control { width:100%; padding:10px12px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.03); color:#e6eef8; }
+ .auth-form-control:focus{ outline:none; box-shadow:04px rgba(102,126,234,0.06); }
+ .auth-btn-primary { width:100%; padding:12px; background: linear-gradient(135deg,#667eea,#764ba2); border:none; border-radius:8px; color:#fff; font-weight:600; }
+ .auth-footer{ text-align:center; margin-top:18px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.04);} .auth-footer a{ color:#9fb1ff; }
+
+ /* Responsive */
+ @@media (max-width:576px) { .auth-card{ padding:20px; width:94%; } .auth-title{ font-size:20px; } }
+</style>
+
+<div class="auth-page">
+ <div class="auth-card">
+ <div class="auth-header">
+ <div class="auth-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="002424" width="28" height="28"><path fill="white" d="M1512c2.2104-1.794-4s-1.79-4-4-4-41.79-441.79444zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm94c-2.670-81.34-84v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+ <h2 class="auth-title">Hesap Oluşturun</h2>
+ <p class="auth-subtitle">İşletmenizi Alanya'da tanıtmaya başlayın</p>
+ </div>
+
+ <form asp-action="Register" method="post" id="registerForm">
+ <div class="auth-form-group"><label asp-for="Email">E-posta</label><input asp-for="Email" class="auth-form-control" placeholder="ornek@email.com" /><span asp-validation-for="Email" class="auth-text-danger"></span></div>
+ <div class="auth-form-group"><label asp-for="Password">Şifre</label><input asp-for="Password" type="password" class="auth-form-control" id="password-input" /><span asp-validation-for="Password" class="auth-text-danger"></span></div>
+ <div class="auth-form-group"><label asp-for="ConfirmPassword">Şifreyi Doğrula</label><input asp-for="ConfirmPassword" type="password" class="auth-form-control" id="confirm-password-input" /><span asp-validation-for="ConfirmPassword" class="auth-text-danger"></span></div>
+ <div class="auth-form-group"><button type="submit" class="auth-btn-primary">Kayıt Ol</button></div>
+ <div class="auth-text-danger">@Html.ValidationSummary(false, "", new { @class = "auth-validation-summary" })</div>
+ </form>
+
+ <div class="auth-footer"><p style="color:#a8b3c7; font-size:14px; margin:0;">Zaten hesabınız var mı? <a asp-controller="Account" asp-action="Login">Giriş Yapın</a></p></div>
+ </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

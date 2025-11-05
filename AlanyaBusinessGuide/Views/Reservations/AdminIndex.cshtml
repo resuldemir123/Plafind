@@ -1,0 +1,199 @@
+@model IEnumerable<AlanyaBusinessGuide.Models.Reservation>
+
+@{
+    ViewData["Title"] = "Rezervasyon Yönetimi";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Rezervasyon Yönetimi</h1>
+        <span class="badge badge-primary">@Model.Count() rezervasyon</span>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Tüm Rezervasyonlar</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>İşletme</th>
+                            <th>Kullanıcı</th>
+                            <th>Tarih</th>
+                            <th>Saat</th>
+                            <th>Kişi</th>
+                            <th>Durum</th>
+                            <th>İletişim</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var reservation in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@reservation.Business?.Name</strong><br>
+                                    <small class="text-muted">@reservation.Business?.Category</small>
+                                </td>
+                                <td>
+                                    <strong>@reservation.User?.FullName</strong><br>
+                                    <small class="text-muted">@reservation.ContactPhone</small>
+                                </td>
+                                <td>@reservation.RequestedDate.ToString("dd.MM.yyyy")</td>
+                                <td>@reservation.RequestedTime.ToString(@"hh\:mm")</td>
+                                <td>@reservation.NumberOfPeople</td>
+                                <td>
+                                    @switch (reservation.Status)
+                                    {
+                                        case "Beklemede":
+                                            <span class="badge badge-warning">Beklemede</span>
+                                            break;
+                                        case "Onaylandı":
+                                            <span class="badge badge-success">Onaylandı</span>
+                                            break;
+                                        case "Reddedildi":
+                                            <span class="badge badge-danger">Reddedildi</span>
+                                            break;
+                                        case "İptal":
+                                            <span class="badge badge-secondary">İptal</span>
+                                            break;
+                                        default:
+                                            <span class="badge badge-info">@reservation.Status</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    <small>
+                                        <i class="fas fa-phone"></i> @reservation.ContactPhone<br>
+                                        @if (!string.IsNullOrEmpty(reservation.ContactEmail))
+                                        {
+                                            <i class="fas fa-envelope"></i> @reservation.ContactEmail
+                                        }
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        @if (reservation.Status == "Beklemede")
+                                        {
+                                            <a href="@Url.Action("Approve", new { id = reservation.Id })" 
+                                               class="btn btn-sm btn-success"
+                                               onclick="return confirm('Bu rezervasyonu onaylamak istediğinizden emin misiniz?')">
+                                                <i class="fas fa-check"></i> Onayla
+                                            </a>
+                                            <a href="@Url.Action("Reject", new { id = reservation.Id })" 
+                                               class="btn btn-sm btn-danger"
+                                               onclick="return confirm('Bu rezervasyonu reddetmek istediğinizden emin misiniz?')">
+                                                <i class="fas fa-times"></i> Reddet
+                                            </a>
+                                        }
+                                        <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal@(reservation.Id)">
+                                            <i class="fas fa-eye"></i> Detay
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detay Modalları -->
+@foreach (var reservation in Model)
+{
+    <div class="modal fade" id="detailsModal@(reservation.Id)" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rezervasyon Detayları</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>İşletme Bilgileri</h6>
+                            <p><strong>Ad:</strong> @reservation.Business?.Name</p>
+                            <p><strong>Kategori:</strong> @reservation.Business?.Category</p>
+                            <p><strong>Adres:</strong> @reservation.Business?.Address</p>
+                            <p><strong>Telefon:</strong> @reservation.Business?.Phone</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Rezervasyon Bilgileri</h6>
+                            <p><strong>Tarih:</strong> @reservation.RequestedDate.ToString("dd.MM.yyyy")</p>
+                            <p><strong>Saat:</strong> @reservation.RequestedTime.ToString(@"hh\:mm")</p>
+                            <p><strong>Kişi Sayısı:</strong> @reservation.NumberOfPeople</p>
+                            <p><strong>Durum:</strong> 
+                                @switch (reservation.Status)
+                                {
+                                    case "Beklemede":
+                                        <span class="badge badge-warning">Beklemede</span>
+                                        break;
+                                    case "Onaylandı":
+                                        <span class="badge badge-success">Onaylandı</span>
+                                        break;
+                                    case "Reddedildi":
+                                        <span class="badge badge-danger">Reddedildi</span>
+                                        break;
+                                    case "İptal":
+                                        <span class="badge badge-secondary">İptal</span>
+                                        break;
+                                    default:
+                                        <span class="badge badge-info">@reservation.Status</span>
+                                        break;
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6>Kullanıcı Bilgileri</h6>
+                            <p><strong>Ad Soyad:</strong> @reservation.User?.FullName</p>
+                            <p><strong>Telefon:</strong> @reservation.ContactPhone</p>
+                            @if (!string.IsNullOrEmpty(reservation.ContactEmail))
+                            {
+                                <p><strong>E-posta:</strong> @reservation.ContactEmail</p>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Zaman Bilgileri</h6>
+                            <p><strong>Oluşturulma:</strong> @reservation.CreatedDate.ToString("dd.MM.yyyy HH:mm")</p>
+                            @if (reservation.UpdatedDate.HasValue)
+                            {
+                                <p><strong>Güncellenme:</strong> @reservation.UpdatedDate.Value.ToString("dd.MM.yyyy HH:mm")</p>
+                            }
+                        </div>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(reservation.Notes))
+                    {
+                        <div class="mt-3">
+                            <h6>Özel Notlar</h6>
+                            <p class="bg-light p-3 rounded">@reservation.Notes</p>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    @if (reservation.Status == "Beklemede")
+                    {
+                        <a href="@Url.Action("Approve", new { id = reservation.Id })" 
+                           class="btn btn-success"
+                           onclick="return confirm('Bu rezervasyonu onaylamak istediğinizden emin misiniz?')">
+                            <i class="fas fa-check"></i> Onayla
+                        </a>
+                        <a href="@Url.Action("Reject", new { id = reservation.Id })" 
+                           class="btn btn-danger"
+                           onclick="return confirm('Bu rezervasyonu reddetmek istediğinizden emin misiniz?')">
+                            <i class="fas fa-times"></i> Reddet
+                        </a>
+                    }
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

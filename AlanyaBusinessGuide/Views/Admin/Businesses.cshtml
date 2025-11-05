@@ -1,0 +1,99 @@
+@model IEnumerable<AlanyaBusinessGuide.Models.Business>
+
+@{
+    ViewData["Title"] = "İşletme Yönetimi";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">İşletme Yönetimi</h1>
+        <a href="@Url.Action("CreateBusiness")" class="btn btn-primary btn-sm shadow-sm">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Yeni İşletme
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">İşletmeler</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>İşletme Adı</th>
+                            <th>Kategori</th>
+                            <th>Adres</th>
+                            <th>Telefon</th>
+                            <th>Durum</th>
+                            <th>Puan</th>
+                            <th>Yorum Sayısı</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var business in Model)
+                        {
+                            <tr>
+                                <td>@business.Name</td>
+                                <td>@business.Category</td>
+                                <td>@business.Address</td>
+                                <td>@business.Phone</td>
+                                <td>
+                                    @if (business.IsActive)
+                                    {
+                                        <span class="badge badge-success">Aktif</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger">Pasif</span>
+                                    }
+                                    @if (!business.IsApproved)
+                                    {
+                                        <span class="badge badge-warning">Onay Bekliyor</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="mr-1">@business.AverageRating.ToString("F1")</span>
+                                        <div class="text-warning">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= business.AverageRating)
+                                                {
+                                                    <i class="fas fa-star"></i>
+                                                }
+                                                else if (i - 0.5 <= business.AverageRating)
+                                                {
+                                                    <i class="fas fa-star-half-alt"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-star"></i>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@business.TotalReviews</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="@Url.Action("EditBusiness", new { id = business.Id })" 
+                                           class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="@Url.Action("DeleteBusiness", new { id = business.Id })" 
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Bu işletmeyi silmek istediğinizden emin misiniz?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

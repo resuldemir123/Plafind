@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Alanya İşletme Rehberi</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        /* Small global adjustments for header/footer aesthetics */
+        body {
+            padding-top: 80px;
+            background: #f8f9fa;
+        }
+
+        .navbar-brand {
+            font-size: 1.05rem;
+        }
+
+        .footer {
+            background: #0b1220;
+            color: #e9ecef;
+        }
+
+            .footer a {
+                color: #e9ecef;
+            }
+
+        .top-2 {
+            top: .5rem;
+        }
+
+        .end-2 {
+            right: .5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold text-white" href="@Url.Action("Index", "Home")">
+                    <i class="fas fa-building text-warning me-2"></i>
+                    <span class="text-white">Pla</span><span class="text-warning">Find</span>
+                </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link fw-medium text-white" href="@Url.Action("Index", "Home")">
+                                <i class="fas fa-home me-1 text-warning"></i> Ana Sayfa
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-medium text-white" href="@Url.Action("Search", "Home")">
+                                <i class="fas fa-search me-1 text-info"></i> İşletme Ara
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-medium text-white" href="@Url.Action("Index", "News")">
+                                <i class="fas fa-newspaper me-1 text-warning"></i> Haberler
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-medium text-white" href="@Url.Action("Contact", "Home")">
+                                <i class="fas fa-envelope me-1 text-success"></i> İletişim
+                            </a>
+                        </li>
+
+                        @* Roles *@
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle fw-medium text-white" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-cog me-1 text-danger"></i> Admin Panel
+                                    </a>
+                                    <ul class="dropdown-menu shadow border-0" aria-labelledby="adminDropdown">
+                                        <li><a class="dropdown-item py-2" href="@Url.Action("Index", "Admin")"><i class="fas fa-tachometer-alt me-2 text-primary"></i> Dashboard</a></li>
+                                        <li><a class="dropdown-item py-2" href="@Url.Action("Businesses", "Admin")"><i class="fas fa-building me-2 text-primary"></i> İşletmeler</a></li>
+                                        <li><a class="dropdown-item py-2" href="@Url.Action("CreateBusiness", "Admin")"><i class="fas fa-plus me-2 text-success"></i> İşletme Ekle</a></li>
+                                        <li><a class="dropdown-item py-2" href="@Url.Action("Users", "Admin")"><i class="fas fa-users me-2 text-info"></i> Kullanıcılar</a></li>
+                                        <li><a class="dropdown-item py-2" href="@Url.Action("Reviews", "Admin")"><i class="fas fa-comments me-2 text-warning"></i> Yorumlar</a></li>
+                                        <li><a class="dropdown-item py-2" href="@Url.Action("AdminIndex", "Reservations")"><i class="fas fa-calendar-check me-2 text-secondary"></i> Rezervasyonlar</a></li>
+                                    </ul>
+                                </li>
+                            }
+                            else if (User.IsInRole("User"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle fw-medium text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-user me-1 text-success"></i> Panelim
+                                    </a>
+                                    <ul class="dropdown-menu shadow border-0" aria-labelledby="userDropdown">
+                                        <li><a class="dropdown-item py-2" href="@Url.Action("Index", "User")"><i class="fas fa-tachometer-alt me-2 text-primary"></i> Dashboard</a></li>
+                                        <li><a class="dropdown-item py-2" href="@Url.Action("Favorites", "User")"><i class="fas fa-heart me-2 text-danger"></i> Favorilerim</a></li>
+                                        <li><a class="dropdown-item py-2" href="@Url.Action("MyReviews", "User")"><i class="fas fa-comments me-2 text-warning"></i> Yorumlarım</a></li>
+                                        <li><a class="dropdown-item py-2" href="@Url.Action("Index", "Reservations")"><i class="fas fa-calendar-check me-2 text-info"></i> Rezervasyonlarım</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+                    </ul>
+
+                    @await Html.PartialAsync("_LoginPartial")
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main" class="pb-5">
+        <div class="container">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="footer mt-5">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="fw-bold mb-4 text-white"><i class="fas fa-tags me-2 text-warning"></i>Kategoriler</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="@Url.Action("Search", "Home", new { category = "Restoran" })" class="text-light text-decoration-none d-flex align-items-center"><i class="fas fa-utensils me-2 text-warning"></i>Restoran</a></li>
+                        <li class="mb-2"><a href="@Url.Action("Search", "Home", new { category = "Otel" })" class="text-light text-decoration-none d-flex align-items-center"><i class="fas fa-bed me-2 text-info"></i>Otel</a></li>
+                        <li class="mb-2"><a href="@Url.Action("Search", "Home", new { category = "Mağaza" })" class="text-light text-decoration-none d-flex align-items-center"><i class="fas fa-store me-2 text-success"></i>Mağaza</a></li>
+                        <li class="mb-2"><a href="@Url.Action("Search", "Home", new { category = "Spa & Wellness" })" class="text-light text-decoration-none d-flex align-items-center"><i class="fas fa-spa me-2 text-warning"></i>Spa & Wellness</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="fw-bold mb-4 text-white"><i class="fas fa-link me-2 text-warning"></i>Hızlı Linkler</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="@Url.Action("Index", "Home")" class="text-light text-decoration-none d-flex align-items-center"><i class="fas fa-home me-2 text-primary"></i>Ana Sayfa</a></li>
+                        <li class="mb-2"><a href="@Url.Action("Search", "Home")" class="text-light text-decoration-none d-flex align-items-center"><i class="fas fa-search me-2 text-info"></i>İşletme Ara</a></li>
+                        <li class="mb-2"><a href="@Url.Action("Index", "News")" class="text-light text-decoration-none d-flex align-items-center"><i class="fas fa-newspaper me-2 text-warning"></i>Haberler</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="fw-bold mb-4 text-white"><i class="fas fa-phone me-2 text-warning"></i>İletişim</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-3 d-flex align-items-center"><i class="fas fa-map-marker-alt me-3 text-danger"></i><span>Alanya, Antalya</span></li>
+                        <li class="mb-3 d-flex align-items-center"><i class="fas fa-phone me-3 text-success"></i><span>+90 551 174 66 72</span></li>
+                        <li class="mb-3 d-flex align-items-center"><i class="fas fa-envelope me-3 text-warning"></i><span>info@alanyabusinessguide.com</span></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="fw-bold mb-4 text-white"><i class="fas fa-share-alt me-2 text-warning"></i>Bizi Takip Edin</h5>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="#" class="btn btn-outline-warning btn-sm rounded-circle"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-outline-info btn-sm rounded-circle"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="btn btn-outline-danger btn-sm rounded-circle"><i class="fab fa-instagram"></i></a>
+                    </div>
+                    <div class="mt-4">
+                        <h6 class="fw-bold text-white mb-3">Newsletter</h6>
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="E-posta adresiniz">
+                            <button class="btn btn-warning" type="button"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4 border-secondary">
+
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-12 mb-3 mb-lg-0">
+                    <p class="mb-0 text-white"><i class="fas fa-copyright me-2 text-warning"></i>2025 - Alanya İşletme Rehberi - Tüm Hakları Saklıdır</p>
+                </div>
+                <div class="col-lg-6 col-md-12 text-lg-end">
+                    <div class="d-flex flex-wrap gap-3 justify-content-lg-end">
+                        <a href="#" class="text-white text-decoration-none"><i class="fas fa-shield-alt me-1 text-warning"></i>Gizlilik Politikası</a>
+                        <a href="#" class="text-white text-decoration-none"><i class="fas fa-file-contract me-1 text-warning"></i>Kullanım Şartları</a>
+                        <a href="#" class="text-white text-decoration-none"><i class="fas fa-question-circle me-1 text-warning"></i>Yardım</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

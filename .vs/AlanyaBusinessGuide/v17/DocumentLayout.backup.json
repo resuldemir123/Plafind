@@ -1,0 +1,498 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\areas\\admin\\views\\reservations\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\areas\\admin\\views\\reservations\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\news\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\news\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\reservations\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\reservations\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\businesses\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\businesses\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\user\\businessdetails.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\user\\businessdetails.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\controllers\\reservationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\controllers\\reservationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\reservations\\adminindex.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\reservations\\adminindex.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\reservations\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\reservations\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\news\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\news\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\home\\search.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\home\\search.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\reviews\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\reviews\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\reviews\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\reviews\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\reservations\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\reservations\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\businesses\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\businesses\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\models\\review.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\models\\review.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\controllers\\businessescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\controllers\\businessescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\news\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\news\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\news\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\news\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\models\\news.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\models\\news.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\controllers\\newscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\controllers\\newscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\news\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\news\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|c:\\users\\resuldemir\\source\\repos\\alanyabusinessguide\\alanyabusinessguide\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{F7DD7291-BEBE-436A-9ED9-D176BC310F55}|AlanyaBusinessGuide\\AlanyaBusinessGuide.csproj|solutionrelative:alanyabusinessguide\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 164,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Register.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Account\\Register.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Account\\Register.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Account\\Register.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Account\\Register.cshtml",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAB8AAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-03T12:43:17.088Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "site.css",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\wwwroot\\css\\site.css",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\wwwroot\\css\\site.css",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\wwwroot\\css\\site.css",
+              "RelativeToolTip": "AlanyaBusinessGuide\\wwwroot\\css\\site.css",
+              "ViewState": "AgIAAAYCAAAAAAAAAAApwCMCAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-11-03T12:40:14.446Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAJ4CAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-03T12:26:56.11Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Data\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAADkAAAAAAAAAAAAlwFMAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-03T12:25:00.98Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "BusinessDetails.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\User\\BusinessDetails.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\User\\BusinessDetails.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\User\\BusinessDetails.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\User\\BusinessDetails.cshtml",
+              "ViewState": "AgIAABoAAAAAAAAAAAAjwDQAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-03T12:24:33.302Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Controllers\\AccountController.cs",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Controllers\\AccountController.cs",
+              "ViewState": "AgIAAFEAAAAAAAAAAAAAwCgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-03T12:22:11.989Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Reservations\\Create.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Reservations\\Create.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Reservations\\Create.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Reservations\\Create.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-03T12:16:07.569Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "AdminIndex.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Reservations\\AdminIndex.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Reservations\\AdminIndex.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Reservations\\AdminIndex.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Reservations\\AdminIndex.cshtml",
+              "ViewState": "AgIAAEgAAAAAAAAAAAAAAF4AAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-03T12:15:54.569Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Details.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Areas\\Admin\\Views\\Reservations\\Details.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Areas\\Admin\\Views\\Reservations\\Details.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Areas\\Admin\\Views\\Reservations\\Details.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Areas\\Admin\\Views\\Reservations\\Details.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-03T12:10:56.624Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "ReservationsController.cs",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Controllers\\ReservationsController.cs",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Controllers\\ReservationsController.cs",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Controllers\\ReservationsController.cs",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Controllers\\ReservationsController.cs",
+              "ViewState": "AgIAAI4AAAAAAAAAAAAEwKoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-03T12:02:39.545Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Details.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Reservations\\Details.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Reservations\\Details.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Reservations\\Details.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Reservations\\Details.cshtml",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAAB4AAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-03T12:00:25.836Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Login.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Account\\Login.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Account\\Login.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Account\\Login.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Account\\Login.cshtml",
+              "ViewState": "AgIAAOUAAAAAAAAAAAAQwAYBAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-29T11:32:05.381Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Reviews\\Index.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Reviews\\Index.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Reviews\\Index.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Reviews\\Index.cshtml",
+              "ViewState": "AgIAAIwAAAAAAAAAAAAkwJ4AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-26T11:50:20.508Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Reviews\\Create.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Reviews\\Create.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Reviews\\Create.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Reviews\\Create.cshtml",
+              "ViewState": "AgIAAIwAAAAAAAAAAAAkwKkAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-26T11:50:16.577Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Reservations\\Index.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Reservations\\Index.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Reservations\\Index.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Reservations\\Index.cshtml",
+              "ViewState": "AgIAAH4AAAAAAAAAAAAAAJUAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-26T11:50:09.558Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Businesses\\Create.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Businesses\\Create.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Businesses\\Create.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Businesses\\Create.cshtml",
+              "ViewState": "AgIAADMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-26T11:50:02.465Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "Review.cs",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Models\\Review.cs",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Models\\Review.cs",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Models\\Review.cs",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Models\\Review.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T10:28:39.679Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Details.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Businesses\\Details.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Businesses\\Details.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Businesses\\Details.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Businesses\\Details.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-26T10:20:11.75Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "BusinessesController.cs",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Controllers\\BusinessesController.cs",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Controllers\\BusinessesController.cs",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Controllers\\BusinessesController.cs",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Controllers\\BusinessesController.cs",
+              "ViewState": "AgIAAIQAAAAAAAAAAAAmwJsAAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T10:18:13.512Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Controllers\\HomeController.cs",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAAAawCkAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T10:18:07.975Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "Search.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Home\\Search.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Home\\Search.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Home\\Search.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Home\\Search.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-26T10:17:28.477Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Delete.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\News\\Delete.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\News\\Delete.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\News\\Delete.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\News\\Delete.cshtml",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAB4AAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-26T10:11:56.423Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "Edit.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\News\\Edit.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\News\\Edit.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\News\\Edit.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\News\\Edit.cshtml",
+              "ViewState": "AgIAALcAAAAAAAAAAAAkwMkAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-26T10:11:45.639Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\News\\Create.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\News\\Create.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\News\\Create.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\News\\Create.cshtml",
+              "ViewState": "AgIAAIUAAAAAAAAAAAAkwJgAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-26T10:07:50.391Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "News.cs",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Models\\News.cs",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Models\\News.cs",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Models\\News.cs",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Models\\News.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAABBwA0AAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T10:03:11.5Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "NewsController.cs",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Controllers\\NewsController.cs",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Controllers\\NewsController.cs",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Controllers\\NewsController.cs",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Controllers\\NewsController.cs",
+              "ViewState": "AgIAADYAAAAAAAAAAAAAAKUAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-26T10:02:59.756Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "Details.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\News\\Details.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\News\\Details.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\News\\Details.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\News\\Details.cshtml",
+              "ViewState": "AgIAAJAAAAAAAAAAAAAkwKUAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-26T10:02:16.012Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAD4AAAAAAAAAAAAswE8AAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-26T09:57:44.234Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\News\\Index.cshtml",
+              "RelativeDocumentMoniker": "AlanyaBusinessGuide\\Views\\News\\Index.cshtml",
+              "ToolTip": "C:\\Users\\resuldemir\\Source\\Repos\\AlanyaBusinessGuide\\AlanyaBusinessGuide\\Views\\News\\Index.cshtml",
+              "RelativeToolTip": "AlanyaBusinessGuide\\Views\\News\\Index.cshtml",
+              "ViewState": "AgIAAMABAAAAAAAAAAAAAOIBAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-26T09:56:59.467Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

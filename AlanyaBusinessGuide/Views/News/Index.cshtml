@@ -1,0 +1,483 @@
+﻿@model IEnumerable<AlanyaBusinessGuide.Models.News>
+@{
+    ViewData["Title"] = "Haberler";
+}
+
+<div class="news-page-wrapper">
+    <div class="container py-5">
+        <!-- Başlık Bölümü -->
+        <div class="page-header mb-5">
+            <div class="header-content">
+                <div class="header-icon-wrapper">
+                    <i class="bi bi-newspaper"></i>
+                </div>
+                <div>
+                    <h1 class="page-title mb-2">Haberler</h1>
+                    <p class="page-subtitle mb-0">En son haberler ve güncellemeler</p>
+                </div>
+            </div>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Create" class="btn-create">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    <span>Yeni Haber Ekle</span>
+                </a>
+            }
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="row g-4">
+                @foreach (var item in Model)
+                {
+                    <div class="col-12">
+                        <article class="news-article">
+                            <div class="row g-0">
+                                <!-- Resim Bölümü -->
+                                <div class="col-md-4">
+                                    <div class="article-image-wrapper">
+                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                        {
+                                            <img src="@item.ImageUrl" class="article-image" alt="@item.Title">
+                                            <div class="image-overlay"></div>
+                                        }
+                                        else
+                                        {
+                                            <div class="article-placeholder">
+                                                <i class="bi bi-newspaper"></i>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- İçerik Bölümü -->
+                                <div class="col-md-8">
+                                    <div class="article-content">
+                                        <!-- Başlık -->
+                                        <h2 class="article-title">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="article-link">
+                                                @item.Title
+                                            </a>
+                                        </h2>
+
+                                        <!-- Özet -->
+                                        <div class="article-summary">
+                                            @{
+                                                var summary = item.Content.Length > 200
+                                                ? item.Content.Substring(0, 200) + "..."
+                                                : item.Content;
+                                            }
+                                            <p>@summary</p>
+                                        </div>
+
+                                        <!-- Meta Bilgiler -->
+                                        <div class="article-meta">
+                                            <div class="meta-items">
+                                                <span class="meta-item">
+                                                    <i class="bi bi-person-circle"></i>
+                                                    <span>@(item.Author?.UserName ?? "Bilinmiyor")</span>
+                                                </span>
+                                                <span class="meta-divider">•</span>
+                                                <span class="meta-item">
+                                                    <i class="bi bi-calendar3"></i>
+                                                    <span>@item.PublishDate.ToString("dd MMMM yyyy")</span>
+                                                </span>
+                                                <span class="meta-divider">•</span>
+                                                <span class="meta-item">
+                                                    <i class="bi bi-eye"></i>
+                                                    <span>@(item.ViewCount ?? 0) görüntülenme</span>
+                                                </span>
+                                            </div>
+
+                                            <!-- Aksiyon Butonları -->
+                                            <div class="article-actions">
+                                                <a asp-action="Details" asp-route-id="@item.Id" class="btn-read-more">
+                                                    Devamını Oku
+                                                    <i class="bi bi-arrow-right ms-2"></i>
+                                                </a>
+                                                @if (User.IsInRole("Admin"))
+                                                {
+                                                    <div class="admin-actions">
+                                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                                           class="btn-admin btn-edit"
+                                                           title="Düzenle">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </a>
+                                                        <a asp-action="Delete" asp-route-id="@item.Id"
+                                                           class="btn-admin btn-delete"
+                                                           title="Sil"
+                                                           onclick="return confirm('Bu haberi silmek istediğinizden emin misiniz?');">
+                                                            <i class="bi bi-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-inbox"></i>
+                </div>
+                <h3 class="empty-state-title">Henüz haber bulunmamaktadır</h3>
+                @if (User.IsInRole("Admin"))
+                {
+                    <p class="empty-state-text">İlk haberi oluşturmak için yukarıdaki "Yeni Haber Ekle" butonuna tıklayın.</p>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .news-page-wrapper {
+        background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+        min-height: 100vh;
+    }
+
+    /* Başlık Bölümü */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid #e9ecef;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .header-icon-wrapper {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    }
+
+        .header-icon-wrapper i {
+            font-size: 2rem;
+            color: white;
+        }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #212529;
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+
+    .page-subtitle {
+        font-size: 1rem;
+        color: #6c757d;
+        font-weight: 400;
+    }
+
+    .btn-create {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.875rem 1.75rem;
+        background: linear-gradient(135deg, #198754 0%, #157347 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(25, 135, 84, 0.3);
+    }
+
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(25, 135, 84, 0.4);
+            color: white;
+        }
+
+    /* Haber Kartı */
+    .news-article {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #e9ecef;
+    }
+
+        .news-article:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            border-color: #dee2e6;
+        }
+
+    /* Resim Bölümü */
+    .article-image-wrapper {
+        position: relative;
+        height: 100%;
+        min-height: 280px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .article-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .news-article:hover .article-image {
+        transform: scale(1.08);
+    }
+
+    .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 100%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .news-article:hover .image-overlay {
+        opacity: 1;
+    }
+
+    .article-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+        .article-placeholder i {
+            font-size: 4rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+    /* İçerik Bölümü */
+    .article-content {
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 280px;
+    }
+
+    .article-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1.4;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+
+    .article-link {
+        color: #212529;
+        text-decoration: none;
+        transition: color 0.3s ease;
+        display: inline-block;
+    }
+
+        .article-link:hover {
+            color: #0d6efd;
+        }
+
+    .article-summary {
+        flex-grow: 1;
+        margin-bottom: 1.5rem;
+    }
+
+        .article-summary p {
+            color: #6c757d;
+            font-size: 1rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+    /* Meta Bilgiler */
+    .article-meta {
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .meta-items {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    .meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+        .meta-item i {
+            font-size: 1rem;
+            color: #0d6efd;
+        }
+
+    .meta-divider {
+        color: #dee2e6;
+    }
+
+    /* Aksiyon Butonları */
+    .article-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-read-more {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.625rem 1.25rem;
+        background: #0d6efd;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+        .btn-read-more:hover {
+            background: #0b5ed7;
+            color: white;
+            transform: translateX(4px);
+        }
+
+    .admin-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-admin {
+        width: 38px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+
+    .btn-edit {
+        background: #ffc107;
+        color: #000;
+    }
+
+        .btn-edit:hover {
+            background: #ffb800;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+        }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+        .btn-delete:hover {
+            background: #bb2d3b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+
+    /* Boş Durum */
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-state-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 2rem;
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .empty-state-icon i {
+            font-size: 3rem;
+            color: white;
+        }
+
+    .empty-state-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 0.75rem;
+    }
+
+    .empty-state-text {
+        font-size: 1.125rem;
+        color: #6c757d;
+        margin: 0;
+    }
+
+    <style >
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .page-header
+
+    {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-icon-wrapper {
+        width: 60px;
+        height: 60px;
+    }
+
+        .header-icon-wrapper i {
+            font-size: 1.75rem;
+        }
+
+    .page-title {
+        font-size: 2rem;
+    }
+    /* ... diğer kurallar ... */
+    }
+
+</style>
