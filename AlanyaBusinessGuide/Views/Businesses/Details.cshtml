@@ -1,204 +1,241 @@
-﻿@model AlanyaBusinessGuide.Models.Business
+﻿@using System.Globalization
+@model AlanyaBusinessGuide.ViewModels.BusinessDetailsViewModel
 @{
-    ViewData["Title"] = Model.Name + " - İşletme Detayları";
+    var business = Model.Business;
+    ViewData["Title"] = $"{business.Name} - İşletme Detayları";
+    var hasImage = !string.IsNullOrWhiteSpace(business.ImageUrl);
+    var hasLocation = business.Latitude.HasValue && business.Longitude.HasValue;
+    var locationLat = hasLocation ? business.Latitude!.Value.ToString(CultureInfo.InvariantCulture) : string.Empty;
+    var locationLng = hasLocation ? business.Longitude!.Value.ToString(CultureInfo.InvariantCulture) : string.Empty;
+    var heroBackground = hasImage
+        ? $"background-image: linear-gradient(135deg, rgba(7,17,38,0.92) 0%, rgba(7,17,38,0.6) 50%, rgba(7,17,38,0.95) 100%), url('{business.ImageUrl}');"
+        : string.Empty;
 }
+@Html.AntiForgeryToken()
 
-<div class="container py-4">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Ana Sayfa</a></li>
-            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Search">İşletmeler</a></li>
-            <li class="breadcrumb-item active">@Model.Name</li>
-        </ol>
-    </nav>
+<section class="business-hero @(hasImage ? "with-image" : "no-image")" style="@heroBackground">
+    <div class="hero-overlay">
+        <div class="container">
+            <nav aria-label="breadcrumb" class="hero-breadcrumb">
+                <ol class="breadcrumb mb-3">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Ana Sayfa</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Search">İşletmeler</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">@business.Name</li>
+                </ol>
+            </nav>
 
-    <div class="row">
-        <!-- Main Content -->
-        <div class="col-lg-8">
-            <!-- Business Header -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div>
-                            <h1 class="display-6 fw-bold mb-2">@Model.Name</h1>
-                            @if (Model.IsFeatured)
-                            {
-                                <span class="badge bg-warning text-dark mb-2">
-                                    <i class="fas fa-star me-1"></i>Öne Çıkan İşletme
-                                </span>
-                            }
-                        </div>
-                        @if (User.Identity.IsAuthenticated)
+            <div class="hero-content row g-4 align-items-center">
+                <div class="col-lg-7">
+                    <div class="hero-heading">
+                        <h1 class="hero-title">@business.Name</h1>
+                        @if (business.IsFeatured)
                         {
-                            <button class="btn btn-outline-danger btn-lg" title="Favorilere Ekle">
-                                <i class="far fa-heart"></i>
-                            </button>
-                        }
-                    </div>
-
-                    <!-- Rating -->
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center">
-                            <span class="display-6 fw-bold text-warning me-3">@Model.AverageRating.ToString("F1")</span>
-                            <div>
-                                <div class="d-flex mb-1">
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        @if (i <= Math.Round(Model.AverageRating))
-                                        {
-                                            <i class="fas fa-star text-warning fs-4"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="far fa-star text-warning fs-4"></i>
-                                        }
-                                    }
-                                </div>
-                                <p class="mb-0 text-muted">@Model.TotalReviews değerlendirme</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Category & Price -->
-                    <div class="mb-3">
-                        <span class="badge bg-primary fs-6 me-2">
-                            <i class="fas fa-tag me-1"></i>@(Model.Category?.Name ?? "Kategori Yok")
-                        </span>
-                        @if (!string.IsNullOrEmpty(Model.PriceRange))
-                        {
-                            <span class="badge bg-success fs-6">
-                                <i class="fas fa-dollar-sign me-1"></i>@Model.PriceRange
+                            <span class="hero-badge">
+                                <i class="fas fa-star me-1"></i>Öne Çıkan İşletme
                             </span>
                         }
                     </div>
 
-                    <!-- Quick Actions -->
-                    <div class="d-flex gap-2 flex-wrap">
-                        @if (!string.IsNullOrEmpty(Model.Phone))
+                    <div class="hero-rating">
+                        <div class="score">@business.AverageRating.ToString("F1")</div>
+                        <div class="stars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="@(i <= Math.Round(business.AverageRating) ? "fas" : "far") fa-star"></i>
+                            }
+                        </div>
+                        <span class="rating-count">@business.TotalReviews değerlendirme</span>
+                    </div>
+
+                    <div class="hero-tags">
+                        <span class="tag tag-category">
+                            <i class="fas fa-tag me-1"></i>@(business.Category?.Name ?? "Kategori Yok")
+                        </span>
+                        @if (!string.IsNullOrEmpty(business.PriceRange))
                         {
-                            <a href="tel:@Model.Phone" class="btn btn-success">
+                            <span class="tag tag-price">
+                                <i class="fas fa-dollar-sign me-1"></i>@business.PriceRange
+                            </span>
+                        }
+                    </div>
+
+                    <div class="hero-actions">
+                        @if (!string.IsNullOrEmpty(business.Phone))
+                        {
+                            <a href="tel:@business.Phone" class="hero-btn hero-btn--call">
                                 <i class="fas fa-phone me-2"></i>Ara
                             </a>
                         }
-                        @* Harici linkler (website, paylaşım, yol tarifi) şimdilik devre dışı *@
+                        @if (!string.IsNullOrEmpty(business.Email))
+                        {
+                            <a href="mailto:@business.Email" class="hero-btn hero-btn--email">
+                                <i class="fas fa-envelope me-2"></i>E-posta
+                            </a>
+                        }
+                        @if (!string.IsNullOrEmpty(business.Website))
+                        {
+                            <a href="@business.Website" target="_blank" class="hero-btn hero-btn--website">
+                                <i class="fas fa-external-link-alt me-2"></i>Website
+                            </a>
+                        }
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <button class="hero-btn hero-btn--favorite favorite-btn" 
+                                    data-business-id="@business.Id" 
+                                    title="Favorilere ekle">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="hero-meta">
+                        @if (!string.IsNullOrEmpty(business.WorkingHours))
+                        {
+                            <div class="meta-card">
+                                <span class="meta-icon text-info"><i class="fas fa-clock"></i></span>
+                                <div>
+                                    <p class="meta-label">Çalışma Saatleri</p>
+                                    <p class="meta-value">@business.WorkingHours</p>
+                                </div>
+                            </div>
+                        }
+                        <div class="meta-card">
+                            <span class="meta-icon text-warning"><i class="fas fa-star"></i></span>
+                            <div>
+                                <p class="meta-label">Değerlendirme</p>
+                                <p class="meta-value">@business.TotalReviews yorum</p>
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(business.Address))
+                        {
+                            <div class="meta-card">
+                                <span class="meta-icon text-danger"><i class="fas fa-map-marker-alt"></i></span>
+                                <div>
+                                    <p class="meta-label">Adres</p>
+                                    <p class="meta-value">@business.Address</p>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
 
-            <!-- Business Image -->
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <div class="card shadow-sm border-0 mb-4 overflow-hidden">
-                    <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name"
-                         style="max-height: 500px; object-fit: cover; width: 100%;">
-                </div>
-            }
-            else
-            {
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="bg-gradient-primary d-flex align-items-center justify-content-center"
-                         style="height: 400px;">
-                        <div class="text-center text-white">
-                            <i class="fas fa-building fa-5x opacity-50 mb-3"></i>
-                            <p class="fs-5">Resim mevcut değil</p>
+<section class="business-content py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                @if (hasImage)
+                {
+                    <div class="media-card mb-4">
+                        <img src="@business.ImageUrl" alt="@business.Name" class="media-image" />
+                        <div class="media-overlay">
+                            <div>
+                                <span class="media-label"><i class="fas fa-camera me-2"></i>Öne çıkan görsel</span>
+                                <p class="media-title">@business.Name</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
 
-            <!-- Description -->
-            @if (!string.IsNullOrEmpty(Model.Description))
-            {
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body p-4">
-                        <h3 class="fw-bold mb-3">
-                            <i class="fas fa-info-circle text-primary me-2"></i>Hakkında
-                        </h3>
-                        <p class="lead text-muted">@Model.Description</p>
+                <div class="info-grid mb-4">
+                    <div class="info-card">
+                        <span class="info-icon text-primary"><i class="fas fa-tags"></i></span>
+                        <h6>Kategori</h6>
+                        <p>@(business.Category?.Name ?? "Belirtilmemiş")</p>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-icon text-success"><i class="fas fa-dollar-sign"></i></span>
+                        <h6>Fiyat Aralığı</h6>
+                        <p>@(!string.IsNullOrEmpty(business.PriceRange) ? business.PriceRange : "Belirtilmemiş")</p>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-icon text-info"><i class="fas fa-phone"></i></span>
+                        <h6>Telefon</h6>
+                        <p>@(!string.IsNullOrEmpty(business.Phone) ? business.Phone : "Belirtilmemiş")</p>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-icon text-warning"><i class="fas fa-clock"></i></span>
+                        <h6>Çalışma Saatleri</h6>
+                        <p>@(!string.IsNullOrEmpty(business.WorkingHours) ? business.WorkingHours : "Belirtilmemiş")</p>
                     </div>
                 </div>
-            }
 
-            <!-- Working Hours -->
-            @if (!string.IsNullOrEmpty(Model.WorkingHours))
-            {
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body p-4">
-                        <h3 class="fw-bold mb-3">
-                            <i class="fas fa-clock text-primary me-2"></i>Çalışma Saatleri
-                        </h3>
-                        <p class="fs-5 text-muted mb-0">@Model.WorkingHours</p>
+                @if (!string.IsNullOrEmpty(business.Description))
+                {
+                    <div class="section-card mb-4">
+                        <div class="section-header">
+                            <i class="fas fa-info-circle me-2 text-warning"></i>
+                            <h3 class="section-title">İşletme Hakkında</h3>
+                        </div>
+                        <p class="section-text">@business.Description</p>
                     </div>
-                </div>
-            }
+                }
 
-            <!-- Reviews Section -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body p-4">
-                    <h3 class="fw-bold mb-4">
-                        <i class="fas fa-comments text-primary me-2"></i>
-                        Yorumlar (@Model.TotalReviews)
-                    </h3>
+                <div class="section-card mb-4">
+                    <div class="section-header">
+                        <i class="fas fa-comments me-2 text-warning"></i>
+                        <h3 class="section-title">Yorumlar</h3>
+                        <span class="badge bg-warning text-dark ms-auto">@business.TotalReviews</span>
+                    </div>
 
-                    @if (Model.Reviews != null && Model.Reviews.Any())
+                    @if (business.Reviews != null && business.Reviews.Any(r => r.IsApproved && r.IsActive))
                     {
-                        @foreach (var review in Model.Reviews.OrderByDescending(r => r.CreatedDate).Take(5))
-                        {
-                            <div class="border-bottom pb-3 mb-3">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        <h6 class="fw-bold mb-1">
-                                            <i class="fas fa-user-circle text-primary me-2"></i>
-                                            @(review.User?.UserName ?? "Anonim Kullanıcı")
-                                        </h6>
-                                        <div class="mb-1">
-                                            @for (int i = 1; i <= 5; i++)
-                                            {
-                                                @if (i <= review.Rating)
-                                                {
-                                                    <i class="fas fa-star text-warning"></i>
-                                                }
-                                                else
-                                                {
-                                                    <i class="far fa-star text-warning"></i>
-                                                }
-                                            }
+                        <div class="reviews-list">
+                            @foreach (var review in business.Reviews.Where(r => r.IsApproved && r.IsActive).OrderByDescending(r => r.CreatedDate).Take(5))
+                            {
+                                <div class="review-card">
+                                    <div class="review-header">
+                                        <div class="review-user">
+                                            <div class="avatar"><i class="fas fa-user"></i></div>
+                                            <div>
+                                                <h6>@(review.User?.FullName ?? review.User?.UserName ?? "Anonim Kullanıcı")</h6>
+                                                <div class="review-stars">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        <i class="@(i <= review.Rating ? "fas" : "far") fa-star"></i>
+                                                    }
+                                                </div>
+                                            </div>
                                         </div>
+                                        <span class="review-date">@review.CreatedDate.ToString("dd MMMM yyyy")</span>
                                     </div>
-                                    <small class="text-muted">@review.CreatedDate.ToString("dd MMMM yyyy")</small>
+                                    @if (!string.IsNullOrEmpty(review.Comment))
+                                    {
+                                        <p class="review-text">@review.Comment</p>
+                                    }
                                 </div>
-                                @if (!string.IsNullOrEmpty(review.Comment))
-                                {
-                                    <p class="mb-0 text-muted">@review.Comment</p>
-                                }
-                            </div>
-                        }
+                            }
+                        </div>
 
-                        @if (Model.TotalReviews > 5)
+                        @if (business.TotalReviews > 5)
                         {
-                            <div class="text-center mt-3">
-                                <button class="btn btn-outline-primary">
-                                    Tüm Yorumları Gör (@Model.TotalReviews)
+                            <div class="text-center mt-4">
+                                <button class="btn btn-outline-primary rounded-pill px-4">
+                                    Tüm yorumları görüntüle (@business.TotalReviews)
                                 </button>
                             </div>
                         }
                     }
                     else
                     {
-                        <div class="text-center py-5">
-                            <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
-                            <p class="text-muted fs-5">Henüz yorum yapılmamış.</p>
-                            <p class="text-muted">İlk yorumu siz yapın!</p>
+                        <div class="empty-state">
+                            <i class="fas fa-comment-slash"></i>
+                            <p>Henüz yorum yapılmamış.</p>
+                            <span class="text-muted">İlk yorumu siz yapın!</span>
                         </div>
                     }
 
                     @if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
                     {
                         <div class="mt-4">
-                            <button class="btn btn-primary btn-lg w-100">
+                            <a asp-controller="Reviews" asp-action="Create" asp-route-businessId="@business.Id" class="btn btn-primary w-100">
                                 <i class="fas fa-pen me-2"></i>Yorum Yap ve Puanla
-                            </button>
+                            </a>
                         </div>
                     }
                     else if (!User.Identity.IsAuthenticated)
@@ -210,157 +247,872 @@
                     }
                 </div>
             </div>
-        </div>
 
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <!-- Contact Info Card -->
-            <div class="card shadow-sm border-0 mb-4 sticky-top" style="top: 20px;">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4">
-                        <i class="fas fa-address-card text-primary me-2"></i>İletişim Bilgileri
-                    </h5>
+            <div class="col-lg-4">
+                <div class="section-card sidebar-card">
+                    <div class="section-header">
+                        <i class="fas fa-address-book me-2 text-warning"></i>
+                        <h3 class="section-title">İletişim Bilgileri</h3>
+                    </div>
 
-                    <!-- Address -->
-                    @if (!string.IsNullOrEmpty(Model.Address))
-                    {
-                        <div class="mb-3 pb-3 border-bottom">
-                            <h6 class="fw-semibold mb-2">
-                                <i class="fas fa-map-marker-alt text-danger me-2"></i>Adres
-                            </h6>
-                            <p class="mb-0 text-muted">@Model.Address</p>
-                            @* Harita bağlantısı şimdilik devre dışı *@
-                        </div>
-                    }
+                    <div class="contact-list">
+                        @if (!string.IsNullOrEmpty(business.Address))
+                        {
+                            <div class="contact-row">
+                                <span class="contact-icon text-danger"><i class="fas fa-map-marker-alt"></i></span>
+                                <div>
+                                    <p class="contact-label">Adres</p>
+                                    <p class="contact-value">@business.Address</p>
+                                </div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(business.Phone))
+                        {
+                            <div class="contact-row">
+                                <span class="contact-icon text-success"><i class="fas fa-phone"></i></span>
+                                <div>
+                                    <p class="contact-label">Telefon</p>
+                                    <a href="tel:@business.Phone" class="contact-action btn btn-success w-100">
+                                        <i class="fas fa-phone-alt me-2"></i>@business.Phone
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(business.Email))
+                        {
+                            <div class="contact-row">
+                                <span class="contact-icon text-warning"><i class="fas fa-envelope"></i></span>
+                                <div>
+                                    <p class="contact-label">E-posta</p>
+                                    <a href="mailto:@business.Email" class="contact-link">@business.Email</a>
+                                </div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(business.Website))
+                        {
+                            <div class="contact-row">
+                                <span class="contact-icon text-info"><i class="fas fa-globe"></i></span>
+                                <div>
+                                    <p class="contact-label">Website</p>
+                                    <a href="@business.Website" target="_blank" class="contact-action btn btn-info text-white w-100">
+                                        <i class="fas fa-external-link-alt me-2"></i>Websiteyi Ziyaret Et
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
 
-                    <!-- Phone -->
-                    @if (!string.IsNullOrEmpty(Model.Phone))
-                    {
-                        <div class="mb-3 pb-3 border-bottom">
-                            <h6 class="fw-semibold mb-2">
-                                <i class="fas fa-phone text-success me-2"></i>Telefon
-                            </h6>
-                            <a href="tel:@Model.Phone" class="btn btn-success w-100">
-                                <i class="fas fa-phone me-2"></i>@Model.Phone
-                            </a>
-                        </div>
-                    }
-
-                    <!-- Email -->
-                    @if (!string.IsNullOrEmpty(Model.Email))
-                    {
-                        <div class="mb-3 pb-3 border-bottom">
-                            <h6 class="fw-semibold mb-2">
-                                <i class="fas fa-envelope text-warning me-2"></i>E-posta
-                            </h6>
-                            <a href="mailto:@Model.Email" class="text-decoration-none d-block">
-                                @Model.Email
-                            </a>
-                        </div>
-                    }
-
-                    <!-- Website -->
-                    @if (!string.IsNullOrEmpty(Model.Website))
-                    {
-                        <div class="mb-3 pb-3 border-bottom">
-                            <h6 class="fw-semibold mb-2">
-                                <i class="fas fa-globe text-info me-2"></i>Website
-                            </h6>
-                            <a href="@Model.Website" target="_blank" class="btn btn-info text-white w-100">
-                                <i class="fas fa-external-link-alt me-2"></i>Websiteyi Ziyaret Et
-                            </a>
-                        </div>
-                    }
-
-                    <!-- Working Hours -->
-                    @if (!string.IsNullOrEmpty(Model.WorkingHours))
-                    {
-                        <div class="mb-3">
-                            <h6 class="fw-semibold mb-2">
-                                <i class="fas fa-clock text-primary me-2"></i>Çalışma Saatleri
-                            </h6>
-                            <p class="mb-0 text-muted">@Model.WorkingHours</p>
-                        </div>
-                    }
-
-                    <!-- Admin Actions -->
                     @if (User.IsInRole("Admin"))
                     {
-                        <hr class="my-4">
-                        <h6 class="fw-bold mb-3 text-danger">
-                            <i class="fas fa-user-shield me-2"></i>Admin İşlemleri
-                        </h6>
-                        <div class="d-grid gap-2">
-                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-                                <i class="fas fa-edit me-2"></i>Düzenle
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger"
-                               onclick="return confirm('Bu işletmeyi silmek istediğinizden emin misiniz?');">
-                                <i class="fas fa-trash me-2"></i>Sil
-                            </a>
+                        <div class="admin-tools mt-4 pt-4 border-top border-secondary">
+                            <h6 class="fw-bold text-danger mb-3">
+                                <i class="fas fa-user-shield me-2"></i>Admin İşlemleri
+                            </h6>
+                            <div class="d-grid gap-2">
+                                <a asp-action="Edit" asp-route-id="@business.Id" class="btn btn-warning">
+                                    <i class="fas fa-edit me-2"></i>Düzenle
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@business.Id" class="btn btn-danger"
+                                   onclick="return confirm('Bu işletmeyi silmek istediğinizden emin misiniz?');">
+                                    <i class="fas fa-trash me-2"></i>Sil
+                                </a>
+                            </div>
                         </div>
                     }
                 </div>
-            </div>
 
-            <!-- Share Card -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="fas fa-share-alt text-primary me-2"></i>Paylaş
-                    </h5>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <button class="btn btn-primary btn-sm">
-                            <i class="fab fa-facebook"></i>
+                @if (hasLocation)
+                {
+                    <div class="section-card sidebar-card mt-4">
+                        <div class="section-header">
+                            <i class="fas fa-map-marked-alt me-2 text-warning"></i>
+                            <h3 class="section-title">Konum</h3>
+                        </div>
+                        <div id="businessLocationMap"
+                             class="business-map"
+                             data-lat="@locationLat"
+                             data-lng="@locationLng"
+                             data-name="@business.Name">
+                        </div>
+                        <p class="map-note">
+                            <i class="fas fa-info-circle me-1"></i> Harita üzerinden yakınlaştırarak işletmenin tam konumunu görebilirsiniz.
+                        </p>
+                    </div>
+                }
+
+                <div class="section-card sidebar-card">
+                    <div class="section-header">
+                        <i class="fas fa-share-alt me-2 text-warning"></i>
+                        <h3 class="section-title">Paylaş</h3>
+                    </div>
+                    <div class="share-grid">
+                        <button class="share-pill share-pill--facebook" title="Facebook" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.href),'_blank')">
+                            <i class="fab fa-facebook-f"></i>
                         </button>
-                        <button class="btn btn-info btn-sm text-white">
+                        <button class="share-pill share-pill--twitter" title="X (Twitter)" onclick="window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(window.location.href),'_blank')">
                             <i class="fab fa-twitter"></i>
                         </button>
-                        <button class="btn btn-success btn-sm">
+                        <button class="share-pill share-pill--whatsapp" title="WhatsApp" onclick="window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(window.location.href),'_blank')">
                             <i class="fab fa-whatsapp"></i>
                         </button>
-                        <button class="btn btn-secondary btn-sm">
+                        <button class="share-pill share-pill--copy" title="Linki kopyala" onclick="copyToClipboard()">
                             <i class="fas fa-link"></i>
                         </button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Back Button -->
-            <a asp-controller="Home" asp-action="Search" class="btn btn-outline-secondary w-100 btn-lg">
-                <i class="fas fa-arrow-left me-2"></i>İşletmelere Geri Dön
-            </a>
+                <a asp-controller="Home" asp-action="Search" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-arrow-left me-2"></i>İşletmelere Geri Dön
+                </a>
+            </div>
         </div>
     </div>
-</div>
+</section>
+
+@if (Model.SimilarBusinesses != null && Model.SimilarBusinesses.Any())
+{
+    <section class="similar-businesses py-5">
+        <div class="container">
+            <div class="section-card">
+                <div class="section-header">
+                    <i class="fas fa-clone me-2 text-warning"></i>
+                    <h3 class="section-title">Benzer İşletmeler</h3>
+                    <span class="badge bg-secondary ms-auto">@Model.SimilarBusinesses.Count</span>
+                </div>
+                <div class="similar-grid">
+                    @foreach (var similar in Model.SimilarBusinesses)
+                    {
+                        var cover = string.IsNullOrWhiteSpace(similar.ImageUrl)
+                            ? Url.Content("~/images/190_alanya.jpg")
+                            : similar.ImageUrl;
+                        <article class="similar-card">
+                            <div class="similar-media" style="background-image: url('@cover');">
+                                <span class="similar-category">@similar.Category?.Name</span>
+                            </div>
+                            <div class="similar-body">
+                                <h4 class="similar-title">@similar.Name</h4>
+                                <p class="similar-meta">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    @(string.IsNullOrWhiteSpace(similar.Address) ? "Adres bilgisi yok" : similar.Address)
+                                </p>
+                                <div class="similar-rating">
+                                    <span class="score">@similar.AverageRating.ToString("F1")</span>
+                                    <span class="count">(@similar.TotalReviews)</span>
+                                </div>
+                                <a asp-controller="Businesses" asp-action="Details" asp-route-id="@similar.Id" class="btn btn-outline-warning w-100">
+                                    İncele
+                                </a>
+                            </div>
+                        </article>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+}
 
 <style>
-    .card {
-        border-radius: 12px;
+    .business-hero {
+        position: relative;
+        padding: 4rem 0 3rem;
+        background: linear-gradient(135deg, rgba(7,17,38,0.95), rgba(7,17,38,0.85));
+        background-size: cover;
+        background-position: center;
     }
 
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .business-hero .hero-overlay {
+        backdrop-filter: blur(8px);
+        background: rgba(7,17,38,0.65);
+        padding: 1.5rem;
+        border-radius: 1.5rem;
     }
 
-    .sticky-top {
-        position: sticky;
-        top: 20px;
-        z-index: 1020;
+    .business-hero .breadcrumb {
+        background: transparent;
+        padding: 0;
     }
 
-    .btn {
-        border-radius: 8px;
+    .business-hero .breadcrumb a {
+        color: var(--accent);
     }
 
-    .card-body h3 {
+    .hero-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        margin-bottom: .75rem;
+        color: var(--text);
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .5rem 1.2rem;
+        border-radius: 999px;
+        background: rgba(255,193,7,0.15);
+        border: 1px solid rgba(255,193,7,0.35);
+        color: var(--accent);
+        font-weight: 600;
+        letter-spacing: .02em;
+    }
+
+    .hero-rating {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .hero-rating .score {
+        font-size: clamp(3rem, 6vw, 4.5rem);
+        font-weight: 800;
+        color: var(--accent);
+        line-height: 1;
+    }
+
+    .hero-rating .stars {
+        display: flex;
+        gap: .35rem;
         font-size: 1.5rem;
+        color: var(--accent);
     }
 
-    @@media (max-width: 991px) {
-        .sticky-top {
-            position: relative;
-            top: 0;
+    .hero-rating .rating-count {
+        color: rgba(226,232,240,0.75);
+        font-weight: 600;
+        letter-spacing: .03em;
+    }
+
+    .hero-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-tags .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .55rem 1.3rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .tag-category {
+        background: rgba(59,130,246,0.2);
+        border: 1px solid rgba(59,130,246,0.4);
+        color: #60a5fa;
+    }
+
+    .tag-price {
+        background: rgba(34,197,94,0.2);
+        border: 1px solid rgba(34,197,94,0.4);
+        color: #4ade80;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .hero-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: .6rem;
+        padding: .75rem 1.4rem;
+        border-radius: .9rem;
+        font-weight: 600;
+        border: 1px solid transparent;
+        transition: all .3s ease;
+    }
+
+    .hero-btn--call {
+        background: rgba(34,197,94,0.18);
+        border-color: rgba(34,197,94,0.35);
+        color: #4ade80;
+    }
+
+    .hero-btn--email {
+        background: rgba(245,158,11,0.18);
+        border-color: rgba(245,158,11,0.35);
+        color: #fbbf24;
+    }
+
+    .hero-btn--website {
+        background: rgba(59,130,246,0.18);
+        border-color: rgba(59,130,246,0.35);
+        color: #60a5fa;
+    }
+
+    .hero-btn--favorite {
+        background: rgba(220,38,38,0.18);
+        border-color: rgba(220,38,38,0.35);
+        color: #f87171;
+    }
+
+    .hero-btn--favorite.active {
+        background: rgba(220,38,38,0.3);
+        border-color: rgba(220,38,38,0.5);
+        color: #ef4444;
+    }
+
+    .hero-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 24px rgba(8,14,29,0.35);
+    }
+
+    .hero-meta {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .meta-card {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        padding: 1.2rem 1.4rem;
+        border-radius: 1rem;
+        background: rgba(15,23,42,0.65);
+        border: 1px solid rgba(148,163,184,0.18);
+    }
+
+    .meta-icon {
+        font-size: 1.75rem;
+    }
+
+    .meta-label {
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        font-size: .75rem;
+        color: rgba(226,232,240,0.65);
+    }
+
+    .meta-value {
+        margin: 0;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .business-content {
+        background: linear-gradient(180deg, rgba(7,12,25,0.95) 0%, rgba(7,12,25,0.7) 100%);
+    }
+
+    .section-card {
+        background: rgba(17,24,39,0.78);
+        border: 1px solid rgba(148,163,184,0.15);
+        border-radius: 1.25rem;
+        padding: 2rem;
+        box-shadow: 0 24px 60px rgba(7,12,24,0.35);
+    }
+
+    .media-card {
+        position: relative;
+        border-radius: 1.5rem;
+        overflow: hidden;
+        box-shadow: 0 30px 60px rgba(7,12,24,0.4);
+    }
+
+    .media-image {
+        width: 100%;
+        height: 420px;
+        object-fit: cover;
+        transition: transform .5s ease;
+    }
+
+    .media-card:hover .media-image {
+        transform: scale(1.05);
+    }
+
+    .media-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(7,12,25,0) 0%, rgba(7,12,25,0.85) 100%);
+        display: flex;
+        align-items: flex-end;
+        padding: 1.5rem;
+    }
+
+    .media-label {
+        font-size: .85rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: rgba(226,232,240,0.7);
+    }
+
+    .media-title {
+        font-size: 1.25rem;
+        margin: .35rem 0 0;
+        color: var(--text);
+        font-weight: 600;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+
+    .info-card {
+        background: rgba(15,23,42,0.7);
+        border: 1px solid rgba(148,163,184,0.15);
+        border-radius: 1rem;
+        padding: 1.4rem;
+        display: grid;
+        gap: .35rem;
+        transition: all .3s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(255,193,7,0.25);
+        box-shadow: 0 18px 40px rgba(8,13,23,0.4);
+    }
+
+    .info-icon {
+        font-size: 1.6rem;
+    }
+
+    .info-card h6 {
+        margin: .3rem 0;
+        font-weight: 700;
+        color: rgba(226,232,240,0.95);
+    }
+
+    .info-card p {
+        margin: 0;
+        color: rgba(226,232,240,0.75);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        border-bottom: 2px solid rgba(255,193,7,0.2);
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        margin: 0;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .section-text {
+        color: rgba(226,232,240,0.8);
+        font-size: 1.05rem;
+        line-height: 1.9;
+    }
+
+    .reviews-list {
+        display: grid;
+        gap: 1.2rem;
+    }
+
+    .review-card {
+        background: rgba(12,18,33,0.65);
+        border: 1px solid rgba(148,163,184,0.12);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all .3s ease;
+    }
+
+    .review-card:hover {
+        border-color: rgba(255,193,7,0.25);
+        transform: translateY(-3px);
+    }
+
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .review-user {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .review-user h6 {
+        margin: 0 0 .35rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .review-stars {
+        color: var(--accent);
+        font-size: .9rem;
+    }
+
+    .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255,193,7,0.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        font-size: 1.2rem;
+    }
+
+    .review-date {
+        color: rgba(226,232,240,0.55);
+        font-size: .9rem;
+    }
+
+    .review-text {
+        margin: 0;
+        color: rgba(226,232,240,0.75);
+        line-height: 1.75;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: rgba(226,232,240,0.6);
+        display: grid;
+        gap: .5rem;
+    }
+
+    .empty-state i {
+        font-size: 3.5rem;
+    }
+
+    .contact-list {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .contact-row {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .contact-icon {
+        font-size: 1.5rem;
+        margin-top: .25rem;
+    }
+
+    .contact-label {
+        margin: 0;
+        font-weight: 600;
+        color: rgba(226,232,240,0.8);
+    }
+
+    .contact-value {
+        margin: .2rem 0 0;
+        color: rgba(226,232,240,0.65);
+        line-height: 1.6;
+    }
+
+    .contact-link {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .contact-link:hover {
+        color: #ffd166;
+    }
+
+    .contact-action {
+        margin-top: .5rem;
+    }
+
+    .business-map {
+        width: 100%;
+        height: 240px;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 1px solid rgba(148,163,184,0.2);
+    }
+
+    .map-note {
+        margin-top: .75rem;
+        color: rgba(226,232,240,0.65);
+        font-size: .9rem;
+    }
+
+    .share-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: .75rem;
+    }
+
+    .share-pill {
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 1rem;
+        border: none;
+        background: rgba(15,23,42,0.7);
+        color: var(--text);
+        font-size: 1.35rem;
+        transition: all .25s ease;
+    }
+
+    .share-pill:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 40px rgba(8,13,23,0.45);
+    }
+
+    .share-pill--facebook { color: #3b5998; }
+    .share-pill--twitter { color: #1da1f2; }
+    .share-pill--whatsapp { color: #25d366; }
+    .share-pill--copy { color: #f59e0b; }
+
+    .similar-businesses {
+        background: linear-gradient(180deg, rgba(7,12,25,0.85) 0%, rgba(7,12,25,0.95) 100%);
+    }
+
+    .similar-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .similar-card {
+        background: rgba(15,23,42,0.75);
+        border: 1px solid rgba(148,163,184,0.15);
+        border-radius: 1.25rem;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 45px rgba(7,12,24,0.4);
+    }
+
+    .similar-media {
+        position: relative;
+        height: 160px;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .similar-category {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: rgba(0,0,0,0.6);
+        padding: .4rem .9rem;
+        border-radius: 999px;
+        font-size: .85rem;
+        color: var(--text);
+    }
+
+    .similar-body {
+        padding: 1.6rem;
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+    }
+
+    .similar-title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .similar-meta {
+        margin: 0;
+        color: rgba(226,232,240,0.65);
+        font-size: .95rem;
+    }
+
+    .similar-rating {
+        display: flex;
+        align-items: baseline;
+        gap: .4rem;
+        color: var(--accent);
+        font-weight: 700;
+    }
+
+    .similar-rating .count {
+        font-size: .85rem;
+        color: rgba(226,232,240,0.6);
+    }
+
+    @@media (max-width: 992px) {
+        .hero-overlay {
+            padding: 1rem;
+        }
+
+        .hero-actions {
+            gap: .5rem;
+        }
+
+        .hero-meta {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .hero-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .hero-btn {
+            justify-content: center;
+        }
+
+        .info-grid {
+            grid-template-columns: repeat(2, minmax(140px, 1fr));
+        }
+
+        .share-grid {
+            grid-template-columns: repeat(2, minmax(120px, 1fr));
         }
     }
 </style>
+
+@section Scripts {
+    <script>
+        @if (hasLocation)
+        {
+            <text>
+        window.initBusinessLocationMap = function () {
+            const mapEl = document.getElementById('businessLocationMap');
+            if (!mapEl) {
+                return;
+            }
+
+            const lat = parseFloat(mapEl.dataset.lat);
+            const lng = parseFloat(mapEl.dataset.lng);
+
+            if (Number.isNaN(lat) || Number.isNaN(lng)) {
+                return;
+            }
+
+            const map = new google.maps.Map(mapEl, {
+                center: { lat: lat, lng: lng },
+                zoom: 15,
+                disableDefaultUI: true
+            });
+
+            new google.maps.Marker({
+                position: { lat: lat, lng: lng },
+                map: map,
+                title: mapEl.dataset.name || 'İşletme'
+            });
+        };
+            </text>
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(window.location.href)
+                .then(() => alert('Link panoya kopyalandı!'));
+        }
+
+        $(document).ready(function () {
+            function getToken() {
+                return $('input[name="__RequestVerificationToken"]').val() || '';
+            }
+
+            $(document).on('click', '.favorite-btn', function (e) {
+                e.preventDefault();
+                var businessId = $(this).data('business-id');
+                var button = $(this);
+                var icon = button.find('i');
+
+                if (!businessId) {
+                    console.error('Business ID bulunamadı');
+                    alert('Bir hata oluştu. Lütfen sayfayı yenileyin.');
+                    return;
+                }
+
+                var token = getToken();
+
+                $.ajax({
+                    url: '@Url.Action("ToggleFavorite", "User")',
+                    type: 'POST',
+                    data: {
+                        businessId: businessId
+                    },
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    beforeSend: function (xhr) {
+                        if (token) {
+                            xhr.setRequestHeader('RequestVerificationToken', token);
+                        }
+                    },
+                    success: function (response) {
+                        if (response && response.success) {
+                            if (response.isFavorite) {
+                                icon.removeClass('far').addClass('fas');
+                                button.addClass('active');
+                                button.attr('title', 'Favorilerden çıkar');
+                            } else {
+                                icon.removeClass('fas').addClass('far');
+                                button.removeClass('active');
+                                button.attr('title', 'Favorilere ekle');
+                            }
+                            var notification = $('<div class="alert alert-success position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 9999; min-width: 300px; border-radius: 0.5rem;">' + response.message + '</div>');
+                            $('body').append(notification);
+                            setTimeout(function () {
+                                notification.fadeOut(function () {
+                                    $(this).remove();
+                                });
+                            }, 2000);
+                        } else {
+                            alert(response ? response.message : 'Bilinmeyen bir hata oluştu');
+                        }
+                    },
+                    error: function (xhr, status) {
+                        if (xhr.status === 401 || xhr.status === 403) {
+                            alert('Bu işlemi yapmak için giriş yapmanız gerekiyor.');
+                        } else if (xhr.status === 400) {
+                            var errorMsg = xhr.responseJSON && xhr.responseJSON.message
+                                ? xhr.responseJSON.message
+                                : 'Geçersiz istek. Lütfen tekrar deneyin.';
+                            alert(errorMsg);
+                        } else {
+                            alert('Bir hata oluştu. Lütfen tekrar deneyin. (Hata: ' + status + ')');
+                        }
+                    }
+                });
+            });
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <text>
+                var businessId = @business.Id;
+                $.ajax({
+                    url: '@Url.Action("CheckFavorite", "User")',
+                    type: 'GET',
+                    data: { businessId: businessId },
+                    success: function(response) {
+                        if (response && response.isFavorite) {
+                            $('.favorite-btn').find('i').removeClass('far').addClass('fas');
+                            $('.favorite-btn').addClass('active');
+                            $('.favorite-btn').attr('title', 'Favorilerden çıkar');
+                        }
+                    }
+                });
+                </text>
+            }
+        });
+    </script>
+    @if (hasLocation && !string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string))
+    {
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@ViewBag.GoogleMapsApiKey&callback=initBusinessLocationMap"></script>
+    }
+    else if (hasLocation)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var mapEl = document.getElementById('businessLocationMap');
+                if (mapEl) {
+                    mapEl.innerHTML = '<div class="p-3 text-center text-muted">Google Maps anahtarı bulunamadı.</div>';
+                }
+            });
+        </script>
+    }
+}

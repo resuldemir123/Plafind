@@ -9,6 +9,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* Small global adjustments for header/footer aesthetics */
         body {
@@ -22,6 +25,20 @@
 
         .navbar-brand {
             font-size: 1.05rem;
+        }
+
+        .navbar-logo {
+            height: 45px;
+            width: auto;
+            object-fit: contain;
+            max-width: 150px;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .navbar-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 4px 8px rgba(255,193,7,0.4));
         }
 
         .footer {
@@ -40,15 +57,45 @@
         .end-2 {
             right: .5rem;
         }
+
+        .footer-logo {
+            height: 70px;
+            width: auto;
+            object-fit: contain;
+            max-width: 220px;
+            opacity: 0.95;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.1);
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .footer-logo:hover {
+            opacity: 1;
+            transform: scale(1.05);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+        }
+
+        @@media (max-width: 768px) {
+            .navbar-logo {
+                height: 38px;
+                max-width: 130px;
+            }
+
+            .footer-logo {
+                height: 50px;
+                max-width: 150px;
+            }
+        }
     </style>
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-lg">
             <div class="container-fluid">
-                <a class="navbar-brand fw-bold text-white" href="@Url.Action("Index", "Home")">
-                    <i class="fas fa-building text-warning me-2"></i>
-                    <span class="text-white">Pla</span><span class="text-warning">Find</span>
+                <a class="navbar-brand fw-bold text-white d-flex align-items-center" href="@Url.Action("Index", "Home")">
+                    <img src="~/images/Logo.png" alt="Alanya İşletme Rehberi Logo" class="navbar-logo" onerror="this.onerror=null; this.src='~/images/Logo.jpg';" />
                 </a>
                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false">
                     <span class="navbar-toggler-icon"></span>
@@ -66,6 +113,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link fw-medium text-white" href="@Url.Action("Map", "Businesses")">
+                                <i class="fas fa-map-marked-alt me-1 text-success"></i> Harita
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link fw-medium text-white" href="@Url.Action("Index", "News")">
                                 <i class="fas fa-newspaper me-1 text-warning"></i> Haberler
                             </a>
@@ -75,9 +127,14 @@
                                 <i class="fas fa-envelope me-1 text-success"></i> İletişim
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-medium text-white" href="@Url.Action("About", "Home")">
+                                <i class="fas fa-info-circle me-1 text-info"></i> Hakkımızda
+                            </a>
+                        </li>
 
                         @* Roles *@
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
                             if (User.IsInRole("Admin"))
                             {
@@ -123,6 +180,12 @@
 
     <footer class="footer mt-5">
         <div class="container py-5">
+            <div class="row mb-4">
+                <div class="col-12 text-center mb-4">
+                    <img src="~/images/Logo.png" alt="Alanya İşletme Rehberi Logo" class="footer-logo mb-3" onerror="this.onerror=null; this.src='~/images/Logo.jpg';" />
+                    <p class="text-white-50 mb-0">Alanya'nın en kapsamlı işletme rehberi</p>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-lg-3 col-md-6 mb-4">
                     <h5 class="fw-bold mb-4 text-white"><i class="fas fa-tags me-2 text-warning"></i>Kategoriler</h5>
@@ -177,9 +240,8 @@
                 </div>
                 <div class="col-lg-6 col-md-12 text-lg-end">
                     <div class="d-flex flex-wrap gap-3 justify-content-lg-end">
-                        <a href="#" class="text-white text-decoration-none"><i class="fas fa-shield-alt me-1 text-warning"></i>Gizlilik Politikası</a>
-                        <a href="#" class="text-white text-decoration-none"><i class="fas fa-file-contract me-1 text-warning"></i>Kullanım Şartları</a>
-                        <a href="#" class="text-white text-decoration-none"><i class="fas fa-question-circle me-1 text-warning"></i>Yardım</a>
+                        <a href="@Url.Action("Privacy", "Home")" class="text-white text-decoration-none"><i class="fas fa-shield-alt me-1 text-warning"></i>Gizlilik Politikası</a>
+                        <a href="@Url.Action("Help", "Home")" class="text-white text-decoration-none"><i class="fas fa-question-circle me-1 text-warning"></i>Yardım</a>
                     </div>
                 </div>
             </div>
@@ -189,6 +251,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/location-picker.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,10 +1,14 @@
 ﻿using AlanyaBusinessGuide.Data;
 using AlanyaBusinessGuide.Models;
+using AlanyaBusinessGuide.Options;
+using AlanyaBusinessGuide.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +47,34 @@ builder.Services.AddControllersWithViews();
 // RAZOR PAGES
 builder.Services.AddRazorPages();
 
+// EMAIL SERVICE
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+// SMS SERVICE
+builder.Services.AddScoped<ISmsService, SmsService>();
+
+builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("GoogleGemini"));
+builder.Services.AddHttpClient<IGeminiChatService, GeminiChatService>();
+builder.Services.Configure<GoogleMapsOptions>(builder.Configuration.GetSection("GoogleMaps"));
+
+// MEMORY CACHE (SMS kodları için)
+builder.Services.AddMemoryCache();
+
+// GOOGLE AUTHENTICATION
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+        var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        
+        if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientSecret))
+        {
+            options.ClientId = googleClientId;
+            options.ClientSecret = googleClientSecret;
+            options.CallbackPath = "/signin-google"; // Varsayılan path
+        }
+    });
+
 var app = builder.Build();
 
 // Seed data
@@ -53,6 +85,9 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         await AlanyaBusinessGuide.Data.DbSeeder.SeedDataAsync(context);
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        await AlanyaBusinessGuide.Data.IdentitySeeder.SeedAdminAsync(userManager, roleManager);
     }
     catch (Exception ex)
     {
@@ -61,7 +96,11 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();

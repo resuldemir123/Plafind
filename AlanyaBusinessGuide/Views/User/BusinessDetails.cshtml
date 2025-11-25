@@ -50,7 +50,7 @@
                         </div>
                         <div class="col-md-4 text-right">
                             <div class="d-flex flex-column gap-2">
-                                @if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
+                                @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin"))
                                 {
                                     <a href="@Url.Action("Create", "Reservations", new { businessId = Model.Id })" class="btn btn-success btn-lg">
                                         <i class="fas fa-calendar-plus"></i> Rezervasyon Yap

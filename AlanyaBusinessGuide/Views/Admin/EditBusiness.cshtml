@@ -104,6 +104,42 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Latitude" class="control-label">Konum (Enlem)</label>
+                            <input asp-for="Latitude" class="form-control" type="number" step="any" placeholder="36.5432" />
+                            <span asp-validation-for="Latitude" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Longitude" class="control-label">Konum (Boylam)</label>
+                            <input asp-for="Longitude" class="form-control" type="number" step="any" placeholder="31.9991" />
+                            <span asp-validation-for="Longitude" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                            <div>
+                                <h5 class="mb-1">Haritadan Konum Güncelle</h5>
+                                <small class="text-muted">Var olan değerler haritada işaretlidir. Yeni bir noktaya tıklayarak güncelleyebilirsiniz.</small>
+                            </div>
+                            <div class="map-search d-flex gap-2">
+                                <input type="text" id="mapSearchInput" class="form-control" placeholder="Mahalle / Cadde / Yer adı" />
+                                <button type="button" id="mapSearchBtn" class="btn btn-outline-secondary">Ara</button>
+                            </div>
+                        </div>
+                        <div id="businessFormMap" class="map-picker-canvas mb-2"></div>
+                        <small id="mapStatusText" class="map-status-text text-muted d-block">
+                            Haritaya tıklayarak işaretlediğiniz konum enlem ve boylam alanlarına yansır.
+                        </small>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label asp-for="Description" class="control-label">Açıklama</label>
                     <textarea asp-for="Description" class="form-control" rows="4"></textarea>
@@ -148,6 +184,59 @@
     </div>
 </div>
 
+<style>
+    .map-picker-canvas {
+        width: 100%;
+        height: 320px;
+        border-radius: 1rem;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .map-search {
+        min-width: 320px;
+    }
+
+    @@media (max-width: 576px) {
+        .map-search {
+            flex-direction: column;
+            width: 100%;
+        }
+    }
+</style>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        window.initBusinessLocationPicker = function () {
+            if (!window.LocationPicker) {
+                return;
+            }
+            LocationPicker.init({
+                mapElementId: 'businessFormMap',
+                latInputId: 'Latitude',
+                lngInputId: 'Longitude',
+                addressInputId: 'Address',
+                searchInputId: 'mapSearchInput',
+                searchButtonId: 'mapSearchBtn',
+                statusElementId: 'mapStatusText'
+            });
+        };
+    </script>
+    @if (!string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string))
+    {
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@ViewBag.GoogleMapsApiKey&callback=initBusinessLocationPicker"></script>
+    }
+    else
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var status = document.getElementById('mapStatusText');
+                if (status) {
+                    status.textContent = 'Google Maps anahtarı olmadığı için harita yüklenemedi.';
+                    status.classList.remove('text-muted');
+                    status.classList.add('text-danger');
+                }
+            });
+        </script>
+    }
 }

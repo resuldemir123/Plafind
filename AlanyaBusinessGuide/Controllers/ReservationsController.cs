@@ -169,7 +169,7 @@ namespace AlanyaBusinessGuide.Controllers
             return RedirectToAction(nameof(AdminIndex));
         }
 
-        private async Task<ApplicationUser> GetCurrentApplicationUserAsync()
+        private async Task<ApplicationUser?> GetCurrentApplicationUserAsync()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return null;

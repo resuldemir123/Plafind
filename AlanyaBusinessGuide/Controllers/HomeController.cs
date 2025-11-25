@@ -2,6 +2,8 @@
 using AlanyaBusinessGuide.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using AlanyaBusinessGuide.Models;
+using AlanyaBusinessGuide.Services;
 
 namespace AlanyaBusinessGuide.Controllers
 {
@@ -9,10 +11,12 @@ namespace AlanyaBusinessGuide.Controllers
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IEmailService _emailService;
 
-        public HomeController(ApplicationDbContext context)
+        public HomeController(ApplicationDbContext context, IEmailService emailService)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         }
 
         public async Task<IActionResult> Index()
@@ -39,7 +43,7 @@ namespace AlanyaBusinessGuide.Controllers
                     .ToListAsync();
 
                 var categories = await _context.Categories
-                    .Where(c => c.Businesses.Any(b => b.IsActive && b.IsApproved))
+                    .Where(c => c.Businesses != null && c.Businesses.Any(b => b.IsActive && b.IsApproved))
                     .Select(c => c.Name)
                     .Distinct()
                     .Take(8)
@@ -61,7 +65,7 @@ namespace AlanyaBusinessGuide.Controllers
             catch (Exception)
             {
                 // Hata loglama eklenebilir (örneğin, ILogger ile)
-                return View("Error"); // Hata sayfasına yönlendirme
+                return RedirectToAction("Error"); // Hata sayfasına yönlendirme
             }
         }
 
@@ -135,7 +139,7 @@ namespace AlanyaBusinessGuide.Controllers
                 
                 // Get all categories for filter dropdown
                 ViewBag.Categories = await _context.Categories
-                    .Where(c => c.Businesses.Any(b => b.IsActive && b.IsApproved))
+                    .Where(c => c.Businesses != null && c.Businesses.Any(b => b.IsActive && b.IsApproved))
                     .Select(c => c.Name)
                     .Distinct()
                     .ToListAsync();
@@ -145,14 +149,81 @@ namespace AlanyaBusinessGuide.Controllers
             catch (Exception)
             {
                 // Hata loglama eklenebilir
-                return View("Error");
+                return RedirectToAction("Error");
             }
         }
 
         public IActionResult Contact()
         {
             ViewData["Title"] = "İletişim - Alanya İşletme Rehberi";
+            return View(new ContactViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Contact(ContactViewModel model)
+        {
+            ViewData["Title"] = "İletişim - Alanya İşletme Rehberi";
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                var emailSent = await _emailService.SendContactEmailAsync(
+                    model.Name,
+                    model.Email,
+                    model.Phone,
+                    model.Subject,
+                    model.Message
+                );
+
+                if (emailSent)
+                {
+                    TempData["SuccessMessage"] = "Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.";
+                    return RedirectToAction(nameof(Contact));
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "E-posta gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+            }
+
+            return View(model);
+        }
+
+        public IActionResult Privacy()
+        {
+            ViewData["Title"] = "Gizlilik Politikası - Alanya İşletme Rehberi";
             return View();
+        }
+
+        public IActionResult Help()
+        {
+            ViewData["Title"] = "Yardım - Alanya İşletme Rehberi";
+            return View();
+        }
+
+        public IActionResult About()
+        {
+            ViewData["Title"] = "Hakkımızda - Alanya İşletme Rehberi";
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            var model = new ErrorViewModel
+            {
+                RequestId = System.Diagnostics.Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+            return View(model);
         }
     }
 }

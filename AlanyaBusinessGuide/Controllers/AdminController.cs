@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using AlanyaBusinessGuide.Data;
 using AlanyaBusinessGuide.Models;
+using AlanyaBusinessGuide.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
 namespace AlanyaBusinessGuide.Controllers
@@ -13,11 +15,13 @@ namespace AlanyaBusinessGuide.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly GoogleMapsOptions _mapsOptions;
 
-        public AdminController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public AdminController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<GoogleMapsOptions> mapsOptions)
         {
             _context = context;
             _userManager = userManager;
+            _mapsOptions = mapsOptions?.Value ?? new GoogleMapsOptions();
         }
 
         public async Task<IActionResult> Index()
@@ -63,6 +67,7 @@ namespace AlanyaBusinessGuide.Controllers
 
         public IActionResult CreateBusiness()
         {
+            ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
             return View();
         }
 
@@ -80,6 +85,7 @@ namespace AlanyaBusinessGuide.Controllers
 
                 return RedirectToAction(nameof(Businesses));
             }
+            ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
             return View(business);
         }
 
@@ -87,6 +93,7 @@ namespace AlanyaBusinessGuide.Controllers
         {
             var business = await _context.Businesses.FindAsync(id);
             if (business == null) return NotFound();
+            ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
             return View(business);
         }
 
@@ -103,6 +110,7 @@ namespace AlanyaBusinessGuide.Controllers
 
                 return RedirectToAction(nameof(Businesses));
             }
+            ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
             return View(business);
         }
 

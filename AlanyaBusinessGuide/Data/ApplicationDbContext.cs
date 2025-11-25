@@ -19,6 +19,7 @@ namespace AlanyaBusinessGuide.Data
         public DbSet<News> News { get; set; }
         public DbSet<UserFavorite> UserFavorites { get; set; }
         public DbSet<AdminLog> AdminLogs { get; set; }
+        public DbSet<UserPhoto> UserPhotos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -78,6 +79,14 @@ namespace AlanyaBusinessGuide.Data
                       .WithMany(c => c.Businesses)
                       .HasForeignKey(b => b.CategoryId)
                       .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<UserPhoto>(entity =>
+            {
+                entity.HasOne(up => up.User)
+                      .WithMany(u => u.Photos)
+                      .HasForeignKey(up => up.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

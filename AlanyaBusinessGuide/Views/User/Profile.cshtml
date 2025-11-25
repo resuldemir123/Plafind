@@ -1,92 +1,1628 @@
-@model AlanyaBusinessGuide.Models.ApplicationUser
+@model AlanyaBusinessGuide.ViewModels.UserProfileViewModel
+@using System.IO;
+@using System.Linq;
 
 @{
-    ViewData["Title"] = "Profilim";
+    ViewData["Title"] = "Profil";
+    var defaultAvatars = Model.DefaultAvatars ?? Enumerable.Empty<string>();
+    var currentAvatar = string.IsNullOrWhiteSpace(Model.CurrentAvatarUrl)
+        ? Url.Content("~/images/default-avatar.svg")
+        : Url.Content(Model.CurrentAvatarUrl.StartsWith("/") ? "~" + Model.CurrentAvatarUrl : (Model.CurrentAvatarUrl.StartsWith("~/") ? Model.CurrentAvatarUrl : "~/" + Model.CurrentAvatarUrl));
+    var locationText = !string.IsNullOrEmpty(Model.City) && !string.IsNullOrEmpty(Model.Country) 
+        ? $"{Model.City}, {Model.Country}" 
+        : (!string.IsNullOrEmpty(Model.Country) ? Model.Country : "Konum belirtilmemiş");
 }
 
-<div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Profilim</h1>
+<div class="container-fluid py-4">
+    <div class="row g-4 profile-layout">
+        <div class="col-xl-3">
+            <div class="profile-sidebar glass-card sticky-sidebar">
+                <div class="sidebar-header">
+                    <h5 class="mb-2">Profil Panosu</h5>
+                    <p class="text-muted mb-0">Tüm bölümlere buradan ulaşın</p>
+            </div>
+                <nav class="profile-nav flex-column" id="profileNav">
+                    <a href="#section-overview" class="profile-nav-link active">
+                        <i class="fas fa-user-circle me-2"></i>Genel Bilgiler
+                    </a>
+                    <a href="#section-security" class="profile-nav-link">
+                        <i class="fas fa-shield-alt me-2"></i>Güvenlik
+                    </a>
+                    <a href="#section-location" class="profile-nav-link">
+                        <i class="fas fa-map-marked-alt me-2"></i>Konum
+                    </a>
+                    <a href="#section-media" class="profile-nav-link">
+                        <i class="fas fa-images me-2"></i>Fotoğraflar
+                    </a>
+                </nav>
+        </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Profil Bilgileri</h6>
+        <div class="col-xl-9">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+                <div class="alert alert-danger glass-card alert-dismissible fade show" role="alert" style="margin-bottom: 2rem;">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-circle me-3" style="font-size: 1.5rem;"></i>
+                <div class="flex-grow-1">
+                    <strong class="me-2">Hata!</strong>
+                    <span>@Model.ErrorMessage</span>
                 </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+                <div class="alert alert-success glass-card alert-dismissible fade show" role="alert" style="margin-bottom: 2rem;">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle me-3" style="font-size: 1.5rem;"></i>
+                <div class="flex-grow-1">
+                    <strong class="me-2">Başarılı!</strong>
+                    <span>@Model.SuccessMessage</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+
+            <section id="section-overview" class="profile-section mb-4" data-profile-section>
+
+    <div class="row g-4">
+        <div class="col-xl-4">
+            <div class="profile-avatar card glass-card h-100">
                 <div class="card-body">
-                    <form asp-action="UpdateProfile" method="post">
-                        <div class="row">
+                    <h5 class="section-heading mb-4">
+                        <span class="icon-circle me-2"><i class="fas fa-user-circle"></i></span>
+                        Profil Fotoğrafı
+                    </h5>
+
+                    <div class="avatar-preview mb-4">
+                        <img src="@currentAvatar" alt="Profil avatarı" id="avatarPreview" class="avatar-image" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Varsayılan Avatarlar</label>
+                        <div class="avatar-options">
+                            @foreach (var avatar in defaultAvatars)
+                            {
+                                var isChecked = string.Equals(Model.CurrentAvatarUrl, avatar, StringComparison.OrdinalIgnoreCase);
+                                var avatarId = $"avatar_{System.IO.Path.GetFileNameWithoutExtension(avatar)}";
+                                <label class="avatar-option @(isChecked ? "active" : "")" for="@avatarId">
+                                    <input type="radio" id="@avatarId" name="avatarOption" value="@avatar" @(isChecked ? "checked" : "") />
+                                    <img src="@Url.Content("~" + avatar)" alt="Avatar seçeneği" />
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Özel görsel yükle</label>
+                        <div class="upload-wrapper">
+                            <input type="file" class="form-control" name="AvatarFile" form="profileForm" accept="image/*">
+                            <small class="text-muted d-block mt-2">Desteklenen formatlar: .png, .jpg, .jpeg, .webp, .svg (maks. 2MB)</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-outline-danger" form="removeAvatarForm">
+                            <i class="fas fa-times me-2"></i>Avatarı Kaldır
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="resetAvatarBtn">
+                            <i class="fas fa-undo me-2"></i>Varsayılan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8" id="section-profile">
+            <div class="card glass-card">
+                <div class="card-body">
+                    <h5 class="section-heading mb-4">
+                        <span class="icon-circle me-2"><i class="fas fa-user-edit"></i></span>
+                        Profil Bilgileri
+                    </h5>
+
+                    <!-- Görüntüleme Modu -->
+                    <div id="profileViewMode" class="profile-view-mode">
+                        <div class="row g-4">
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="FullName" class="control-label">Ad Soyad *</label>
-                                    <input asp-for="FullName" class="form-control" required />
-                                    <span asp-validation-for="FullName" class="text-danger"></span>
+                                <div class="profile-info-item">
+                                    <label class="profile-info-label">
+                                        <i class="fas fa-at me-2 text-warning"></i>Kullanıcı Adı
+                                    </label>
+                                    <div class="profile-info-value">@(Model.UserName ?? "Belirtilmemiş")</div>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="PhoneNumber" class="control-label">Telefon</label>
-                                    <input asp-for="PhoneNumber" class="form-control" />
-                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                <div class="profile-info-item">
+                                    <label class="profile-info-label">
+                                        <i class="fas fa-user me-2 text-warning"></i>Görünen Ad
+                                    </label>
+                                    <div class="profile-info-value">@(Model.DisplayName ?? "Belirtilmemiş")</div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="profile-info-item profile-email-item">
+                                    <label class="profile-info-label">
+                                        <i class="fas fa-envelope me-2 text-warning"></i>E-posta Adresi
+                                    </label>
+                                    <div class="profile-info-value profile-email-value">@(Model.Email ?? "E-posta belirtilmemiş")</div>
+                                    <small class="profile-email-note">
+                                        <i class="fas fa-info-circle me-1"></i>E-posta adresinizi Güvenlik bölümünden güncelleyebilirsiniz.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="profile-info-item">
+                                    <label class="profile-info-label">
+                                        <i class="fas fa-id-card me-2 text-warning"></i>Ad Soyad
+                                    </label>
+                                    <div class="profile-info-value">@(Model.FullName ?? "Belirtilmemiş")</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="profile-info-item">
+                                    <label class="profile-info-label">
+                                        <i class="fas fa-phone me-2 text-warning"></i>Telefon
+                                    </label>
+                                    <div class="profile-info-value">@(Model.PhoneNumber ?? "Belirtilmemiş")</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="profile-info-item">
+                                    <label class="profile-info-label">
+                                        <i class="fas fa-globe me-2 text-warning"></i>Ülke
+                                    </label>
+                                    <div class="profile-info-value">@(Model.Country ?? "Belirtilmemiş")</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" id="cityViewContainer" style="@(Model.Country == "Türkiye" ? "" : "display: none;")">
+                                <div class="profile-info-item">
+                                    <label class="profile-info-label">
+                                        <i class="fas fa-map-marker-alt me-2 text-warning"></i>Şehir
+                                    </label>
+                                    <div class="profile-info-value">@(Model.City ?? "Belirtilmemiş")</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="form-group mt-4">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Güncelle
+                        <div class="d-flex justify-content-end gap-3 mt-4">
+                            <button type="button" class="btn btn-primary btn-lg" id="editProfileBtn">
+                                <i class="fas fa-edit me-2"></i>Düzenle
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Düzenleme Modu -->
+                    <form asp-action="UpdateProfile" method="post" enctype="multipart/form-data" id="profileForm" class="profile-form" style="display: none;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="SelectedAvatar" id="selectedAvatarInput" value="@(Model.SelectedAvatar ?? Model.CurrentAvatarUrl)">
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label asp-for="UserName" class="form-label">Kullanıcı Adı</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                    <input asp-for="UserName" class="form-control" />
+                                </div>
+                                <small class="text-muted">Bu ad, giriş yaptığınızda ve diğer kullanıcılara görünecek kullanıcı adınızdır.</small>
+                                <span asp-validation-for="UserName" class="text-danger d-block mt-1"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="DisplayName" class="form-label">Görünen Ad</label>
+                                <input asp-for="DisplayName" class="form-control form-control-lg" placeholder="Profilinizde görünecek takma ad" />
+                                <span asp-validation-for="DisplayName" class="text-danger d-block mt-1"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Email" class="form-label">E-posta Adresi</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input asp-for="Email" class="form-control" readonly style="background-color: rgba(15, 23, 42, 0.4); cursor: not-allowed;" />
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>E-posta adresinizi Güvenlik bölümünden güncelleyebilirsiniz.
+                                </small>
+                                <span asp-validation-for="Email" class="text-danger d-block mt-1"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="FullName" class="form-label">Ad Soyad</label>
+                                <input asp-for="FullName" class="form-control form-control-lg" placeholder="Gerçek adınız (isteğe bağlı)" />
+                                <span asp-validation-for="FullName" class="text-danger d-block mt-1"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label">Telefon</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input asp-for="PhoneNumber" class="form-control" placeholder="+90 5XX XXX XX XX" />
+                                </div>
+                                <span asp-validation-for="PhoneNumber" class="text-danger d-block mt-1"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <div id="section-location" class="location-divider" data-profile-section>
+                                    <h6 class="text-uppercase text-muted small mb-1">Konum Bilgileri</h6>
+                                    <p class="text-muted mb-0">Ülke ve şehir bilgilerinizi güncelleyerek içerik önerilerini kişiselleştirebilirsiniz.</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Country" class="form-label">Ülke</label>
+                                <div class="country-select-wrapper">
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                        <select asp-for="Country" class="form-select modern-select" id="countrySelect">
+                                        <option value="">Ülke Seçiniz</option>
+                                        <option value="Türkiye">Türkiye</option>
+                                        <option value="Afganistan">Afganistan</option>
+                                        <option value="Almanya">Almanya</option>
+                                        <option value="Amerika Birleşik Devletleri">Amerika Birleşik Devletleri</option>
+                                        <option value="Arjantin">Arjantin</option>
+                                        <option value="Avustralya">Avustralya</option>
+                                        <option value="Avusturya">Avusturya</option>
+                                        <option value="Azerbaycan">Azerbaycan</option>
+                                        <option value="Bahreyn">Bahreyn</option>
+                                        <option value="Belçika">Belçika</option>
+                                        <option value="Birleşik Arap Emirlikleri">Birleşik Arap Emirlikleri</option>
+                                        <option value="Birleşik Krallık">Birleşik Krallık</option>
+                                        <option value="Bosna Hersek">Bosna Hersek</option>
+                                        <option value="Brezilya">Brezilya</option>
+                                        <option value="Bulgaristan">Bulgaristan</option>
+                                        <option value="Çek Cumhuriyeti">Çek Cumhuriyeti</option>
+                                        <option value="Çin">Çin</option>
+                                        <option value="Danimarka">Danimarka</option>
+                                        <option value="Finlandiya">Finlandiya</option>
+                                        <option value="Fransa">Fransa</option>
+                                        <option value="Güney Afrika">Güney Afrika</option>
+                                        <option value="Güney Kore">Güney Kore</option>
+                                        <option value="Gürcistan">Gürcistan</option>
+                                        <option value="Hindistan">Hindistan</option>
+                                        <option value="Hırvatistan">Hırvatistan</option>
+                                        <option value="Hollanda">Hollanda</option>
+                                        <option value="Irak">Irak</option>
+                                        <option value="İngiltere">İngiltere</option>
+                                        <option value="İran">İran</option>
+                                        <option value="İrlanda">İrlanda</option>
+                                        <option value="İspanya">İspanya</option>
+                                        <option value="İsrail">İsrail</option>
+                                        <option value="İsveç">İsveç</option>
+                                        <option value="İsviçre">İsviçre</option>
+                                        <option value="İtalya">İtalya</option>
+                                        <option value="Japonya">Japonya</option>
+                                        <option value="Kanada">Kanada</option>
+                                        <option value="Katar">Katar</option>
+                                        <option value="Kazakistan">Kazakistan</option>
+                                        <option value="Kıbrıs">Kıbrıs</option>
+                                        <option value="Kırgızistan">Kırgızistan</option>
+                                        <option value="Kosova">Kosova</option>
+                                        <option value="Kuzey Kıbrıs Türk Cumhuriyeti">Kuzey Kıbrıs Türk Cumhuriyeti</option>
+                                        <option value="Kuveyt">Kuveyt</option>
+                                        <option value="Lübnan">Lübnan</option>
+                                        <option value="Macaristan">Macaristan</option>
+                                        <option value="Makedonya">Makedonya</option>
+                                        <option value="Malezya">Malezya</option>
+                                        <option value="Meksika">Meksika</option>
+                                        <option value="Mısır">Mısır</option>
+                                        <option value="Norveç">Norveç</option>
+                                        <option value="Özbekistan">Özbekistan</option>
+                                        <option value="Pakistan">Pakistan</option>
+                                        <option value="Polonya">Polonya</option>
+                                        <option value="Portekiz">Portekiz</option>
+                                        <option value="Romanya">Romanya</option>
+                                        <option value="Rusya">Rusya</option>
+                                        <option value="Sırbistan">Sırbistan</option>
+                                        <option value="Singapur">Singapur</option>
+                                        <option value="Slovakya">Slovakya</option>
+                                        <option value="Slovenya">Slovenya</option>
+                                        <option value="Suudi Arabistan">Suudi Arabistan</option>
+                                        <option value="Suriye">Suriye</option>
+                                        <option value="Tacikistan">Tacikistan</option>
+                                        <option value="Tayland">Tayland</option>
+                                        <option value="Tunus">Tunus</option>
+                                        <option value="Türkmenistan">Türkmenistan</option>
+                                        <option value="Ukrayna">Ukrayna</option>
+                                        <option value="Umman">Umman</option>
+                                        <option value="Ürdün">Ürdün</option>
+                                        <option value="Yeni Zelanda">Yeni Zelanda</option>
+                                        <option value="Yunanistan">Yunanistan</option>
+                                        <option value="Diğer">Diğer</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <small class="text-muted">Hangi ülkeden olduğunuzu seçin</small>
+                                <span asp-validation-for="Country" class="text-danger d-block mt-1"></span>
+                            </div>
+
+                            <div class="col-md-6" id="citySelectContainer" style="display: none;">
+                                <label asp-for="City" class="form-label">Şehir</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                    <select asp-for="City" class="form-select modern-select" id="citySelect">
+                                        <option value="">Şehir Seçiniz</option>
+                                        <option value="Adana">Adana</option>
+                                        <option value="Adıyaman">Adıyaman</option>
+                                        <option value="Afyonkarahisar">Afyonkarahisar</option>
+                                        <option value="Ağrı">Ağrı</option>
+                                        <option value="Amasya">Amasya</option>
+                                        <option value="Ankara">Ankara</option>
+                                        <option value="Antalya">Antalya</option>
+                                        <option value="Artvin">Artvin</option>
+                                        <option value="Aydın">Aydın</option>
+                                        <option value="Balıkesir">Balıkesir</option>
+                                        <option value="Bilecik">Bilecik</option>
+                                        <option value="Bingöl">Bingöl</option>
+                                        <option value="Bitlis">Bitlis</option>
+                                        <option value="Bolu">Bolu</option>
+                                        <option value="Burdur">Burdur</option>
+                                        <option value="Bursa">Bursa</option>
+                                        <option value="Çanakkale">Çanakkale</option>
+                                        <option value="Çankırı">Çankırı</option>
+                                        <option value="Çorum">Çorum</option>
+                                        <option value="Denizli">Denizli</option>
+                                        <option value="Diyarbakır">Diyarbakır</option>
+                                        <option value="Edirne">Edirne</option>
+                                        <option value="Elazığ">Elazığ</option>
+                                        <option value="Erzincan">Erzincan</option>
+                                        <option value="Erzurum">Erzurum</option>
+                                        <option value="Eskişehir">Eskişehir</option>
+                                        <option value="Gaziantep">Gaziantep</option>
+                                        <option value="Giresun">Giresun</option>
+                                        <option value="Gümüşhane">Gümüşhane</option>
+                                        <option value="Hakkari">Hakkari</option>
+                                        <option value="Hatay">Hatay</option>
+                                        <option value="Isparta">Isparta</option>
+                                        <option value="İçel">İçel (Mersin)</option>
+                                        <option value="İstanbul">İstanbul</option>
+                                        <option value="İzmir">İzmir</option>
+                                        <option value="Kars">Kars</option>
+                                        <option value="Kastamonu">Kastamonu</option>
+                                        <option value="Kayseri">Kayseri</option>
+                                        <option value="Kırklareli">Kırklareli</option>
+                                        <option value="Kırşehir">Kırşehir</option>
+                                        <option value="Kocaeli">Kocaeli</option>
+                                        <option value="Konya">Konya</option>
+                                        <option value="Kütahya">Kütahya</option>
+                                        <option value="Malatya">Malatya</option>
+                                        <option value="Manisa">Manisa</option>
+                                        <option value="Kahramanmaraş">Kahramanmaraş</option>
+                                        <option value="Mardin">Mardin</option>
+                                        <option value="Muğla">Muğla</option>
+                                        <option value="Muş">Muş</option>
+                                        <option value="Nevşehir">Nevşehir</option>
+                                        <option value="Niğde">Niğde</option>
+                                        <option value="Ordu">Ordu</option>
+                                        <option value="Rize">Rize</option>
+                                        <option value="Sakarya">Sakarya</option>
+                                        <option value="Samsun">Samsun</option>
+                                        <option value="Siirt">Siirt</option>
+                                        <option value="Sinop">Sinop</option>
+                                        <option value="Sivas">Sivas</option>
+                                        <option value="Tekirdağ">Tekirdağ</option>
+                                        <option value="Tokat">Tokat</option>
+                                        <option value="Trabzon">Trabzon</option>
+                                        <option value="Tunceli">Tunceli</option>
+                                        <option value="Şanlıurfa">Şanlıurfa</option>
+                                        <option value="Uşak">Uşak</option>
+                                        <option value="Van">Van</option>
+                                        <option value="Yozgat">Yozgat</option>
+                                        <option value="Zonguldak">Zonguldak</option>
+                                        <option value="Aksaray">Aksaray</option>
+                                        <option value="Bayburt">Bayburt</option>
+                                        <option value="Karaman">Karaman</option>
+                                        <option value="Kırıkkale">Kırıkkale</option>
+                                        <option value="Batman">Batman</option>
+                                        <option value="Şırnak">Şırnak</option>
+                                        <option value="Bartın">Bartın</option>
+                                        <option value="Ardahan">Ardahan</option>
+                                        <option value="Iğdır">Iğdır</option>
+                                        <option value="Yalova">Yalova</option>
+                                        <option value="Karabük">Karabük</option>
+                                        <option value="Kilis">Kilis</option>
+                                        <option value="Osmaniye">Osmaniye</option>
+                                        <option value="Düzce">Düzce</option>
+                                    </select>
+                                </div>
+                                <small class="text-muted">Nereli olduğunuzu seçin</small>
+                                <span asp-validation-for="City" class="text-danger d-block mt-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-3 mt-4" id="saveButtonsContainer" style="display: none;">
+                            <button type="button" class="btn btn-outline-secondary" id="cancelEditBtn">
+                                <i class="fas fa-times me-2"></i>Vazgeç
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Değişiklikleri Kaydet
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+    </div>
+</section>
 
-        <div class="col-lg-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Hesap Bilgileri</h6>
-                </div>
+            <section id="section-security" class="card glass-card mb-4 modern-security-section" data-profile-section>
                 <div class="card-body">
-                    <p><strong>Kayıt Tarihi:</strong> @Model.CreatedDate.ToString("dd.MM.yyyy")</p>
-                    <p><strong>Durum:</strong> 
-                        @if (Model.IsActive)
-                        {
-                            <span class="badge badge-success">Aktif</span>
-                        }
-                        else
-                        {
-                            <span class="badge badge-danger">Pasif</span>
-                        }
-                    </p>
-                </div>
-            </div>
-
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">İstatistikler</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-6">
-                            <div class="border-right">
-                                <h4 class="text-primary">@Model.Favorites.Count</h4>
-                                <small class="text-muted">Favori</small>
+                    <h5 class="section-heading mb-4">
+                        <span class="icon-circle me-2"><i class="fas fa-shield-alt"></i></span>
+                        Güvenlik ve Hesap Ayarları
+                    </h5>
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <div class="security-panel modern-security-card">
+                                <div class="security-card-header">
+                                    <div class="security-icon-wrapper">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="security-card-title">E-posta Güncelleme</h6>
+                                        <p class="security-card-subtitle">E-posta adresinizi değiştirin</p>
+                                    </div>
+                                </div>
+                                <div class="security-card-body">
+                                    <div class="current-email-display">
+                                        <i class="fas fa-envelope-open me-2"></i>
+                                        <span class="current-email-label">Mevcut E-posta:</span>
+                                        <strong class="current-email-value">@(Model.Email ?? "Belirtilmemiş")</strong>
+                                    </div>
+                                    <form asp-action="ChangeEmail" method="post" class="mt-4">
+                                        @Html.AntiForgeryToken()
+                                        <div class="mb-3">
+                                            <label for="newEmail" class="form-label modern-label">
+                                                <i class="fas fa-envelope me-2"></i>Yeni E-posta
+                                            </label>
+                                            <input type="email" class="form-control modern-input" id="newEmail" name="NewEmail" placeholder="yeni@email.com" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="currentPasswordEmail" class="form-label modern-label">
+                                                <i class="fas fa-lock me-2"></i>Mevcut Şifre
+                                            </label>
+                                            <input type="password" class="form-control modern-input" id="currentPasswordEmail" name="CurrentPassword" placeholder="Şifrenizi girin" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary w-100 modern-btn-primary">
+                                            <i class="fas fa-save me-2"></i>E-postayı Güncelle
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <h4 class="text-success">@Model.Reviews.Count</h4>
-                            <small class="text-muted">Yorum</small>
+                        <div class="col-lg-6">
+                            <div class="security-panel modern-security-card">
+                                <div class="security-card-header">
+                                    <div class="security-icon-wrapper password-icon">
+                                        <i class="fas fa-key"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="security-card-title">Şifre Değiştirme</h6>
+                                        <p class="security-card-subtitle">E-posta ile şifre sıfırlama linki alın</p>
+                                    </div>
+                                </div>
+                                <div class="security-card-body">
+                                    <div class="password-reset-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <span>Şifrenizi değiştirmek için e-posta adresinize sıfırlama linki gönderebiliriz.</span>
+                                    </div>
+                                    <form asp-action="RequestPasswordReset" method="post" class="mt-4">
+                                        @Html.AntiForgeryToken()
+                                        <div class="mb-3">
+                                            <label class="form-label modern-label">
+                                                <i class="fas fa-envelope me-2"></i>E-posta Adresi
+                                            </label>
+                                            <input type="email" class="form-control modern-input" value="@(Model.Email ?? "")" readonly style="background-color: rgba(15, 23, 42, 0.4); cursor: not-allowed;">
+                                            <small class="text-muted d-block mt-2">
+                                                Şifre sıfırlama linki bu e-posta adresine gönderilecektir.
+                                            </small>
+                                        </div>
+                                        <button type="submit" class="btn btn-warning w-100 modern-btn-warning">
+                                            <i class="fas fa-paper-plane me-2"></i>Şifre Sıfırlama Linki Gönder
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
+
+            <section id="section-media" class="card glass-card" data-profile-section>
+                <div class="card-body">
+                    <h5 class="section-heading mb-4">
+                        <span class="icon-circle me-2"><i class="fas fa-images"></i></span>
+                        Bölgede Çektiğim Fotoğraflar
+                    </h5>
+
+                    <form asp-action="UploadPhotos" method="post" enctype="multipart/form-data" id="photoUploadForm" class="mb-4">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label for="photoFiles" class="form-label">Fotoğraf Yükle</label>
+                            <input type="file" class="form-control" id="photoFiles" name="photoFiles" accept="image/*" multiple>
+                            <small class="text-muted">Birden fazla fotoğraf seçebilirsiniz (maks. 5MB her biri, desteklenen: .jpg, .jpeg, .png, .webp)</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload me-2"></i>Fotoğrafları Yükle
+                        </button>
+                    </form>
+
+                    <div class="photos-gallery" id="photosGallery">
+                        @if (Model.Photos != null && Model.Photos.Any())
+                        {
+                            <div class="row g-3">
+                                @foreach (var photo in Model.Photos.OrderByDescending(p => p.CreatedDate))
+                                {
+                                    <div class="col-md-4 col-lg-3">
+                                        <div class="photo-item">
+                                            <img src="@Url.Content(photo.PhotoUrl)" alt="@photo.Description" class="photo-thumbnail">
+                                            <div class="photo-overlay">
+                                                <button type="button" class="btn btn-sm btn-danger delete-photo-btn" data-photo-id="@photo.Id">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5 text-muted">
+                                <i class="fas fa-images fa-3x mb-3"></i>
+                                <p>Henüz fotoğraf yüklenmemiş. Bölgede çektiğiniz fotoğrafları yükleyebilirsiniz.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 </div>
 
+                    <form asp-action="UpdateProfile" method="post" class="d-none" id="removeAvatarForm">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="UserName" value="@Model.UserName" />
+                        <input type="hidden" name="DisplayName" value="@Model.DisplayName" />
+                        <input type="hidden" name="FullName" value="@Model.FullName" />
+                        <input type="hidden" name="PhoneNumber" value="@Model.PhoneNumber" />
+                        <input type="hidden" name="City" value="@Model.City" />
+                        <input type="hidden" name="Country" value="@Model.Country" />
+                        <input type="hidden" name="SelectedAvatar" value="remove" />
+                    </form>
+</div>
+
+<style>
+
+
+    .achievements-section {
+        padding: 2rem 0;
+    }
+
+    .achievements-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+    }
+
+    .achievements-subtitle {
+        color: rgba(226, 232, 240, 0.7);
+        margin-bottom: 2rem;
+    }
+
+    .achievements-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .achievement-card {
+        display: flex;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: var(--panel);
+        border: 1px solid var(--card-border);
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .achievement-card.locked {
+        opacity: 0.7;
+    }
+
+    .achievement-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(148, 163, 184, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .achievement-icon i {
+        font-size: 1.5rem;
+        color: rgba(226, 232, 240, 0.5);
+    }
+
+    .achievement-content h4 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+    }
+
+    .achievement-content p {
+        font-size: 0.9rem;
+        color: rgba(226, 232, 240, 0.7);
+        margin: 0;
+    }
+
+    .view-all-btn {
+        width: 100%;
+        padding: 1rem;
+        background: #16a34a;
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .view-all-btn:hover {
+        background: #15803d;
+    }
+
+    .photos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .photo-item {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        background: var(--panel);
+        border: 1px solid var(--card-border);
+    }
+
+    .photo-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .photo-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .photo-item:hover .photo-overlay {
+        opacity: 1;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: rgba(226, 232, 240, 0.7);
+    }
+
+    .empty-state i {
+        color: rgba(226, 232, 240, 0.5);
+        margin-bottom: 1rem;
+    }
+
+    .fab-btn {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #16a34a;
+        color: white;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .fab-btn:hover {
+        background: #15803d;
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(22, 163, 74, 0.6);
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Profile Layout Styles */
+    .profile-layout {
+        align-items: flex-start;
+    }
+
+    .profile-sidebar {
+        padding: 1.5rem;
+        border-radius: 1.25rem;
+    }
+
+    .sticky-sidebar {
+        position: sticky;
+        top: 100px;
+    }
+
+    .sidebar-header h5 {
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .profile-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .profile-nav .profile-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.65rem 0.85rem;
+        border-radius: 0.85rem;
+        color: rgba(226,232,240,0.8);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .profile-nav .profile-nav-link:hover,
+    .profile-nav .profile-nav-link.active {
+        background: rgba(255,193,7,0.15);
+        color: var(--accent);
+    }
+
+    .profile-nav .profile-nav-link i {
+        width: 24px;
+        text-align: center;
+    }
+
+    .profile-section {
+        scroll-margin-top: 90px;
+    }
+
+    .profile-section + .profile-section {
+        margin-top: 2rem;
+    }
+
+    .security-panel {
+        padding: 1.25rem;
+        border: 1px solid rgba(148,163,184,0.2);
+        border-radius: 1rem;
+        background: rgba(15,23,42,0.5);
+        height: 100%;
+    }
+
+    .location-divider {
+        padding: 1rem 1.25rem;
+        background: rgba(59,130,246,0.08);
+        border: 1px solid rgba(59,130,246,0.2);
+        border-radius: 0.85rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .location-divider p {
+        font-size: 0.9rem;
+    }
+
+    @@media (max-width: 1199px) {
+        .profile-sidebar {
+            position: static;
+        }
+    }
+    .photo-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        aspect-ratio: 1;
+        background: var(--panel);
+        border: 1px solid var(--card-border);
+    }
+
+    .photo-thumbnail {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .photo-item:hover .photo-thumbnail {
+        transform: scale(1.1);
+    }
+
+    .photo-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .photo-item:hover .photo-overlay {
+        opacity: 1;
+    }
+
+    .delete-photo-btn {
+        z-index: 10;
+    }
+
+    /* Profil görüntüleme modu stilleri */
+    .profile-view-mode {
+        animation: fadeIn 0.3s ease;
+    }
+
+    .profile-info-item {
+        padding: 1.25rem;
+        background: rgba(15, 23, 42, 0.4);
+        border-radius: 0.85rem;
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    .profile-info-item:hover {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(255, 193, 7, 0.25);
+        transform: translateY(-2px);
+    }
+
+    .profile-info-label {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: rgba(226, 232, 240, 0.7);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-info-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text);
+        word-break: break-word;
+    }
+
+    /* E-posta özel stilleri */
+    .profile-email-item {
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.08) 0%, rgba(15, 23, 42, 0.4) 100%);
+        border: 1px solid rgba(255, 193, 7, 0.2);
+    }
+
+    .profile-email-item:hover {
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.12) 0%, rgba(15, 23, 42, 0.6) 100%);
+        border-color: rgba(255, 193, 7, 0.35);
+    }
+
+    .profile-email-value {
+        font-size: 1.15rem;
+        color: var(--accent);
+        font-weight: 700;
+    }
+
+    .profile-email-note {
+        display: block;
+        margin-top: 0.5rem;
+        color: rgba(226, 232, 240, 0.6);
+        font-size: 0.85rem;
+    }
+
+    /* Profil Hero Stilleri */
+    .profile-hero-content {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        padding: 2rem;
+    }
+
+    .profile-hero-avatar {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .hero-avatar-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255, 193, 7, 0.4);
+        box-shadow: 0 20px 40px rgba(7, 12, 24, 0.4);
+    }
+
+    .hero-avatar-badge {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid rgba(15, 23, 42, 0.8);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-avatar-badge i {
+        color: #212529;
+        font-size: 0.9rem;
+    }
+
+    .profile-hero-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .profile-hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .hero-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+        color: rgba(226, 232, 240, 0.8);
+    }
+
+    .hero-meta-item i {
+        font-size: 1rem;
+    }
+
+    .profile-hero-stats {
+        display: flex;
+        gap: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .hero-stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.5rem;
+        background: rgba(255, 193, 7, 0.1);
+        border-radius: 1rem;
+        border: 1px solid rgba(255, 193, 7, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .hero-stat-item:hover {
+        background: rgba(255, 193, 7, 0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 193, 7, 0.2);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255, 193, 7, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        font-size: 1.25rem;
+    }
+
+    .stat-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: rgba(226, 232, 240, 0.7);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.25rem;
+    }
+
+    /* Navbar E-posta Stilleri */
+    .navbar-email {
+        font-size: 0.75rem;
+        color: rgba(226, 232, 240, 0.7);
+        line-height: 1.2;
+    }
+
+    @@media (max-width: 992px) {
+        .profile-hero-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .profile-hero-stats {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .profile-hero-meta {
+            justify-content: center;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .profile-hero-content {
+            padding: 1.5rem;
+        }
+
+        .hero-avatar-image {
+            width: 100px;
+            height: 100px;
+        }
+
+        .hero-stat-item {
+            padding: 0.75rem 1rem;
+        } 
+
+        .stat-value {
+            font-size: 1.25rem;
+        }
+    }
+
+    /* Modern select stilleri */
+    .country-select-wrapper {
+        position: relative;
+    }
+
+    .modern-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffc107' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1rem;
+        padding-right: 2.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .modern-select:hover {
+        border-color: rgba(255, 193, 7, 0.4);
+        box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+    }
+
+    .modern-select:focus {
+        border-color: rgba(255, 193, 7, 0.6);
+        box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.15);
+        outline: none;
+    }
+
+    /* Select ve option stilleri */
+    #countrySelect,
+    #citySelect {
+        color: var(--text) !important;
+        background-color: rgba(15, 23, 42, 0.6) !important;
+    }
+
+    #countrySelect option,
+    #citySelect option {
+        background-color: rgba(15, 23, 42, 0.95) !important;
+        color: var(--text) !important;
+        padding: 0.75rem;
+    }
+
+    #countrySelect option:hover,
+    #citySelect option:hover {
+        background-color: rgba(255, 193, 7, 0.15) !important;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Modern Modal Styles */
+    .modern-modal {
+        border: none;
+        border-radius: 1.25rem;
+        overflow: hidden;
+    }
+
+    .modern-modal-header {
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 152, 0, 0.1) 100%);
+        border-bottom: 1px solid rgba(255, 193, 7, 0.2);
+        padding: 1.5rem;
+    }
+
+    .modern-modal-header .modal-title {
+        font-weight: 700;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+    }
+
+    .modern-modal-body {
+        padding: 2rem;
+    }
+
+    .modern-modal-footer {
+        background: rgba(15, 23, 42, 0.5);
+        border-top: 1px solid rgba(148, 163, 184, 0.2);
+        padding: 1.25rem 1.5rem;
+    }
+
+    .modern-label {
+        font-weight: 600;
+        color: rgba(226, 232, 240, 0.9);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+    .modern-input,
+    .modern-select {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        color: var(--text);
+        padding: 0.85rem 1rem;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .modern-input:focus,
+    .modern-select:focus {
+        background: rgba(15, 23, 42, 0.8);
+        border-color: rgba(255, 193, 7, 0.5);
+        box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+        outline: none;
+        color: var(--text);
+    }
+
+    .modern-input::placeholder {
+        color: rgba(226, 232, 240, 0.5);
+    }
+
+    .modern-btn-primary {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        border: none;
+        color: #212529;
+        font-weight: 700;
+        padding: 0.85rem 1.5rem;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+    }
+
+    .modern-btn-primary:hover {
+        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+        color: #212529;
+    }
+
+    .modern-btn-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        border: none;
+        color: #212529;
+        font-weight: 700;
+        padding: 0.85rem 1.5rem;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+    }
+
+    .modern-btn-warning:hover {
+        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+        color: #212529;
+    }
+
+    /* Modern Security Section */
+    .modern-security-section {
+        margin-top: 2rem;
+    }
+
+    .modern-security-card {
+        padding: 2rem;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 1.25rem;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.4) 100%);
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .modern-security-card:hover {
+        border-color: rgba(255, 193, 7, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .security-card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .security-icon-wrapper {
+        width: 56px;
+        height: 56px;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #60a5fa;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .security-icon-wrapper.password-icon {
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 193, 7, 0.1) 100%);
+        color: var(--accent);
+    }
+
+    .security-card-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0;
+    }
+
+    .security-card-subtitle {
+        font-size: 0.875rem;
+        color: rgba(226, 232, 240, 0.7);
+        margin: 0.25rem 0 0 0;
+    }
+
+    .security-card-body {
+        padding-top: 0;
+    }
+
+    .current-email-display {
+        padding: 1rem;
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.2);
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .current-email-label {
+        color: rgba(226, 232, 240, 0.8);
+        font-size: 0.9rem;
+    }
+
+    .current-email-value {
+        color: var(--accent);
+        font-size: 0.95rem;
+        word-break: break-all;
+    }
+
+    .password-reset-info {
+        padding: 1rem;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 0.75rem;
+        color: rgba(226, 232, 240, 0.9);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .password-reset-info i {
+        color: #60a5fa;
+        margin-top: 0.125rem;
+    }
+
+    @@media (max-width: 991px) {
+        .modern-security-card {
+            margin-bottom: 1.5rem;
+        }
+    }
+</style>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        (function () {
+            // Sidebar Navigation
+            const navContainer = document.getElementById('profileNav');
+            if (navContainer) {
+                const navLinks = navContainer.querySelectorAll('.profile-nav-link');
+                const sections = document.querySelectorAll('[data-profile-section]');
+
+                // Smooth scroll and active state management
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href');
+                        const targetSection = document.querySelector(targetId);
+                        
+                        if (targetSection) {
+                            // Remove active class from all links
+                            navLinks.forEach(l => l.classList.remove('active'));
+                            // Add active class to clicked link
+                            this.classList.add('active');
+                            
+                            // Smooth scroll to section
+                            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    });
+                });
+
+                // Update active link on scroll
+                const observerOptions = {
+                    root: null,
+                    rootMargin: '-100px 0px -50% 0px',
+                    threshold: 0
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const id = entry.target.getAttribute('id');
+                            navLinks.forEach(link => {
+                                link.classList.remove('active');
+                                if (link.getAttribute('href') === `#${id}`) {
+                                    link.classList.add('active');
+                                }
+                            });
+                        }
+                    });
+                }, observerOptions);
+
+                sections.forEach(section => observer.observe(section));
+            }
+
+
+            // Old Profile Code
+            const avatarOptions = document.querySelectorAll('.avatar-option input[type="radio"]');
+            const selectedAvatarInput = document.getElementById('selectedAvatarInput');
+            const avatarPreview = document.getElementById('avatarPreview');
+            const fileInput = document.querySelector('input[name="AvatarFile"]');
+            const resetBtn = document.getElementById('resetAvatarBtn');
+            const defaultAvatar = '@Url.Content("~/images/default-avatar.svg")';
+
+            avatarOptions.forEach(option => {
+                option.addEventListener('change', function () {
+                    selectedAvatarInput.value = this.value;
+                    avatarPreview.src = this.nextElementSibling.src;
+
+                    document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('active'));
+                    this.closest('.avatar-option').classList.add('active');
+
+                    if (fileInput) {
+                        fileInput.value = '';
+                    }
+                });
+            });
+
+            if (fileInput) {
+                fileInput.addEventListener('change', function () {
+                    if (this.files && this.files[0]) {
+                        selectedAvatarInput.value = '';
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            avatarPreview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(this.files[0]);
+
+                        document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('active'));
+                    }
+                });
+            }
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function () {
+                    selectedAvatarInput.value = '';
+                    avatarPreview.src = defaultAvatar;
+                    if (fileInput) {
+                        fileInput.value = '';
+                    }
+                    document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('active'));
+                });
+            }
+
+            // Şehir seçimi için
+            const citySelect = document.getElementById('citySelect');
+            if (citySelect) {
+                citySelect.value = '@Model.City';
+            }
+
+            // Profil düzenleme modu
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const profileViewMode = document.getElementById('profileViewMode');
+            const profileForm = document.getElementById('profileForm');
+            const saveButtonsContainer = document.getElementById('saveButtonsContainer');
+
+            if (editProfileBtn) {
+                editProfileBtn.addEventListener('click', function() {
+                    profileViewMode.style.display = 'none';
+                    profileForm.style.display = 'block';
+                    saveButtonsContainer.style.display = 'flex';
+                    profileForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
+
+            if (cancelEditBtn) {
+                cancelEditBtn.addEventListener('click', function() {
+                    profileForm.style.display = 'none';
+                    saveButtonsContainer.style.display = 'none';
+                    profileViewMode.style.display = 'block';
+                    profileViewMode.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
+
+            // Ülke seçimi için
+            const countrySelect = document.getElementById('countrySelect');
+            const citySelectContainer = document.getElementById('citySelectContainer');
+            const cityViewContainer = document.getElementById('cityViewContainer');
+            
+            function toggleCitySelect() {
+                if (countrySelect && citySelectContainer) {
+                    if (countrySelect.value === 'Türkiye') {
+                        citySelectContainer.style.display = 'block';
+                    } else {
+                        citySelectContainer.style.display = 'none';
+                        const citySelect = document.getElementById('citySelect');
+                        if (citySelect) {
+                            citySelect.value = '';
+                        }
+                    }
+                }
+            }
+
+            if (countrySelect) {
+                countrySelect.value = '@Model.Country';
+                countrySelect.addEventListener('change', function() {
+                    toggleCitySelect();
+                    // Görüntüleme modundaki şehir görünürlüğünü güncelle
+                    if (cityViewContainer) {
+                        if (this.value === 'Türkiye') {
+                            cityViewContainer.style.display = 'block';
+                        } else {
+                            cityViewContainer.style.display = 'none';
+                        }
+                    }
+                });
+                toggleCitySelect(); // İlk yüklemede kontrol et
+            }
+
+            // Fotoğraf silme
+            document.querySelectorAll('.delete-photo-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const photoId = this.getAttribute('data-photo-id');
+                    if (confirm('Bu fotoğrafı silmek istediğinize emin misiniz?')) {
+                        fetch('@Url.Action("DeletePhoto", "User")', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            },
+                            body: JSON.stringify({ photoId: photoId })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                location.reload();
+                            } else {
+                                alert('Fotoğraf silinirken bir hata oluştu.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Fotoğraf silinirken bir hata oluştu.');
+                        });
+                    }
+                });
+            });
+
+            // Kenar menü aktive etme
+            const navContainer = document.getElementById('profileNav');
+            const sectionElements = document.querySelectorAll('[data-profile-section]');
+
+            if (navContainer && sectionElements.length) {
+                const navLinks = navContainer.querySelectorAll('.profile-nav-link');
+
+                const setActiveLink = (targetId) => {
+                    if (!targetId) return;
+                    navLinks.forEach(link => {
+                        if (link.getAttribute('href') === `#${targetId}`) {
+                            link.classList.add('active');
+                        } else {
+                            link.classList.remove('active');
+                        }
+                    });
+                };
+
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                    });
+                });
+
+                if ('IntersectionObserver' in window) {
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                setActiveLink(entry.target.getAttribute('id'));
+                            }
+                        });
+                    }, {
+                        rootMargin: '-45% 0px -45% 0px',
+                        threshold: 0.2
+                    });
+
+                    sectionElements.forEach(section => observer.observe(section));
+                    setActiveLink(sectionElements[0].getAttribute('id'));
+                }
+            }
+        })();
+    </script>
 }

@@ -61,12 +61,33 @@ namespace AlanyaBusinessGuide.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("ConsentAccepted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ConsentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -113,6 +134,9 @@ namespace AlanyaBusinessGuide.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Website")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -167,6 +191,12 @@ namespace AlanyaBusinessGuide.Migrations
 
                     b.Property<bool>("IsFeatured")
                         .HasColumnType("bit");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -371,6 +401,38 @@ namespace AlanyaBusinessGuide.Migrations
                         .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("UserFavorites");
+                });
+
+            modelBuilder.Entity("AlanyaBusinessGuide.Models.UserPhoto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PhotoUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserPhotos");
                 });
 
             modelBuilder.Entity("AlanyaBusinessGuide.Models.UserProfile", b =>
@@ -603,6 +665,17 @@ namespace AlanyaBusinessGuide.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("AlanyaBusinessGuide.Models.UserPhoto", b =>
+                {
+                    b.HasOne("AlanyaBusinessGuide.Models.ApplicationUser", "User")
+                        .WithMany("Photos")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AlanyaBusinessGuide.Models.UserProfile", b =>
                 {
                     b.HasOne("AlanyaBusinessGuide.Models.ApplicationUser", "User")
@@ -667,6 +740,8 @@ namespace AlanyaBusinessGuide.Migrations
             modelBuilder.Entity("AlanyaBusinessGuide.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Favorites");
+
+                    b.Navigation("Photos");
 
                     b.Navigation("Reviews");
                 });

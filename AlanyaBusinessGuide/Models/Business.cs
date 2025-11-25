@@ -19,6 +19,8 @@ namespace AlanyaBusinessGuide.Models
         public string? Website { get; set; }
         public string? WorkingHours { get; set; }
         public string? PriceRange { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
         public bool IsFeatured { get; set; } = false;
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;

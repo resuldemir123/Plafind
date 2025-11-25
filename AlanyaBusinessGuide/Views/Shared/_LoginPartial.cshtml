@@ -6,14 +6,25 @@
 {
     <ul class="navbar-nav ms-auto">
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"
-               style="color: #ffffff; text-decoration: none;">
-                <i class="fas fa-user-circle me-1"></i>
-                @{
-                    var currentUser = await UserManager.GetUserAsync(User);
-                    var displayName = currentUser?.UserName ?? currentUser?.Email ?? "Kullanıcı";
-                }
-                @displayName
+            @{
+                var currentUser = await UserManager.GetUserAsync(User);
+                var displayName = currentUser?.DisplayName
+                    ?? currentUser?.FullName
+                    ?? currentUser?.UserName
+                    ?? currentUser?.Email
+                    ?? "Kullanıcı";
+                var avatarPath = string.IsNullOrWhiteSpace(currentUser?.AvatarUrl)
+                    ? Url.Content("~/images/default-avatar.svg")
+                    : Url.Content(currentUser.AvatarUrl.StartsWith("/") ? "~" + currentUser.AvatarUrl : currentUser.AvatarUrl);
+            }
+            <a class="nav-link dropdown-toggle navbar-profile d-flex align-items-center gap-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="navbar-avatar">
+                    <img src="@avatarPath" alt="Profil" />
+                </span>
+                <div class="d-flex flex-column align-items-start">
+                    <span class="navbar-username">@(currentUser?.UserName ?? "Kullanıcı")</span>
+                    <small class="navbar-email">@(currentUser?.Email ?? "")</small>
+                </div>
                 @if (User?.IsInRole("Admin") ?? false)
                 {
                     <span class="badge bg-success ms-1">Admin</span>
@@ -27,10 +38,12 @@
                 @if (User?.IsInRole("Admin") ?? false)
                 {
                     <li><a class="dropdown-item" href="@Url.Action("Index", "Admin")"><i class="fas fa-tachometer-alt me-2"></i>Admin Panel</a></li>
+                    <li><a class="dropdown-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card me-2"></i>Profil Ayarları</a></li>
                 }
                 else if (User?.IsInRole("User") ?? false)
                 {
                     <li><a class="dropdown-item" href="@Url.Action("Index", "User")"><i class="fas fa-user me-2"></i>Kullanıcı Panel</a></li>
+                    <li><a class="dropdown-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card me-2"></i>Profil Ayarları</a></li>
                 }
                 <li><hr class="dropdown-divider" /></li>
                 <li>

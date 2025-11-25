@@ -4,60 +4,178 @@
     Layout = "_Layout";
 }
 
+<div class="auth-page-wrapper">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-icon-wrapper">
+                    <i class="fas fa-sign-in-alt"></i>
+                </div>
+                <h1 class="auth-title">Hoş Geldiniz</h1>
+                <p class="auth-subtitle">Alanya İşletme Rehberi'ne giriş yapın</p>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert alert-danger-custom" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <div>
+                        @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+                    </div>
+                </div>
+            }
+
+            <form asp-action="Login" method="post" id="loginForm" class="auth-form">
+                @Html.AntiForgeryToken()
+                
+                <div class="form-group-custom">
+                    <label asp-for="Email" class="form-label-custom">
+                        <i class="fas fa-envelope me-2"></i>
+                        E-posta Adresi
+                    </label>
+                    <div class="input-wrapper">
+                        <input asp-for="Email" 
+                               type="email" 
+                               class="form-input-custom" 
+                               placeholder="ornek@email.com"
+                               autocomplete="email"
+                               required />
+                        <i class="input-icon fas fa-envelope"></i>
+                    </div>
+                    <span asp-validation-for="Email" class="error-message"></span>
+                </div>
+
+                <div class="form-group-custom">
+                    <label asp-for="Password" class="form-label-custom">
+                        <i class="fas fa-lock me-2"></i>
+                        Şifre
+                    </label>
+                    <div class="input-wrapper">
+                        <input asp-for="Password" 
+                               type="password" 
+                               class="form-input-custom" 
+                               placeholder="••••••••"
+                               id="passwordInput"
+                               autocomplete="current-password"
+                               required />
+                        <i class="input-icon fas fa-lock"></i>
+                        <button type="button" class="password-toggle" id="passwordToggle" aria-label="Şifreyi göster/gizle">
+                            <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="error-message"></span>
+                    <div class="forgot-password-link">
+                        <a asp-controller="Account" asp-action="ForgotPassword" class="link-custom">
+                            <i class="fas fa-question-circle me-1"></i>
+                            Şifremi Unuttum?
+                        </a>
+                    </div>
+                </div>
+
+                <div class="form-group-custom">
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <span class="btn-text">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Giriş Yap
+                        </span>
+                        <span class="btn-loader" style="display: none;">
+                            <i class="fas fa-spinner fa-spin me-2"></i>
+                            Giriş yapılıyor...
+                        </span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="auth-divider">
+                <span>veya</span>
+            </div>
+
+            <div class="auth-footer">
+                <p class="footer-text">
+                    Hesabınız yok mu?
+                    <a asp-controller="Account" asp-action="Register" class="link-primary">
+                        <i class="fas fa-user-plus me-1"></i>
+                        Hemen Kayıt Olun
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <div class="auth-features">
+            <div class="feature-item">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Güvenli Giriş</h3>
+                <p>Verileriniz şifrelenmiş olarak korunur</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-star"></i>
+                <h3>İşletme Değerlendirme</h3>
+                <p>Favori işletmelerinizi değerlendirin</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-calendar-check"></i>
+                <h3>Rezervasyon Yönetimi</h3>
+                <p>Kolayca rezervasyon yapın ve yönetin</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-    .auth-page {
-        min-height: calc(100vh - 200px);
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .auth-page-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0b1220 0%, #1e293b 50%, #0b1220 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 60px 20px;
+        padding: 2rem 1rem;
         position: relative;
-        margin: 0 -15px;
         overflow: hidden;
     }
 
-        .auth-page::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%), 
-                        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            animation: backgroundShift 20s ease-in-out infinite;
-        }
-
-    @@keyframes backgroundShift {
-        0%, 100% {
-            opacity: 0.6;
-        }
-
-        50% {
-            opacity: 0.8;
-        }
+    .auth-page-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 30%, rgba(255, 193, 7, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+        animation: backgroundPulse 15s ease-in-out infinite;
+        pointer-events: none;
     }
 
-    .auth-card {
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        padding: 50px;
-        max-width: 450px;
+    @@keyframes backgroundPulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 0.8; }
+    }
+
+    .auth-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        max-width: 1200px;
         width: 100%;
         position: relative;
         z-index: 1;
-        animation: slideUp 0.6s ease-out;
     }
 
-    @@keyframes slideUp {
+    .auth-card {
+        background: var(--panel);
+        border-radius: 1.5rem;
+        padding: 3rem;
+        border: 1px solid var(--card-border);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        animation: slideInUp 0.6s ease-out;
+    }
+
+    @@keyframes slideInUp {
         from {
             opacity: 0;
             transform: translateY(30px);
         }
-
         to {
             opacity: 1;
             transform: translateY(0);
@@ -66,213 +184,397 @@
 
     .auth-header {
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: 2.5rem;
     }
 
-    .auth-icon {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .auth-icon-wrapper {
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 10px 30px rgba(255, 193, 7, 0.4);
+        animation: iconPulse 2s ease-in-out infinite;
     }
 
-        .auth-icon svg {
-            width: 40px;
-            height: 40px;
-            fill: white;
-        }
+    @@keyframes iconPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .auth-icon-wrapper i {
+        font-size: 2.5rem;
+        color: #0b1220;
+    }
 
     .auth-title {
-        font-size: 28px;
-        font-weight: 700;
-        color: #2d3748;
-        margin-bottom: 10px;
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
     }
 
     .auth-subtitle {
-        color: #718096;
-        font-size: 14px;
+        color: var(--muted);
+        font-size: 1rem;
+        margin: 0;
     }
 
-    .auth-form-group {
-        margin-bottom: 25px;
+    .alert-danger-custom {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-left: 4px solid #ef4444;
+        color: #fee2e2;
+        padding: 1rem 1.25rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
     }
 
-        .auth-form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #4a5568;
-            font-weight: 600;
-            font-size: 14px;
-        }
+    .alert-danger-custom i {
+        color: #ef4444;
+        font-size: 1.25rem;
+        margin-top: 0.125rem;
+    }
 
-    .auth-form-control {
+    .alert-danger-custom ul {
+        margin: 0;
+        padding-left: 1.25rem;
+        list-style: none;
+    }
+
+    .alert-danger-custom li {
+        margin: 0.25rem 0;
+    }
+
+    .auth-form {
+        margin-top: 2rem;
+    }
+
+    .form-group-custom {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label-custom {
+        display: flex;
+        align-items: center;
+        color: var(--text);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .form-label-custom i {
+        color: #ffc107;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .form-input-custom {
         width: 100%;
-        padding: 14px 16px;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
-        font-size: 15px;
+        padding: 1rem 3rem 1rem 3rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid var(--card-border);
+        border-radius: 0.75rem;
+        color: var(--text);
+        font-size: 1rem;
         transition: all 0.3s ease;
-        background: #f7fafc;
         box-sizing: border-box;
     }
 
-        .auth-form-control:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
+    .form-input-custom::placeholder {
+        color: var(--muted);
+    }
 
-    .auth-btn-primary {
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .form-input-custom:focus {
+        outline: none;
+        border-color: #ffc107;
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.1);
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+        pointer-events: none;
+        transition: color 0.3s ease;
+    }
+
+    .form-input-custom:focus + .input-icon,
+    .form-input-custom:not(:placeholder-shown) + .input-icon {
+        color: #ffc107;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
         border: none;
-        border-radius: 10px;
-        color: white;
-        font-size: 16px;
-        font-weight: 600;
+        color: var(--muted);
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: color 0.3s ease;
+        z-index: 2;
+    }
+
+    .password-toggle:hover {
+        color: #ffc107;
+    }
+
+    .forgot-password-link {
+        text-align: right;
+        margin-top: 0.5rem;
+    }
+
+    .link-custom {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .link-custom:hover {
+        color: #ffc107;
+    }
+
+    .error-message {
+        display: block;
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .error-message::before {
+        content: '⚠';
+        font-size: 0.875rem;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        border: none;
+        border-radius: 0.75rem;
+        color: #0b1220;
+        font-size: 1rem;
+        font-weight: 700;
         cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
 
-        .auth-btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-            color: white;
-        }
-
-        .auth-btn-primary:active {
-            transform: translateY(0);
-        }
-
-    .auth-text-danger {
-        color: #e53e3e;
-        font-size: 13px;
-        margin-top: 5px;
-        display: block;
+    .btn-submit:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 193, 7, 0.5);
     }
 
-    .auth-validation-summary {
-        background: #fff5f5;
-        border-left: 4px solid #e53e3e;
-        padding: 12px 16px;
-        border-radius: 8px;
-        margin-top: 20px;
+    .btn-submit:active:not(:disabled) {
+        transform: translateY(0);
     }
 
-        .auth-validation-summary ul {
-            margin: 0;
-            padding-left: 20px;
-            color: #e53e3e;
-            list-style: none;
-        }
+    .btn-submit:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
 
-        .auth-validation-summary li:before {
-            content: "• ";
-            color: #e53e3e;
-            font-weight: bold;
-            margin-right: 5px;
-        }
+    .auth-divider {
+        text-align: center;
+        margin: 2rem 0;
+        position: relative;
+    }
+
+    .auth-divider::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 1px;
+        background: var(--card-border);
+    }
+
+    .auth-divider span {
+        background: var(--panel);
+        padding: 0 1rem;
+        color: var(--muted);
+        font-size: 0.875rem;
+        position: relative;
+        z-index: 1;
+    }
 
     .auth-footer {
         text-align: center;
-        margin-top: 30px;
-        padding-top: 25px;
-        border-top: 1px solid #e2e8f0;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--card-border);
     }
 
-        .auth-footer a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-            .auth-footer a:hover {
-                color: #764ba2;
-            }
-
-    .forgot-password {
-        text-align: right;
-        margin-top: 8px;
+    .footer-text {
+        color: var(--muted);
+        font-size: 0.9375rem;
+        margin: 0;
     }
 
-        .forgot-password a {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 13px;
-            transition: color 0.3s ease;
+    .link-primary {
+        color: #ffc107;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        margin-left: 0.5rem;
+    }
+
+    .link-primary:hover {
+        color: #ff9800;
+    }
+
+    .auth-features {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        justify-content: center;
+    }
+
+    .feature-item {
+        text-align: center;
+        padding: 2rem;
+        background: var(--panel);
+        border-radius: 1rem;
+        border: 1px solid var(--card-border);
+        transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 193, 7, 0.3);
+    }
+
+    .feature-item i {
+        font-size: 3rem;
+        color: #ffc107;
+        margin-bottom: 1rem;
+    }
+
+    .feature-item h3 {
+        color: var(--text);
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-item p {
+        color: var(--muted);
+        font-size: 0.9375rem;
+        margin: 0;
+    }
+
+    @@media (max-width: 992px) {
+        .auth-container {
+            grid-template-columns: 1fr;
+            gap: 2rem;
         }
 
-            .forgot-password a:hover {
-                color: #764ba2;
-            }
+        .auth-features {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
 
-    /* Responsive */
-    @@media (max-width: 576px) {
+        .feature-item {
+            flex: 1;
+            min-width: 200px;
+        }
+    }
+
+    @@media (max-width: 768px) {
         .auth-card {
-            padding: 30px 25px;
+            padding: 2rem 1.5rem;
         }
 
         .auth-title {
-            font-size: 24px;
+            font-size: 1.75rem;
+        }
+
+        .auth-features {
+            flex-direction: column;
         }
     }
 </style>
 
-<div class="auth-page">
-    <div class="auth-card">
-        <div class="auth-header">
-            <div class="auth-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-                </svg>
-            </div>
-            <h2 class="auth-title">Hoş Geldiniz</h2>
-            <p class="auth-subtitle">Alanya İşletme Rehberi'ne giriş yapın</p>
-        </div>
-
-        <form asp-action="Login" method="post">
-            <div class="auth-form-group">
-                <label asp-for="Email">E-posta</label>
-                <input asp-for="Email" class="auth-form-control" placeholder="ornek@email.com" />
-                <span asp-validation-for="Email" class="auth-text-danger"></span>
-            </div>
-
-            <div class="auth-form-group">
-                <label asp-for="Password">Şifre</label>
-                <input asp-for="Password" type="password" class="auth-form-control" placeholder="••••••••" />
-                <span asp-validation-for="Password" class="auth-text-danger"></span>
-                <div class="forgot-password">
-                    <a href="#">Şifremi Unuttum?</a>
-                </div>
-            </div>
-
-            <div class="auth-form-group">
-                <button type="submit" class="auth-btn-primary">Giriş Yap</button>
-            </div>
-
-            <div class="auth-text-danger">
-                @Html.ValidationSummary(false, "", new { @class = "auth-validation-summary" })
-            </div>
-        </form>
-
-        <div class="auth-footer">
-            <p style="color: #718096; font-size: 14px; margin: 0;">
-                Hesabınız yok mu? <a asp-controller="Account" asp-action="Register">Kayıt Olun</a>
-            </p>
-        </div>
-    </div>
-</div>
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('passwordInput');
+            const passwordToggle = document.getElementById('passwordToggle');
+            const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+            const loginForm = document.getElementById('loginForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnLoader = submitBtn.querySelector('.btn-loader');
+
+            // Password toggle
+            if (passwordToggle && passwordInput) {
+                passwordToggle.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    if (type === 'text') {
+                        passwordToggleIcon.classList.remove('fa-eye');
+                        passwordToggleIcon.classList.add('fa-eye-slash');
+                    } else {
+                        passwordToggleIcon.classList.remove('fa-eye-slash');
+                        passwordToggleIcon.classList.add('fa-eye');
+                    }
+                });
+            }
+
+            // Form submission
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    if (loginForm.checkValidity()) {
+                        submitBtn.disabled = true;
+                        btnText.style.display = 'none';
+                        btnLoader.style.display = 'flex';
+                    }
+                });
+            }
+
+            // Input focus animations
+            const inputs = document.querySelectorAll('.form-input-custom');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.querySelector('.input-icon').style.color = '#ffc107';
+                });
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.parentElement.querySelector('.input-icon').style.color = '';
+                    }
+                });
+            });
+        });
+    </script>
 }

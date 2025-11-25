@@ -2,17 +2,22 @@
 using Microsoft.AspNetCore.Mvc;
 using AlanyaBusinessGuide.Data;
 using AlanyaBusinessGuide.Models;
+using AlanyaBusinessGuide.Options;
+using AlanyaBusinessGuide.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace AlanyaBusinessGuide.Controllers
 {
     public class BusinessesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly GoogleMapsOptions _mapsOptions;
 
-        public BusinessesController(ApplicationDbContext context)
+        public BusinessesController(ApplicationDbContext context, IOptions<GoogleMapsOptions> mapsOptions)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _mapsOptions = mapsOptions?.Value ?? new GoogleMapsOptions();
         }
 
         // GET: Businesses (Herkes görebilir)
@@ -49,7 +54,69 @@ namespace AlanyaBusinessGuide.Controllers
                 return NotFound();
             }
 
-            return View(business);
+            var similarBusinesses = new List<Business>();
+
+            if (business.CategoryId.HasValue)
+            {
+                similarBusinesses = await _context.Businesses
+                    .Where(b => b.Id != business.Id &&
+                                b.CategoryId == business.CategoryId &&
+                                b.IsActive &&
+                                b.IsApproved)
+                    .Include(b => b.Category)
+                    .OrderByDescending(b => b.IsFeatured)
+                    .ThenByDescending(b => b.AverageRating)
+                    .ThenByDescending(b => b.CreatedDate)
+                    .Take(6)
+                    .ToListAsync();
+            }
+
+            var viewModel = new BusinessDetailsViewModel
+            {
+                Business = business,
+                SimilarBusinesses = similarBusinesses
+            };
+
+            ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
+
+            return View(viewModel);
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> Map()
+        {
+            var businesses = await _context.Businesses
+                .Where(b => b.IsActive && b.IsApproved)
+                .Include(b => b.Category)
+                .ToListAsync();
+
+            ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
+
+            return View(businesses);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Locations()
+        {
+            var locations = await _context.Businesses
+                .Where(b => b.IsActive && b.IsApproved && b.Latitude.HasValue && b.Longitude.HasValue)
+                .Select(b => new
+                {
+                    b.Id,
+                    b.Name,
+                    b.Address,
+                    Category = b.Category != null ? b.Category.Name : null,
+                    b.Phone,
+                    b.ImageUrl,
+                    b.AverageRating,
+                    b.TotalReviews,
+                    Latitude = b.Latitude,
+                    Longitude = b.Longitude
+                })
+                .ToListAsync();
+
+            return Json(locations);
         }
 
         // GET: Businesses/Create (Sadece Admin ve User)
@@ -57,6 +124,7 @@ namespace AlanyaBusinessGuide.Controllers
         public IActionResult Create()
         {
             ViewBag.Categories = _context.Categories.ToList();
+            ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
             return View();
         }
 
@@ -75,6 +143,7 @@ namespace AlanyaBusinessGuide.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Categories = _context.Categories.ToList();
+            ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
             return View(business);
         }
 
@@ -91,6 +160,7 @@ namespace AlanyaBusinessGuide.Controllers
             if (business == null) return NotFound();
 
             ViewBag.Categories = _context.Categories.ToList();
+            ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
             return View(business);
         }
 
@@ -123,6 +193,7 @@ namespace AlanyaBusinessGuide.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Categories = _context.Categories.ToList();
+            ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
             return View(business);
         }
 

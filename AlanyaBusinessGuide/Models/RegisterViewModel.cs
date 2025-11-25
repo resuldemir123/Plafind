@@ -17,5 +17,13 @@ namespace AlanyaBusinessGuide.Models
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "Şifreler eşleşmiyor.")]
         public string? ConfirmPassword { get; set; } // Nullable olarak işaretlendi
+
+        [Display(Name = "Ülke")]
+        [StringLength(100, ErrorMessage = "Ülke adı en fazla 100 karakter olabilir.")]
+        public string? Country { get; set; }
+
+        [Required(ErrorMessage = "Kullanım şartlarını kabul etmeniz gerekmektedir.")]
+        [Display(Name = "Kullanım Şartları")]
+        public bool ConsentAccepted { get; set; } = false;
     }
 }

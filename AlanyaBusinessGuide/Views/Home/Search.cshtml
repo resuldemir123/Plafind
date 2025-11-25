@@ -1,352 +1,462 @@
 @model IEnumerable<AlanyaBusinessGuide.Models.Business>
 @{
-    ViewData["Title"] = "Alanya İşletmeleri";
-    var query = ViewBag.Query as string ?? "";
-    var category = ViewBag.Category as string;
+    var businesses = Model?.ToList() ?? new List<AlanyaBusinessGuide.Models.Business>();
+    var featuredBusinesses = businesses
+        .Where(b => b.IsFeatured)
+        .OrderByDescending(b => b.AverageRating)
+        .Take(6)
+        .ToList();
+
+    var trendingBusinesses = businesses
+        .OrderByDescending(b => b.TotalReviews)
+        .ThenByDescending(b => b.AverageRating)
+        .Take(6)
+        .ToList();
+
+    var allBusinessIds = new HashSet<int>(featuredBusinesses.Select(b => b.Id));
+    foreach (var biz in trendingBusinesses)
+    {
+        allBusinessIds.Add(biz.Id);
+    }
+
+    var remainingBusinesses = businesses
+        .Where(b => !allBusinessIds.Contains(b.Id))
+        .OrderByDescending(b => b.AverageRating)
+        .ToList();
+
     var categories = ViewBag.Categories as List<string> ?? new List<string>();
-    var sortBy = ViewBag.SortBy as string ?? "featured";
-    var minRating = ViewBag.MinRating as string ?? "";
-    var priceRange = ViewBag.PriceRange as string ?? "";
-    string DefaultBusinessImage = Url.Content("~/images/business-placeholder.jpg");
+    var query = ViewBag.Query as string ?? string.Empty;
+    var selectedCategory = ViewBag.Category as string ?? string.Empty;
+    var minRating = ViewBag.MinRating as string ?? string.Empty;
+    var priceRange = ViewBag.PriceRange as string ?? string.Empty;
+    var sortBy = (ViewBag.SortBy as string ?? "featured").ToLower();
 }
 
-<div class="container-fluid search-page">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mt-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Alanya İşletmeleri</li>
-        </ol>
-    </nav>
+<section class="search-hero">
+    <div class="hero-overlay">
+        <div class="container">
+            <p class="eyebrow">Alanya İşletmeleri</p>
+            <h1>Aradığın deneyimi saniyeler içinde bul</h1>
+            <p class="lead">Restoranlardan aktivitelere kadar yüzlerce işletme arasından filtrele, karşılaştır, hemen keşfet.</p>
 
-    <!-- Header & Filters Form -->
-    <form id="filtersForm" method="get" action="@Url.Action("Search", "Home")" class="mb-4">
-        <div class="row mb-3 align-items-center">
-            <div class="col-md-6 col-lg-8">
-                <div>
-                    <h1 class="display-6 fw-bold text-dark mb-0">Alanya İşletmeleri</h1>
-                    <p class="text-muted">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Alanya bölgesindeki tüm işletmeler
-                    </p>
-                </div>
-            </div>
-
-            <!-- Sort Options -->
-            <div class="col-md-6 col-lg-4 text-md-end mt-3 mt-md-0">
-                <label class="form-label me-2 mb-0 d-inline-block">Sırala:</label>
-                <select name="sortBy" id="sortBy" class="form-select d-inline-block" style="width: 220px;" data-auto-submit="true">
-                    <option value="featured" selected="@(sortBy == "featured")">Öne çıkanlar</option>
-                    <option value="rating" selected="@(sortBy == "rating")">En yüksek puan</option>
-                    <option value="reviews" selected="@(sortBy == "reviews")">En çok yorum</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Left Sidebar - Filters -->
-            <div class="col-lg-3 col-md-4 mb-4">
-                <div class="card filter-card shadow-sm">
-                    <div class="card-body">
-                        <!-- Search Form -->
-                        <div class="mb-4">
-                            <label class="visually-hidden" for="queryInput">İşletme ara</label>
-                            <div class="input-group">
-                                <input type="search" id="queryInput" name="query" class="form-control" placeholder="İşletme ara..." value="@query">
-                                <button class="btn btn-primary" type="submit" aria-label="Ara">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Category Filter -->
-                        <div class="mb-4">
-                            <h6 class="fw-bold mb-3">
-                                <i class="fas fa-tags me-2"></i>
-                                Kategoriler
-                            </h6>
-                            @if (categories.Any())
-                            {
-                                <div class="overflow-auto" style="max-height: 240px;">
-                                    @for (int idx = 0; idx < categories.Count; idx++)
-                                    {
-                                        var cat = categories[idx];
-                                        var safeId = $"cat_{idx}";
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" id="@safeId" name="category" value="@cat"
-                                                   @(cat == category ? "checked" : "") data-auto-submit="true">
-                                            <label class="form-check-label" for="@safeId">
-                                                @cat
-                                            </label>
-                                        </div>
-                                    }
-                                    <div class="form-check mt-2">
-                                        <input class="form-check-input" type="radio" id="cat_all" name="category" value=""
-                                               @(string.IsNullOrEmpty(category) ? "checked" : "") data-auto-submit="true">
-                                        <label class="form-check-label" for="cat_all">Tümü</label>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-
-                        <!-- Rating Filter -->
-                        <div class="mb-4">
-                            <h6 class="fw-bold mb-3">
-                                <i class="fas fa-star me-2"></i>
-                                Minimum Puan
-                            </h6>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="minRating" id="rating_any" value=""
-                                       @(string.IsNullOrEmpty(minRating) ? "checked" : "") data-auto-submit="true">
-                                <label class="form-check-label" for="rating_any">Tümü</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="minRating" id="rating3" value="3"
-                                       @(minRating == "3" ? "checked" : "") data-auto-submit="true">
-                                <label class="form-check-label" for="rating3">
-                                    <span class="text-warning"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span> 3+ Yıldız
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="minRating" id="rating4" value="4"
-                                       @(minRating == "4" ? "checked" : "") data-auto-submit="true">
-                                <label class="form-check-label" for="rating4">
-                                    <span class="text-warning"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span> 4+ Yıldız
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Price Range Filter -->
-                        <div class="mb-3">
-                            <h6 class="fw-bold mb-3">
-                                <i class="fas fa-money-bill-wave me-2"></i>Fiyat Aralığı
-                            </h6>
-                            <select name="priceRange" class="form-select" data-auto-submit="true">
-                                <option value="" selected="@(string.IsNullOrEmpty(priceRange))">Hepsi</option>
-                                <option value="$" selected="@(priceRange == "$")">$</option>
-                                <option value="$$" selected="@(priceRange == "$$")">$$</option>
-                                <option value="$$$" selected="@(priceRange == "$$$")">$$$</option>
-                            </select>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <a href="@Url.Action("Search", "Home")" class="btn btn-outline-secondary flex-fill">Filtreleri Temizle</a>
-                            <button type="submit" class="btn btn-primary flex-fill d-md-none">Uygula</button>
-                        </div>
+            <form asp-action="Search" asp-controller="Home" method="get" class="search-bar row gx-2 gy-2">
+                <div class="col-lg-4">
+                    <div class="input-pill">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="query" value="@query" placeholder="İşletme adı, mutfak türü veya mahalle" />
                     </div>
                 </div>
-            </div>
-
-            <!-- Right Content - Search Results -->
-            <div class="col-lg-9 col-md-8">
-                <div class="mb-3">
-                    <h5 class="text-muted">@((Model?.Count() ?? 0).ToString()) sonuç bulundu</h5>
-                </div>
-
-                <div class="row g-3">
-                    @if (Model != null && Model.Any())
-                    {
-                        foreach (var business in Model)
+                <div class="col-lg-3">
+                    <select name="category" class="input-pill">
+                        <option value="" selected="@(string.IsNullOrEmpty(selectedCategory) ? "selected" : null)">Tüm kategoriler</option>
+                        @foreach (var cat in categories)
                         {
-                            var avg = business.AverageRating;
-                            var rounded = (int)Math.Round(avg);
-                            <div class="col-12">
-                                <div class="card h-100 search-result-card shadow-sm overflow-hidden position-relative">
-                                    <div class="row g-0">
-                                        <!-- Business Image -->
-                                        <div class="col-md-4">
-                                            <div class="business-image-container h-100">
-                                                <img src="@(string.IsNullOrEmpty(business.ImageUrl) ? DefaultBusinessImage : business.ImageUrl)"
-                                                     onerror="this.src='@DefaultBusinessImage'"
-                                                     class="img-fluid w-100 h-100 object-fit-cover"
-                                                     alt="@business.Name" style="height: 250px; object-fit: cover;">
-                                                @if (business.IsFeatured)
-                                                {
-                                                    <div class="position-absolute top-2 end-2 m-2">
-                                                        <span class="badge bg-warning text-dark">
-                                                            <i class="fas fa-star me-1"></i>Öne Çıkan
-                                                        </span>
-                                                    </div>
-                                                }
-                                            </div>
-                                        </div>
-
-                                        <!-- Business Info -->
-                                        <div class="col-md-8">
-                                            <div class="card-body d-flex flex-column h-100">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <div>
-                                                        <h4 class="card-title fw-bold mb-1 text-dark">@business.Name</h4>
-                                                        <!-- Use Description instead of ShortDescription -->
-                                                        @if (!string.IsNullOrEmpty(business.Description))
-                                                        {
-                                                            <div class="small text-muted">
-                                                                @(business.Description.Length > 100 ? business.Description.Substring(0, 100) + "..." : business.Description)
-                                                            </div>
-                                                        }
-                                                    </div>
-                                                    <div class="text-end">
-                                                        <div class="fw-bold text-warning fs-5">@business.AverageRating.ToString("F1")</div>
-                                                        <div class="small text-muted">(@business.TotalReviews yorum)</div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Rating Stars -->
-                                                <div class="mb-2">
-                                                    <div class="d-inline-flex align-items-center">
-                                                        @for (int i = 1; i <= 5; i++)
-                                                        {
-                                                            if (i <= Math.Floor(avg))
-                                                            {
-                                                                <i class="fas fa-star text-warning me-1"></i>
-                                                            }
-                                                            else if (i == Math.Ceiling(avg) && avg - Math.Floor(avg) >= 0.5)
-                                                            {
-                                                                <i class="fas fa-star-half-alt text-warning me-1"></i>
-                                                            }
-                                                            else
-                                                            {
-                                                                <i class="far fa-star text-warning me-1"></i>
-                                                            }
-                                                        }
-                                                    </div>
-                                                </div>
-
-                                                <!-- Category & Price -->
-                                                <div class="mb-2">
-                                                    <span class="badge bg-primary text-white me-2">
-                                                        <i class="fas fa-tag me-1"></i>@(business.Category?.Name ?? "Kategori Yok")
-                                                    </span>
-                                                    @if (!string.IsNullOrEmpty(business.PriceRange))
-                                                    {
-                                                        <span class="badge bg-success ms-1">@business.PriceRange</span>
-                                                    }
-                                                </div>
-
-                                                <!-- Description -->
-                                                @if (!string.IsNullOrEmpty(business.Description))
-                                                {
-                                                    <p class="card-text text-muted mb-2">
-                                                        @{
-                                                            var desc = business.Description.Length > 160
-                                                            ? business.Description.Substring(0, 160) + "..."
-                                                            : business.Description;
-                                                        }
-                                                        @desc
-                                                    </p>
-                                                }
-
-                                                <div class="mt-auto d-flex justify-content-between align-items-center">
-                                                    <div class="text-muted small">
-                                                        @if (!string.IsNullOrEmpty(business.Address))
-                                                        {
-                                                            <div><i class="fas fa-map-marker-alt me-1 text-danger"></i> @business.Address</div>
-                                                        }
-                                                        @if (!string.IsNullOrEmpty(business.Phone))
-                                                        {
-                                                            <div><i class="fas fa-phone me-1 text-success"></i> @business.Phone</div>
-                                                        }
-                                                    </div>
-
-                                                    <div>
-                                                        <a href="@Url.Action("Details", "Businesses", new { id = business.Id })" class="btn btn-outline-primary btn-sm">
-                                                            <i class="fas fa-info-circle me-1"></i> Detayları Gör
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <option value="@cat" selected="@(cat == selectedCategory ? "selected" : null)">@cat</option>
                         }
-                    }
-                    else
-                    {
-                        <div class="col-12">
-                            <div class="text-center py-5">
-                                <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                                <h4 class="text-muted">Arama sonucu bulunamadı</h4>
-                                <p class="text-muted">Farklı anahtar kelimeler deneyin veya filtreleri değiştirin.</p>
-                                <a href="@Url.Action("Search", "Home")" class="btn btn-primary">
-                                    <i class="fas fa-redo me-2"></i>Filtreleri Temizle
-                                </a>
-                            </div>
-                        </div>
-                    }
+                    </select>
                 </div>
+                <div class="col-lg-2">
+                    <select name="minRating" class="input-pill">
+                        <option value="" selected="@(string.IsNullOrEmpty(minRating) ? "selected" : null)">Puan</option>
+                        <option value="4.5" selected="@(minRating == "4.5" ? "selected" : null)">4.5+</option>
+                        <option value="4" selected="@(minRating == "4" ? "selected" : null)">4.0+</option>
+                        <option value="3.5" selected="@(minRating == "3.5" ? "selected" : null)">3.5+</option>
+                    </select>
+                </div>
+                <div class="col-lg-2">
+                    <select name="priceRange" class="input-pill">
+                        <option value="" selected="@(string.IsNullOrEmpty(priceRange) ? "selected" : null)">Fiyat</option>
+                        <option value="$" selected="@(priceRange == "$" ? "selected" : null)">$</option>
+                        <option value="$$" selected="@(priceRange == "$$" ? "selected" : null)">$$</option>
+                        <option value="$$$" selected="@(priceRange == "$$$" ? "selected" : null)">$$$</option>
+                    </select>
+                </div>
+                <div class="col-lg-1 d-grid">
+                    <button type="submit" class="btn btn-warning rounded-pill">Ara</button>
+                </div>
+            </form>
+
+            <div class="filter-chips">
+                <span class="chip @(string.IsNullOrEmpty(sortBy) || sortBy == "featured" ? "active" : string.Empty)" data-sort="featured">Öne çıkanlar</span>
+                <span class="chip @(sortBy == "rating" ? "active" : string.Empty)" data-sort="rating">En yüksek puan</span>
+                <span class="chip @(sortBy == "reviews" ? "active" : string.Empty)" data-sort="reviews">En çok yorum</span>
+                <span class="chip @(sortBy == "distance" ? "active" : string.Empty)" data-sort="distance">Yakındakiler</span>
             </div>
         </div>
-    </form>
-</div>
+    </div>
+</section>
+
+<section class="search-sections py-5">
+    <div class="container">
+        @if (featuredBusinesses.Any())
+        {
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">Öne Çıkan İşletmeler</p>
+                    <h2>Seçtiğimiz favoriler</h2>
+                </div>
+                <span class="badge rounded-pill bg-warning text-dark">@featuredBusinesses.Count</span>
+            </div>
+            <div class="featured-carousel">
+                @foreach (var business in featuredBusinesses)
+                {
+                    <article class="business-card highlight">
+                        <div class="card-cover" style="background-image:url('@(string.IsNullOrWhiteSpace(business.ImageUrl) ? Url.Content("~/images/190_alanya.jpg") : business.ImageUrl)');"></div>
+                        <div class="card-body">
+                            <div class="card-badge">
+                                <i class="fas fa-crown me-1"></i>Öne Çıkan
+                            </div>
+                            <h3>@business.Name</h3>
+                            <p>@(business.Description?.Length > 80 ? business.Description[..80] + "..." : business.Description ?? "Açıklama eklenmemiş.")</p>
+                            <div class="card-meta">
+                                <span><i class="fas fa-star text-warning"></i>@business.AverageRating.ToString("F1")</span>
+                                <span><i class="fas fa-comment"></i>@business.TotalReviews yorum</span>
+                                <span><i class="fas fa-tag"></i>@business.Category?.Name</span>
+                            </div>
+                            <a asp-controller="Businesses" asp-action="Details" asp-route-id="@business.Id" class="btn btn-light btn-sm rounded-pill">İncele</a>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+
+        @if (trendingBusinesses.Any())
+        {
+            <div class="section-header mt-5">
+                <div>
+                    <p class="eyebrow">Popüler Seçimler</p>
+                    <h2>Topluluğun favorileri</h2>
+                </div>
+                <span class="badge rounded-pill bg-info text-dark">@trendingBusinesses.Count</span>
+            </div>
+            <div class="trending-grid">
+                @foreach (var business in trendingBusinesses)
+                {
+                    <article class="business-card compact">
+                        <div>
+                            <h3>@business.Name</h3>
+                            <p>@business.Category?.Name</p>
+                        </div>
+                        <div class="rating">
+                            <strong>@business.AverageRating.ToString("F1")</strong>
+                            <span>@business.TotalReviews yorum</span>
+                        </div>
+                        <a asp-controller="Businesses" asp-action="Details" asp-route-id="@business.Id" class="btn btn-outline-light btn-sm rounded-pill">Detay</a>
+                    </article>
+                }
+            </div>
+        }
+
+        <div class="section-header mt-5">
+            <div>
+                <p class="eyebrow">Tüm Sonuçlar</p>
+                <h2>Keşfedilecek diğer işletmeler</h2>
+            </div>
+            <span class="badge rounded-pill bg-secondary">@businesses.Count</span>
+        </div>
+
+        @if (businesses.Any())
+        {
+            <div class="results-grid">
+                @foreach (var business in businesses)
+                {
+                    <article class="business-card basic">
+                        <div class="card-cover" style="background-image:url('@(string.IsNullOrWhiteSpace(business.ImageUrl) ? Url.Content("~/images/190_alanya.jpg") : business.ImageUrl)');"></div>
+                        <div class="card-body">
+                            <div class="card-top">
+                                <div>
+                                    <h3>@business.Name</h3>
+                                    <p class="muted">@business.Category?.Name ?? "Kategori yok"</p>
+                                </div>
+                                <div class="rating">
+                                    <strong>@business.AverageRating.ToString("F1")</strong>
+                                    <span>@business.TotalReviews yorum</span>
+                                </div>
+                            </div>
+                            <p class="address">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                @(string.IsNullOrWhiteSpace(business.Address) ? "Adres bilgisi eklenmemiş" : business.Address)
+                            </p>
+                            <div class="card-actions">
+                                @if (!string.IsNullOrEmpty(business.Phone))
+                                {
+                                    <a href="tel:@business.Phone" class="link">
+                                        <i class="fas fa-phone"></i> Ara
+                                    </a>
+                                }
+                                <a asp-controller="Businesses" asp-action="Details" asp-route-id="@business.Id" class="btn btn-warning btn-sm rounded-pill">Detay</a>
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <h3>Sonuç bulunamadı</h3>
+                <p>Filtreleri gevşetmeyi veya farklı bir anahtar kelime denemeyi düşünün.</p>
+            </div>
+        }
+    </div>
+</section>
 
 <style>
-    .search-result-card {
-        border: 1px solid #e9ecef;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    .search-hero {
+        background: radial-gradient(circle at top, rgba(255, 193, 7, 0.15), transparent 50%), #050c19;
+        color: #f8f9fa;
+        padding: 4rem 0 2rem;
+    }
+
+    .hero-overlay .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: .25em;
+        font-size: .85rem;
+        color: rgba(255,255,255,.7);
+    }
+
+    .hero-overlay h1 {
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .hero-overlay .lead {
+        color: rgba(255,255,255,.8);
+        margin-bottom: 2rem;
+        max-width: 600px;
+    }
+
+    .search-bar .input-pill {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        background: rgba(255,255,255,.1);
+        border-radius: 999px;
+        padding: .75rem 1.2rem;
+        border: 1px solid rgba(255,255,255,.2);
+        color: #fff;
+    }
+
+    .search-bar input,
+    .search-bar select {
+        background: transparent;
+        border: none;
+        color: #fff;
+        width: 100%;
+        outline: none;
+    }
+
+    .search-bar option {
+        color: #000;
+    }
+
+    .filter-chips {
+        display: flex;
+        gap: .75rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+    }
+
+    .filter-chips .chip {
+        padding: .5rem 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.3);
+        cursor: pointer;
+        color: rgba(255,255,255,.8);
+        transition: all .2s ease;
+    }
+
+    .filter-chips .chip.active,
+    .filter-chips .chip:hover {
+        background: #ffc107;
+        color: #111;
+        border-color: #ffc107;
+    }
+
+    .search-sections {
+        background: linear-gradient(180deg, #050c19 0%, #0d1424 50%, #050c19 100%);
+        color: #e5e7eb;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header h2 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .section-header .eyebrow {
+        color: rgba(229,231,235,.6);
+        margin-bottom: .35rem;
+    }
+
+    .featured-carousel {
+        display: grid;
+        gap: 1.2rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .business-card {
+        background: rgba(13,18,32,.9);
+        border-radius: 1.25rem;
         overflow: hidden;
-        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,.05);
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 45px rgba(5,10,20,.6);
     }
 
-        .search-result-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 14px 30px rgba(22, 28, 37, 0.12);
-            border-color: rgba(13,110,253,0.12);
-        }
-
-    .business-image-container {
-        position: relative;
-        overflow: hidden;
-        min-height: 250px;
+    .business-card.highlight {
+        min-height: 360px;
     }
 
-        .business-image-container img.object-fit-cover {
-            transition: transform 0.35s ease;
-            display: block;
-        }
-
-    .search-result-card:hover .business-image-container img.object-fit-cover {
-        transform: scale(1.06);
+    .business-card .card-cover {
+        height: 150px;
+        background-size: cover;
+        background-position: center;
     }
 
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .business-card .card-body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
     }
 
-    .filter-card {
-        position: sticky;
-        top: 20px;
+    .card-badge {
+        align-self: flex-start;
+        padding: .35rem .85rem;
+        border-radius: 999px;
+        background: rgba(255,193,7,.1);
+        border: 1px solid rgba(255,193,7,.3);
+        color: #ffc107;
+        font-size: .85rem;
+        font-weight: 600;
     }
 
-    .form-check-input:checked {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
+    .card-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-size: .9rem;
+        color: rgba(229,231,235,.7);
     }
 
-    .breadcrumb a {
+    .card-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+    }
+
+    .trending-grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .business-card.compact {
+        padding: 1rem 1.25rem;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .business-card.compact h3 {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .business-card.compact p {
+        margin: 0;
+        color: rgba(229,231,235,.6);
+    }
+
+    .business-card.compact .rating {
+        text-align: right;
+    }
+
+    .results-grid {
+        display: grid;
+        gap: 1.2rem;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .business-card.basic .card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .business-card.basic h3 {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .business-card.basic .muted {
+        color: rgba(229,231,235,.6);
+        margin: 0;
+    }
+
+    .business-card.basic .address {
+        margin: .75rem 0;
+        color: rgba(229,231,235,.7);
+    }
+
+    .card-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .card-actions .link {
+        color: #60a5fa;
         text-decoration: none;
     }
 
-    /* Fixed media query syntax */
-    @@media (max-width: 767.98px) {
-        .business-image-container {
-            min-height: 180px;
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        border-radius: 1.5rem;
+        border: 1px dashed rgba(255,255,255,.2);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #ffc107;
+        margin-bottom: 1rem;
+    }
+
+    @@media (max-width: 768px) {
+        .search-bar {
+            padding: 1rem 0;
+        }
+
+        .search-bar .input-pill {
+            border-radius: .9rem;
+        }
+
+        .filter-chips {
+            gap: .5rem;
         }
     }
 </style>
 
-@section Scripts {
-    <script>
-        (function () {
-            // Auto-submit form when controls with data-auto-submit attribute change
-            const form = document.getElementById('filtersForm');
-            if (!form) return;
+<script>
+    document.querySelectorAll('.filter-chips .chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const sort = chip.dataset.sort;
+            const url = new URL(window.location.href);
+            url.searchParams.set('sortBy', sort);
+            window.location.href = url.toString();
+        });
+    });
+</script>
 
-            form.querySelectorAll('[data-auto-submit="true"]').forEach(function (el) {
-                el.addEventListener('change', function () {
-                    form.requestSubmit();
-                });
-            });
-        })();
-    </script>
-}

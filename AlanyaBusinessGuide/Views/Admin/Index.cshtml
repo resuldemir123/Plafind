@@ -119,7 +119,7 @@
                     @if (ViewBag.RecentActivities != null)
                     {
                         <div class="list-group list-group-flush">
-                            @foreach (var activity in ViewBag.RecentActivities as List<AlanyaBusinessGuide.Models.Review>)
+                            @foreach (var activity in (ViewBag.RecentActivities as List<AlanyaBusinessGuide.Models.Review>) ?? new List<AlanyaBusinessGuide.Models.Review>())
                             {
                                 <div class="list-group-item">
                                     <div class="d-flex w-100 justify-content-between">
@@ -152,7 +152,7 @@
                     @if (ViewBag.RecentFavorites != null)
                     {
                         <div class="list-group list-group-flush">
-                            @foreach (var favorite in ViewBag.RecentFavorites as List<AlanyaBusinessGuide.Models.UserFavorite>)
+                            @foreach (var favorite in (ViewBag.RecentFavorites as List<AlanyaBusinessGuide.Models.UserFavorite>) ?? new List<AlanyaBusinessGuide.Models.UserFavorite>())
                             {
                                 <div class="list-group-item">
                                     <div class="d-flex w-100 justify-content-between">
