@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>4e1686c9-1aee-4757-bff6-a59453a18242</UserSecretsId>
+    <RootNamespace>Plafind</RootNamespace>
+    <AssemblyName>Plafind</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.14.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\images\190_alanya.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="materio-bootstrap-html-aspnet-core-mvc-admin-template-free-v3.0.0\**" />
+    <Content Remove="materio-bootstrap-html-aspnet-core-mvc-admin-template-free-v3.0.0\**" />
+    <EmbeddedResource Remove="materio-bootstrap-html-aspnet-core-mvc-admin-template-free-v3.0.0\**" />
+    <None Remove="materio-bootstrap-html-aspnet-core-mvc-admin-template-free-v3.0.0\**" />
+  </ItemGroup>
+
+</Project>

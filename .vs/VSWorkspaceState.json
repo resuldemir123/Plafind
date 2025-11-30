@@ -3,6 +3,7 @@
     "",
     "\\AlanyaBusinessGuide",
     "\\AlanyaBusinessGuide\\Views",
+    "\\AlanyaBusinessGuide\\Views\\Reservations",
     "\\AlanyaBusinessGuide\\Views\\Reviews"
   ],
   "SelectedNode": "\\AlanyaBusinessGuide.sln",

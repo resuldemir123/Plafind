@@ -1,0 +1,26 @@
+@model Plafind.Models.Reservation
+@{
+ ViewData["Title"] = "Rezervasyon Detay (Admin)";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (Model == null)
+{
+ <div class="alert alert-warning">Rezervasyon bulunamadý.</div>
+}
+else
+{
+ <div class="card mb-3">
+ <div class="card-body">
+ <dl class="row">
+ @foreach (var prop in Model.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+ {
+ <dt class="col-sm-3">@prop.Name</dt>
+ <dd class="col-sm-9">@prop.GetValue(Model)</dd>
+ }
+ </dl>
+ <a asp-action="AdminIndex" class="btn btn-secondary">Geri</a>
+ </div>
+ </div>
+}

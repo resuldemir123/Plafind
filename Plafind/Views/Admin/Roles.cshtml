@@ -1,0 +1,78 @@
+@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityRole>
+@{
+    ViewData["Title"] = "Roller";
+}
+
+<div class="page-header">
+    <h1>🛡 Roller</h1>
+    <p>Sistem rollerini görüntüleyin ve yönetin</p>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Yeni Rol Ekle</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="CreateRole" method="post">
+                    <div class="mb-3">
+                        <label for="roleName" class="form-label">Rol Adı</label>
+                        <input type="text" class="form-control" id="roleName" name="roleName" required />
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-plus me-2"></i>Rol Oluştur
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Mevcut Roller</h5>
+            </div>
+            <div class="card-body">
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Rol Adı</th>
+                                    <th>Rol ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var role in Model)
+                                {
+                                    <tr>
+                                        <td><strong>@role.Name</strong></td>
+                                        <td><small class="text-muted">@role.Id</small></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fas fa-user-tag fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Henüz rol bulunmamaktadır.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

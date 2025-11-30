@@ -1,0 +1,81 @@
+@{
+    ViewData["Title"] = "Raporlar";
+    var reports = ViewBag.Reports as dynamic;
+}
+
+<div class="page-header">
+    <h1>📊 Raporlar</h1>
+    <p>Detaylı sistem raporları</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-building me-2"></i>Kategori Bazlı İşletme Dağılımı</h5>
+            </div>
+            <div class="card-body">
+                @if (reports?.BusinessReport != null)
+                {
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Kategori</th>
+                                    <th>İşletme Sayısı</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in reports.BusinessReport)
+                                {
+                                    <tr>
+                                        <td>@item.Category</td>
+                                        <td><strong>@item.Count</strong></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-star me-2"></i>Puan Dağılımı</h5>
+            </div>
+            <div class="card-body">
+                @if (reports?.ReviewReport != null)
+                {
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Puan</th>
+                                    <th>Yorum Sayısı</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in reports.ReviewReport)
+                                {
+                                    <tr>
+                                        <td>
+                                            @for (int i = 0; i < item.Rating; i++)
+                                            {
+                                                <i class="fas fa-star text-warning"></i>
+                                            }
+                                        </td>
+                                        <td><strong>@item.Count</strong></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

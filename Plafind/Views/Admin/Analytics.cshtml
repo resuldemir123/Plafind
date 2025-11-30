@@ -1,0 +1,84 @@
+@{
+    ViewData["Title"] = "İstatistikler";
+    var stats = ViewBag.Stats as dynamic;
+}
+
+<div class="page-header">
+    <h1>📊 İstatistikler</h1>
+    <p>Sistem genel istatistikleri ve analizler</p>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm text-center">
+            <div class="card-body">
+                <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                <h2>@(stats?.TotalUsers ?? 0)</h2>
+                <p class="text-muted mb-0">Toplam Kullanıcı</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm text-center">
+            <div class="card-body">
+                <i class="fas fa-building fa-3x text-success mb-3"></i>
+                <h2>@(stats?.TotalBusinesses ?? 0)</h2>
+                <p class="text-muted mb-0">Toplam İşletme</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm text-center">
+            <div class="card-body">
+                <i class="fas fa-comments fa-3x text-warning mb-3"></i>
+                <h2>@(stats?.TotalReviews ?? 0)</h2>
+                <p class="text-muted mb-0">Toplam Yorum</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm text-center">
+            <div class="card-body">
+                <i class="fas fa-clock fa-3x text-danger mb-3"></i>
+                <h2>@(stats?.PendingReviews ?? 0)</h2>
+                <p class="text-muted mb-0">Bekleyen Yorum</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Son Kullanıcılar</h5>
+    </div>
+    <div class="card-body">
+        @if (stats?.RecentUsers != null)
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Kullanıcı Adı</th>
+                            <th>E-posta</th>
+                            <th>Kayıt Tarihi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in stats.RecentUsers)
+                        {
+                            <tr>
+                                <td>@user.UserName</td>
+                                <td>@user.Email</td>
+                                <td>@user.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+

@@ -1,0 +1,154 @@
+﻿@model IEnumerable<Plafind.Models.Reservation>
+
+@{
+    ViewData["Title"] = "Rezervasyonlarım";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Rezervasyonlarım</h1>
+        <span class="badge badge-primary">@Model.Count() rezervasyon</span>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var reservation in Model)
+            {
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="card-title fw-bold">@reservation.Business?.Name</h5>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-tag"></i> @reservation.Business?.Category
+                                        </small>
+                                    </p>
+                                </div>
+                                <div>
+                                    @switch (reservation.Status)
+                                    {
+                                        case "Beklemede":
+                                            <span class="badge bg-warning">Beklemede</span>
+                                            break;
+                                        case "Onaylandı":
+                                            <span class="badge bg-success">Onaylandı</span>
+                                            break;
+                                        case "Reddedildi":
+                                            <span class="badge bg-danger">Reddedildi</span>
+                                            break;
+                                        case "İptal":
+                                            <span class="badge bg-secondary">İptal</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-info">@reservation.Status</span>
+                                            break;
+                                    }
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong><i class="fas fa-calendar text-primary"></i> Tarih:</strong></p>
+                                    <p class="text-muted">@reservation.RequestedDate.ToString("dd.MM.yyyy")</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong><i class="fas fa-clock text-primary"></i> Saat:</strong></p>
+                                    <p class="text-muted">@reservation.RequestedTime.ToString(@"hh\:mm")</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong><i class="fas fa-users text-primary"></i> Kişi Sayısı:</strong></p>
+                                    <p class="text-muted">@reservation.NumberOfPeople kişi</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong><i class="fas fa-phone text-primary"></i> İletişim:</strong></p>
+                                    <p class="text-muted">@reservation.ContactPhone</p>
+                                </div>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(reservation.Notes))
+                            {
+                                <div class="mb-3">
+                                    <p class="mb-1"><strong><i class="fas fa-sticky-note text-primary"></i> Notlar:</strong></p>
+                                    <p class="text-muted">@reservation.Notes</p>
+                                </div>
+                            }
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-plus"></i> @reservation.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+                                </small>
+                                <div>
+                                    <a href="@Url.Action("Details", new { id = reservation.Id })" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> Detaylar
+                                    </a>
+                                    @if (reservation.Status == "Beklemede" || reservation.Status == "Onaylandı")
+                                    {
+                                        <button class="btn btn-sm btn-outline-danger cancel-reservation-btn" data-reservation-id="@reservation.Id">
+                                            <i class="fas fa-times"></i> İptal Et
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">Henüz rezervasyonunuz yok</h4>
+            <p class="text-muted">İşletmelere rezervasyon yaparak deneyimlerinizi planlayabilirsiniz.</p>
+            <a href="@Url.Action("Businesses", "User")" class="btn btn-primary">
+                <i class="fas fa-search"></i> İşletmeleri Keşfet
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.cancel-reservation-btn').click(function() {
+                var reservationId = $(this).data('reservation-id');
+                var button = $(this);
+                var card = button.closest('.col-lg-6');
+                
+                if (confirm('Bu rezervasyonu iptal etmek istediğinizden emin misiniz?')) {
+                    $.ajax({
+                        url: '@Url.Action("Cancel")',
+                        type: 'POST',
+                        data: { id: reservationId },
+                        success: function(response) {
+                            if (response.success) {
+                                card.fadeOut(300, function() {
+                                    $(this).remove();
+                                });
+                            }
+                            alert(response.message);
+                        },
+                        error: function() {
+                            alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

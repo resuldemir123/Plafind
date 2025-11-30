@@ -1,0 +1,120 @@
+@model Plafind.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Kullanıcı Detayları";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">@Model.FullName - Kullanıcı Detayları</h1>
+        <a href="@Url.Action("Users")" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Geri Dön
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Kullanıcı Bilgileri</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Ad Soyad:</strong> @Model.FullName</p>
+                    <p><strong>Telefon:</strong> @Model.PhoneNumber</p>
+                    <p><strong>Kayıt Tarihi:</strong> @Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</p>
+                    <p><strong>Durum:</strong> 
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge badge-success">Aktif</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-danger">Pasif</span>
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Favori İşletmeler (@Model.Favorites.Count)</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.Favorites.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>İşletme Adı</th>
+                                        <th>Kategori</th>
+                                        <th>Eklenme Tarihi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var favorite in Model.Favorites.OrderByDescending(f => f.AddedDate))
+                                    {
+                                        <tr>
+                                            <td>@favorite.Business?.Name</td>
+                                            <td>@favorite.Business?.Category</td>
+                                            <td>@favorite.AddedDate.ToString("dd.MM.yyyy")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Bu kullanıcının favori işletmesi yok.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Yorumlar (@Model.Reviews.Count)</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.Reviews.Any())
+                    {
+                        @foreach (var review in Model.Reviews.OrderByDescending(r => r.CreatedDate))
+                        {
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">@review.Business?.Name</h6>
+                                        <div class="text-warning">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= review.Rating)
+                                                {
+                                                    <i class="fas fa-star"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-star"></i>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">@review.CreatedDate.ToString("dd.MM.yyyy")</small>
+                                </div>
+                                @if (!string.IsNullOrEmpty(review.Comment))
+                                {
+                                    <p class="mt-2 mb-0">@review.Comment</p>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Bu kullanıcının yorumu yok.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

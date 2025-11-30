@@ -1,0 +1,68 @@
+@model EmailSettingsViewModel
+@{
+    ViewData["Title"] = "E-posta SMTP Ayarları";
+}
+
+<div class="page-header">
+    <h1>🛠 E-posta SMTP Ayarları</h1>
+    <p>E-posta gönderimi için SMTP ayarlarını yapılandırın</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-envelope me-2"></i>SMTP Ayarları</h5>
+            </div>
+            <div class="card-body">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <form asp-action="EmailSettings" method="post">
+                    <div class="mb-3">
+                        <label asp-for="SmtpServer" class="form-label">SMTP Sunucu</label>
+                        <input asp-for="SmtpServer" class="form-control" required />
+                        <span asp-validation-for="SmtpServer" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SmtpPort" class="form-label">SMTP Port</label>
+                        <input asp-for="SmtpPort" type="number" class="form-control" required />
+                        <span asp-validation-for="SmtpPort" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="EmailAddress" class="form-label">E-posta Adresi</label>
+                        <input asp-for="EmailAddress" type="email" class="form-control" required />
+                        <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">Şifre</label>
+                        <input asp-for="Password" type="password" class="form-control" required />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input asp-for="UseSsl" type="checkbox" class="form-check-input" />
+                        <label asp-for="UseSsl" class="form-check-label">SSL Kullan</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Kaydet
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

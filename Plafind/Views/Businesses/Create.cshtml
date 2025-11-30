@@ -1,0 +1,157 @@
+﻿@model Plafind.Models.Business
+
+@{
+    ViewData["Title"] = "Yeni İşletme Ekle";
+}
+
+<h2>Yeni İşletme Ekle</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Name" class="control-label">Ad</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Address" class="control-label">Adres</label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Phone" class="control-label">Telefon</label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CategoryId" class="control-label">Kategori</label>
+        <select asp-for="CategoryId" class="form-control" asp-items="@(((IEnumerable<Plafind.Models.Category>)ViewBag.Categories).Select(c => new SelectListItem { Text = c.Name ?? "Bilinmeyen", Value = c.Id.ToString() }))">
+            <option value="">Kategori Seçin</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ImageUrl" class="control-label">Resim URL</label>
+        <input asp-for="ImageUrl" class="form-control" />
+        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description" class="control-label">Açıklama</label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email" class="control-label">E-posta</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Website" class="control-label">Web Sitesi</label>
+        <input asp-for="Website" class="form-control" />
+        <span asp-validation-for="Website" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="WorkingHours" class="control-label">Çalışma Saatleri</label>
+        <input asp-for="WorkingHours" class="form-control" />
+        <span asp-validation-for="WorkingHours" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PriceRange" class="control-label">Fiyat Aralığı</label>
+        <input asp-for="PriceRange" class="form-control" />
+        <span asp-validation-for="PriceRange" class="text-danger"></span>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Latitude" class="control-label">Konum (Enlem)</label>
+                <input asp-for="Latitude" class="form-control" type="number" step="any" placeholder="36.5432" />
+                <span asp-validation-for="Latitude" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Longitude" class="control-label">Konum (Boylam)</label>
+                <input asp-for="Longitude" class="form-control" type="number" step="any" placeholder="31.9991" />
+                <span asp-validation-for="Longitude" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h5 class="mb-1">Harita Üzerinden Konum Belirle</h5>
+                    <small class="text-muted">Mahalle, cadde veya yer adı araması yapabilir, haritaya tıklayarak işaret koyabilirsiniz.</small>
+                </div>
+                <div class="map-search d-flex gap-2">
+                    <input type="text" id="mapSearchInput" class="form-control" placeholder="Mahalle / Cadde / Yer adı" />
+                    <button type="button" id="mapSearchBtn" class="btn btn-outline-secondary">Ara</button>
+                </div>
+            </div>
+            <div id="businessFormMap" class="map-picker-canvas mb-2"></div>
+            <small id="mapStatusText" class="map-status-text text-muted d-block">
+                Haritada herhangi bir noktayı seçtiğinizde enlem ve boylam alanları otomatik güncellenecektir.
+            </small>
+        </div>
+    </div>
+    <div class="form-group mt-3">
+        <input type="submit" value="Kaydet" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary ms-2">Geri Dön</a>
+    </div>
+</form>
+
+<style>
+    .map-picker-canvas {
+        width: 100%;
+        height: 320px;
+        border-radius: 1rem;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .map-search {
+        min-width: 320px;
+    }
+
+    @@media (max-width: 576px) {
+        .map-search {
+            flex-direction: column;
+            width: 100%;
+        }
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        window.initBusinessLocationPicker = function () {
+            if (!window.LocationPicker) {
+                return;
+            }
+            LocationPicker.init({
+                mapElementId: 'businessFormMap',
+                latInputId: 'Latitude',
+                lngInputId: 'Longitude',
+                addressInputId: 'Address',
+                searchInputId: 'mapSearchInput',
+                searchButtonId: 'mapSearchBtn',
+                statusElementId: 'mapStatusText'
+            });
+        };
+    </script>
+    @if (!string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string))
+    {
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@ViewBag.GoogleMapsApiKey&callback=initBusinessLocationPicker"></script>
+    }
+    else
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var status = document.getElementById('mapStatusText');
+                if (status) {
+                    status.textContent = 'Google Maps anahtarı bulunamadığı için harita yüklenemedi.';
+                    status.classList.remove('text-muted');
+                    status.classList.add('text-danger');
+                }
+            });
+        </script>
+    }
+}

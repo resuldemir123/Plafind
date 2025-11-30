@@ -1,0 +1,633 @@
+﻿@model IEnumerable<Plafind.Models.News>
+@{
+    ViewData["Title"] = "Haberler";
+}
+
+<div class="news-page-wrapper">
+    <div class="container py-5">
+        <!-- Hero Section -->
+        <div class="news-hero-section mb-5">
+            <div class="hero-content">
+                <div class="hero-icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <div class="hero-text">
+                    <h1 class="hero-title">Haberler & Duyurular</h1>
+                    <p class="hero-subtitle">Alanya'dan en güncel haberler, etkinlikler ve önemli duyurular</p>
+                </div>
+            </div>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Create" class="btn-create-news">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    <span>Yeni Haber Ekle</span>
+                </a>
+            }
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="news-grid">
+                @foreach (var item in Model)
+                {
+                    <article class="news-card">
+                        <!-- Image Section -->
+                        <div class="news-card-image">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <a asp-action="Details" asp-route-id="@item.Id">
+                                    <img src="@Url.Content(item.ImageUrl.StartsWith("/") ? "~" + item.ImageUrl : (item.ImageUrl.StartsWith("~/") ? item.ImageUrl : "~/" + item.ImageUrl))" 
+                                         alt="@item.Title" 
+                                         class="news-image">
+                                    <div class="image-overlay">
+                                        <span class="read-more-text">
+                                            <i class="fas fa-arrow-right me-2"></i>Devamını Oku
+                                        </span>
+                                    </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="news-placeholder">
+                                    <i class="fas fa-newspaper"></i>
+                                </div>
+                            }
+                            <div class="news-badge">
+                                <i class="fas fa-fire me-1"></i>
+                                <span>Yeni</span>
+                            </div>
+                        </div>
+
+                        <!-- Content Section -->
+                        <div class="news-card-content">
+                            <div class="news-meta-top">
+                                <span class="news-date">
+                                    <i class="fas fa-calendar-alt me-2"></i>
+                                    @item.PublishDate.ToString("dd MMMM yyyy")
+                                </span>
+                                <span class="news-views">
+                                    <i class="fas fa-eye me-2"></i>
+                                    @(item.ViewCount ?? 0)
+                                </span>
+                            </div>
+
+                            <h2 class="news-title">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="news-title-link">
+                                    @item.Title
+                                </a>
+                            </h2>
+
+                            <div class="news-excerpt">
+                                @{
+                                    var excerpt = item.Content?.Length > 180
+                                        ? item.Content.Substring(0, 180) + "..."
+                                        : item.Content ?? "";
+                                }
+                                <p>@excerpt</p>
+                            </div>
+
+                            <div class="news-card-footer">
+                                <div class="news-author">
+                                    <div class="author-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="author-info">
+                                        <span class="author-name">@(item.Author?.DisplayName ?? item.Author?.UserName ?? "Admin")</span>
+                                        <span class="author-role">Yazar</span>
+                                    </div>
+                                </div>
+
+                                <div class="news-actions">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn-read-more">
+                                        <span>Oku</span>
+                                        <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <div class="admin-actions">
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn-admin-edit" title="Düzenle">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" 
+                                               class="btn-admin-delete" 
+                                               title="Sil"
+                                               onclick="return confirm('Bu haberi silmek istediğinizden emin misiniz?');">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-news-state">
+                <div class="empty-icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <h3 class="empty-title">Henüz haber bulunmamaktadır</h3>
+                <p class="empty-description">Yakında yeni haberler eklenecektir.</p>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Create" class="btn-create-first">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        İlk Haberi Oluştur
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .news-page-wrapper {
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    /* Hero Section */
+    .news-hero-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2.5rem;
+        background: var(--panel);
+        border-radius: 1.5rem;
+        border: 1px solid var(--card-border);
+        margin-bottom: 3rem;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+
+    .hero-content {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex: 1;
+    }
+
+    .hero-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        border-radius: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(255, 193, 7, 0.3);
+    }
+
+    .hero-icon i {
+        font-size: 2.5rem;
+        color: #0b1220;
+    }
+
+    .hero-text {
+        flex: 1;
+    }
+
+    .hero-title {
+        font-size: 2.75rem;
+        font-weight: 800;
+        color: var(--text);
+        margin: 0 0 0.5rem 0;
+        letter-spacing: -0.5px;
+        line-height: 1.2;
+    }
+
+    .hero-subtitle {
+        font-size: 1.125rem;
+        color: var(--muted);
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .btn-create-news {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.875rem 2rem;
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+    }
+
+    .btn-create-news:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4);
+        color: white;
+    }
+
+    /* News Grid */
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    /* News Card */
+    .news-card {
+        background: var(--panel);
+        border-radius: 1.25rem;
+        overflow: hidden;
+        border: 1px solid var(--card-border);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .news-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 193, 7, 0.3);
+    }
+
+    /* Image Section */
+    .news-card-image {
+        position: relative;
+        width: 100%;
+        height: 240px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .news-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .news-card:hover .news-image {
+        transform: scale(1.1);
+    }
+
+    .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent 0%, rgba(11, 18, 32, 0.85) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .news-card:hover .image-overlay {
+        opacity: 1;
+    }
+
+    .read-more-text {
+        color: white;
+        font-weight: 600;
+        font-size: 1.125rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .news-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .news-placeholder i {
+        font-size: 4rem;
+        color: rgba(255, 255, 255, 0.3);
+    }
+
+    .news-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        z-index: 2;
+    }
+
+    /* Content Section */
+    .news-card-content {
+        padding: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .news-meta-top {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+        color: var(--muted);
+    }
+
+    .news-date,
+    .news-views {
+        display: flex;
+        align-items: center;
+    }
+
+    .news-date i,
+    .news-views i {
+        color: #ffc107;
+        font-size: 0.875rem;
+    }
+
+    .news-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1.4;
+        margin: 0 0 1rem 0;
+        color: var(--text);
+    }
+
+    .news-title-link {
+        color: var(--text);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .news-title-link:hover {
+        color: #ffc107;
+    }
+
+    .news-excerpt {
+        flex: 1;
+        margin-bottom: 1.5rem;
+    }
+
+    .news-excerpt p {
+        color: var(--muted);
+        font-size: 0.9375rem;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    /* Card Footer */
+    .news-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--card-border);
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .news-author {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .author-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0b1220;
+        font-weight: 600;
+    }
+
+    .author-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .author-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .author-role {
+        font-size: 0.75rem;
+        color: var(--muted);
+    }
+
+    .news-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .btn-read-more {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.625rem 1.25rem;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-read-more:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        color: white;
+    }
+
+    .admin-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-admin-edit,
+    .btn-admin-delete {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+
+    .btn-admin-edit {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        color: #0b1220;
+    }
+
+    .btn-admin-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+        color: #0b1220;
+    }
+
+    .btn-admin-delete {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+    .btn-admin-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-news-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: var(--panel);
+        border-radius: 1.5rem;
+        border: 1px solid var(--card-border);
+    }
+
+    .empty-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 2rem;
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(255, 193, 7, 0.3);
+    }
+
+    .empty-icon i {
+        font-size: 3.5rem;
+        color: #0b1220;
+    }
+
+    .empty-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 1rem;
+    }
+
+    .empty-description {
+        font-size: 1.125rem;
+        color: var(--muted);
+        margin-bottom: 2rem;
+    }
+
+    .btn-create-first {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.875rem 2rem;
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+    }
+
+    .btn-create-first:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4);
+        color: white;
+    }
+
+    /* Responsive */
+    @@media (max-width: 992px) {
+        .news-grid {
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .hero-title {
+            font-size: 2.25rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .news-hero-section {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 1.5rem;
+        }
+
+        .hero-content {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.5rem;
+        }
+
+        .hero-icon {
+            width: 60px;
+            height: 60px;
+        }
+
+        .hero-icon i {
+            font-size: 2rem;
+        }
+
+        .hero-title {
+            font-size: 1.875rem;
+        }
+
+        .news-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .news-card-footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .news-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .news-card-content {
+            padding: 1.25rem;
+        }
+
+        .news-title {
+            font-size: 1.25rem;
+        }
+
+        .hero-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>

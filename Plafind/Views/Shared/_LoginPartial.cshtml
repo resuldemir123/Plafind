@@ -1,0 +1,70 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Plafind.Models.ApplicationUser> SignInManager
+@inject UserManager<Plafind.Models.ApplicationUser> UserManager
+
+@if (SignInManager?.IsSignedIn(User) ?? false)
+{
+    <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+            @{
+                var currentUser = await UserManager.GetUserAsync(User);
+                var displayName = currentUser?.DisplayName
+                    ?? currentUser?.FullName
+                    ?? currentUser?.UserName
+                    ?? currentUser?.Email
+                    ?? "Kullanıcı";
+            }
+            <a class="nav-link dropdown-toggle navbar-profile d-flex align-items-center gap-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user-circle text-white-50"></i>
+                <div class="d-flex flex-column align-items-start">
+                    <span class="navbar-username">@(currentUser?.UserName ?? "Kullanıcı")</span>
+                    <small class="navbar-email">@(currentUser?.Email ?? "")</small>
+                </div>
+                @if (User?.IsInRole("Admin") ?? false)
+                {
+                    <span class="badge bg-success ms-1">Admin</span>
+                }
+                else if (User?.IsInRole("User") ?? false)
+                {
+                    <span class="badge bg-primary ms-1">Kullanıcı</span>
+                }
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                @if (User?.IsInRole("Admin") ?? false)
+                {
+                    <li><a class="dropdown-item" href="@Url.Action("Index", "Admin")"><i class="fas fa-tachometer-alt me-2"></i>Admin Panel</a></li>
+                    <li><a class="dropdown-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card me-2"></i>Profil Ayarları</a></li>
+                }
+                else if (User?.IsInRole("User") ?? false)
+                {
+                    <li><a class="dropdown-item" href="@Url.Action("Index", "User")"><i class="fas fa-user me-2"></i>Kullanıcı Panel</a></li>
+                    <li><a class="dropdown-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card me-2"></i>Profil Ayarları</a></li>
+                }
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                    <form id="logoutForm" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="dropdown-item" style="border: none; background: none; padding: 0; width: 100%; text-align: left; color: inherit;">
+                            <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </li>
+    </ul>
+}
+else
+{
+    <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Account" asp-action="Login" style="color: #ffffff; text-decoration: none;">
+                <i class="fas fa-sign-in-alt me-1"></i>Giriş Yap
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Account" asp-action="Register" style="color: #ffffff; text-decoration: none;">
+                <i class="fas fa-user-plus me-1"></i>Kayıt Ol
+            </a>
+        </li>
+    </ul>
+}

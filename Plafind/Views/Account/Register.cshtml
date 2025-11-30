@@ -1,0 +1,1245 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Kayıt Ol";
+    Layout = "_Layout";
+}
+
+<div class="auth-page-wrapper">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-icon-wrapper">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h1 class="auth-title">Hesap Oluşturun</h1>
+                <p class="auth-subtitle">Alanya İşletme Rehberi'ne katılın</p>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert alert-danger-custom" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <div>
+                        @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+                    </div>
+                </div>
+            }
+
+            <form asp-action="Register" method="post" id="registerForm" class="auth-form">
+                @Html.AntiForgeryToken()
+                
+                <div class="form-group-custom">
+                    <label asp-for="Email" class="form-label-custom">
+                        <i class="fas fa-envelope me-2"></i>
+                        E-posta Adresi
+                    </label>
+                    <div class="input-wrapper">
+                        <input asp-for="Email" 
+                               type="email" 
+                               class="form-input-custom" 
+                               placeholder="ornek@email.com"
+                               autocomplete="email"
+                               id="emailInput"
+                               required />
+                        <i class="input-icon fas fa-envelope"></i>
+                        <div class="input-status" id="emailStatus"></div>
+                    </div>
+                    <span asp-validation-for="Email" class="error-message"></span>
+                </div>
+
+                <div class="form-group-custom">
+                    <label asp-for="Password" class="form-label-custom">
+                        <i class="fas fa-lock me-2"></i>
+                        Şifre
+                    </label>
+                    <div class="input-wrapper">
+                        <input asp-for="Password" 
+                               type="password" 
+                               class="form-input-custom" 
+                               placeholder="En az 6 karakter"
+                               id="passwordInput"
+                               autocomplete="new-password"
+                               required />
+                        <i class="input-icon fas fa-lock"></i>
+                        <button type="button" class="password-toggle" id="passwordToggle" aria-label="Şifreyi göster/gizle">
+                            <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="error-message"></span>
+                    
+                    <div class="password-strength-container" id="passwordStrengthContainer">
+                        <div class="password-strength-bar">
+                            <div class="password-strength-fill" id="passwordStrengthFill"></div>
+                        </div>
+                        <div class="password-strength-text" id="passwordStrengthText">Şifre gücü: Zayıf</div>
+                    </div>
+
+                    <div class="password-requirements" id="passwordRequirements">
+                        <div class="requirement-item" id="reqLength">
+                            <i class="fas fa-circle"></i>
+                            <span>En az 6 karakter</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group-custom">
+                    <label asp-for="ConfirmPassword" class="form-label-custom">
+                        <i class="fas fa-lock me-2"></i>
+                        Şifre Tekrar
+                    </label>
+                    <div class="input-wrapper">
+                        <input asp-for="ConfirmPassword" 
+                               type="password" 
+                               class="form-input-custom" 
+                               placeholder="Şifrenizi tekrar girin"
+                               id="confirmPasswordInput"
+                               autocomplete="new-password"
+                               required />
+                        <i class="input-icon fas fa-lock"></i>
+                        <button type="button" class="password-toggle" id="confirmPasswordToggle" aria-label="Şifreyi göster/gizle">
+                            <i class="fas fa-eye" id="confirmPasswordToggleIcon"></i>
+                        </button>
+                        <div class="input-status" id="passwordMatchStatus"></div>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="error-message"></span>
+                </div>
+
+                <div class="form-group-custom">
+                    <label asp-for="Country" class="form-label-custom">
+                        <i class="fas fa-globe me-2"></i>
+                        Ülke
+                    </label>
+                    <div class="input-wrapper">
+                        <select asp-for="Country" class="form-input-custom" id="countrySelect" style="color: var(--text); background-color: transparent;">
+                            <option value="" style="background-color: var(--panel); color: var(--text);">Ülke Seçiniz (İsteğe Bağlı)</option>
+                            <option value="Türkiye" style="background-color: var(--panel); color: var(--text);">Türkiye</option>
+                            <option value="Afganistan" style="background-color: var(--panel); color: var(--text);">Afganistan</option>
+                            <option value="Almanya" style="background-color: var(--panel); color: var(--text);">Almanya</option>
+                            <option value="Amerika Birleşik Devletleri">Amerika Birleşik Devletleri</option>
+                            <option value="Arjantin">Arjantin</option>
+                            <option value="Avustralya">Avustralya</option>
+                            <option value="Avusturya">Avusturya</option>
+                            <option value="Azerbaycan">Azerbaycan</option>
+                            <option value="Bahreyn">Bahreyn</option>
+                            <option value="Belçika">Belçika</option>
+                            <option value="Birleşik Arap Emirlikleri">Birleşik Arap Emirlikleri</option>
+                            <option value="Birleşik Krallık">Birleşik Krallık</option>
+                            <option value="Bosna Hersek">Bosna Hersek</option>
+                            <option value="Brezilya">Brezilya</option>
+                            <option value="Bulgaristan">Bulgaristan</option>
+                            <option value="Çek Cumhuriyeti">Çek Cumhuriyeti</option>
+                            <option value="Çin">Çin</option>
+                            <option value="Danimarka">Danimarka</option>
+                            <option value="Finlandiya">Finlandiya</option>
+                            <option value="Fransa">Fransa</option>
+                            <option value="Güney Afrika">Güney Afrika</option>
+                            <option value="Güney Kore">Güney Kore</option>
+                            <option value="Gürcistan">Gürcistan</option>
+                            <option value="Hindistan">Hindistan</option>
+                            <option value="Hırvatistan">Hırvatistan</option>
+                            <option value="Hollanda">Hollanda</option>
+                            <option value="Irak">Irak</option>
+                            <option value="İngiltere">İngiltere</option>
+                            <option value="İran">İran</option>
+                            <option value="İrlanda">İrlanda</option>
+                            <option value="İspanya">İspanya</option>
+                            <option value="İsrail">İsrail</option>
+                            <option value="İsveç">İsveç</option>
+                            <option value="İsviçre">İsviçre</option>
+                            <option value="İtalya">İtalya</option>
+                            <option value="Japonya">Japonya</option>
+                            <option value="Kanada">Kanada</option>
+                            <option value="Katar">Katar</option>
+                            <option value="Kazakistan">Kazakistan</option>
+                            <option value="Kıbrıs">Kıbrıs</option>
+                            <option value="Kırgızistan">Kırgızistan</option>
+                            <option value="Kosova">Kosova</option>
+                            <option value="Kuzey Kıbrıs Türk Cumhuriyeti">Kuzey Kıbrıs Türk Cumhuriyeti</option>
+                            <option value="Kuveyt">Kuveyt</option>
+                            <option value="Lübnan">Lübnan</option>
+                            <option value="Macaristan">Macaristan</option>
+                            <option value="Makedonya">Makedonya</option>
+                            <option value="Malezya">Malezya</option>
+                            <option value="Meksika">Meksika</option>
+                            <option value="Mısır">Mısır</option>
+                            <option value="Norveç">Norveç</option>
+                            <option value="Özbekistan">Özbekistan</option>
+                            <option value="Pakistan">Pakistan</option>
+                            <option value="Polonya">Polonya</option>
+                            <option value="Portekiz">Portekiz</option>
+                            <option value="Romanya">Romanya</option>
+                            <option value="Rusya">Rusya</option>
+                            <option value="Sırbistan">Sırbistan</option>
+                            <option value="Singapur">Singapur</option>
+                            <option value="Slovakya">Slovakya</option>
+                            <option value="Slovenya">Slovenya</option>
+                            <option value="Suudi Arabistan">Suudi Arabistan</option>
+                            <option value="Suriye">Suriye</option>
+                            <option value="Tacikistan">Tacikistan</option>
+                            <option value="Tayland">Tayland</option>
+                            <option value="Tunus">Tunus</option>
+                            <option value="Türkmenistan">Türkmenistan</option>
+                            <option value="Ukrayna">Ukrayna</option>
+                            <option value="Umman">Umman</option>
+                            <option value="Ürdün">Ürdün</option>
+                            <option value="Yeni Zelanda">Yeni Zelanda</option>
+                            <option value="Yunanistan">Yunanistan</option>
+                            <option value="Diğer">Diğer</option>
+                        </select>
+                        <i class="input-icon fas fa-globe"></i>
+                    </div>
+                    <small class="form-help-text" style="color: var(--muted); font-size: 0.875rem; margin-top: 0.5rem; display: block;">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Hangi ülkeden olduğunuzu seçin (isteğe bağlı)
+                    </small>
+                    <span asp-validation-for="Country" class="error-message"></span>
+                </div>
+
+                <!-- Kullanım Şartları Onayı -->
+                <div class="form-group-custom">
+                    <div class="consent-wrapper">
+                        <div class="form-check consent-checkbox-custom">
+                            <input class="form-check-input" type="checkbox" asp-for="ConsentAccepted" id="consentCheckbox" required>
+                            <label class="form-check-label" for="consentCheckbox">
+                                <span class="consent-label-text">
+                                    <a href="#" class="consent-link" data-bs-toggle="modal" data-bs-target="#consentModal">
+                                        Kullanım şartlarını ve gizlilik politikasını
+                                    </a>
+                                    okudum, anladım ve kabul ediyorum.
+                                </span>
+                            </label>
+                        </div>
+                        <span asp-validation-for="ConsentAccepted" class="error-message"></span>
+                    </div>
+                </div>
+
+                <div class="form-group-custom">
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <span class="btn-text">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Kayıt Ol
+                        </span>
+                        <span class="btn-loader" style="display: none;">
+                            <i class="fas fa-spinner fa-spin me-2"></i>
+                            Kayıt yapılıyor...
+                        </span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Kullanım Şartları Modal -->
+            <div class="modal fade" id="consentModal" tabindex="-1" aria-labelledby="consentModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content consent-modal-content">
+                        <div class="modal-header consent-modal-header">
+                            <div class="consent-icon-wrapper">
+                                <i class="fas fa-shield-check"></i>
+                            </div>
+                            <h5 class="modal-title consent-modal-title" id="consentModalLabel">Kullanım Şartları ve Gizlilik Politikası</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body consent-modal-body">
+                            <div class="consent-content">
+                                <p class="consent-text">
+                                    <strong>Alanya İşletme Rehberi</strong>'ni kullanarak aşağıdaki şartları kabul etmiş olursunuz:
+                                </p>
+                                <ul class="consent-list">
+                                    <li>
+                                        <i class="fas fa-check-circle me-2 text-success"></i>
+                                        İşletme bilgilerinin doğruluğu ve güncelliği konusunda platform sorumluluk kabul etmez.
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-check-circle me-2 text-success"></i>
+                                        Arama sonuçları yalnızca bilgilendirme amaçlıdır ve herhangi bir ticari garanti içermez.
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-check-circle me-2 text-success"></i>
+                                        Kişisel verileriniz KVKK ve GDPR standartlarına uygun olarak korunmaktadır.
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-check-circle me-2 text-success"></i>
+                                        Platform kullanımı sırasında oluşabilecek herhangi bir sorundan platform sorumlu tutulamaz.
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-check-circle me-2 text-success"></i>
+                                        Hesabınızı oluşturarak bu şartları kabul etmiş sayılırsınız.
+                                    </li>
+                                </ul>
+                                <div class="consent-note">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Not:</strong> Bu onay veritabanında kaydedilecek ve hesabınızla ilişkilendirilecektir.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer consent-modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i>Kapat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-divider">
+                <span>veya</span>
+            </div>
+
+            <div class="social-login-section">
+                <form asp-controller="Account" asp-action="ExternalLogin" method="post">
+                    <button type="submit" name="provider" value="Google" class="btn-google">
+                        <i class="fab fa-google me-2"></i>
+                        Google ile Kayıt Ol
+                    </button>
+                </form>
+            </div>
+
+            <div class="auth-footer">
+                <p class="footer-text">
+                    Zaten hesabınız var mı?
+                    <a asp-controller="Account" asp-action="Login" class="link-primary">
+                        <i class="fas fa-sign-in-alt me-1"></i>
+                        Giriş Yapın
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <div class="auth-features">
+            <div class="feature-item">
+                <i class="fas fa-rocket"></i>
+                <h3>Hızlı Başlangıç</h3>
+                <p>Birkaç dakikada hesabınızı oluşturun</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-heart"></i>
+                <h3>Favoriler</h3>
+                <p>Beğendiğiniz işletmeleri favorilerinize ekleyin</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-comments"></i>
+                <h3>Yorum Yapın</h3>
+                <p>Deneyimlerinizi paylaşın ve değerlendirin</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --panel: rgba(15, 23, 42, 0.9);
+        --card-border: rgba(148, 163, 184, 0.2);
+        --accent: #22c55e;
+    }
+
+    .auth-page-wrapper {
+        min-height: calc(100vh - 80px);
+        background: linear-gradient(135deg, #0b1220 0%, #1e293b 50%, #0b1220 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 1rem 2rem 1rem;
+        position: relative;
+        overflow: hidden;
+        margin-top: 80px;
+    }
+
+    .auth-page-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 30%, rgba(255, 193, 7, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+        animation: backgroundPulse 15s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    @@keyframes backgroundPulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 0.8; }
+    }
+
+    .auth-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        max-width: 1200px;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-card {
+        background: var(--panel);
+        border-radius: 1.5rem;
+        padding: 3rem;
+        border: 1px solid var(--card-border);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        animation: slideInUp 0.6s ease-out;
+    }
+
+    @@keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .auth-icon-wrapper {
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+        animation: iconPulse 2s ease-in-out infinite;
+    }
+
+    @@keyframes iconPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .auth-icon-wrapper i {
+        font-size: 2.5rem;
+        color: white;
+    }
+
+    .auth-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #ffffff !important;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .auth-subtitle {
+        color: #cbd5e1 !important;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .alert-danger-custom {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-left: 4px solid #ef4444;
+        color: #fee2e2;
+        padding: 1rem 1.25rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .alert-danger-custom i {
+        color: #ef4444;
+        font-size: 1.25rem;
+        margin-top: 0.125rem;
+    }
+
+    .alert-danger-custom ul {
+        margin: 0;
+        padding-left: 1.25rem;
+        list-style: none;
+    }
+
+    .alert-danger-custom li {
+        margin: 0.25rem 0;
+    }
+
+    .auth-form {
+        margin-top: 2rem;
+    }
+
+    .form-group-custom {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label-custom {
+        display: flex;
+        align-items: center;
+        color: #e2e8f0 !important;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .form-label-custom i {
+        color: #22c55e;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .form-input-custom {
+        width: 100%;
+        padding: 1rem 3rem 1rem 3rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 2px solid var(--card-border);
+        border-radius: 0.75rem;
+        color: #ffffff !important;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .form-input-custom::placeholder {
+        color: #94a3b8 !important;
+        opacity: 0.7;
+    }
+
+    .form-input-custom:focus {
+        color: #ffffff !important;
+    }
+
+    .form-input-custom:focus {
+        outline: none;
+        border-color: #22c55e;
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+        pointer-events: none;
+        transition: color 0.3s ease;
+    }
+
+    .form-input-custom:focus + .input-icon,
+    .form-input-custom:not(:placeholder-shown) + .input-icon {
+        color: #22c55e;
+    }
+
+    .form-input-custom select {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 2px solid var(--card-border) !important;
+        color: #ffffff !important;
+        font-size: 1rem;
+        width: 100%;
+        padding: 1rem 3rem 1rem 3rem;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        border-radius: 0.75rem;
+    }
+
+    .form-input-custom select:focus {
+        outline: none;
+        border-color: #22c55e !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    .form-input-custom select option {
+        background: #0f172a !important;
+        color: #e2e8f0 !important;
+        padding: 0.5rem;
+    }
+
+    /* Tüm option'lar için stil */
+    #countrySelect option {
+        background-color: #0f172a !important;
+        color: #e2e8f0 !important;
+    }
+
+    .input-status {
+        position: absolute;
+        right: 3.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.875rem;
+        pointer-events: none;
+    }
+
+    .input-status.valid {
+        color: #22c55e;
+    }
+
+    .input-status.invalid {
+        color: #ef4444;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: color 0.3s ease;
+        z-index: 2;
+    }
+
+    .password-toggle:hover {
+        color: #22c55e;
+    }
+
+    .password-strength-container {
+        margin-top: 0.75rem;
+        display: none;
+    }
+
+    .password-strength-container.active {
+        display: block;
+    }
+
+    .password-strength-bar {
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+
+    .password-strength-fill {
+        height: 100%;
+        width: 0%;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .password-strength-fill.weak {
+        width: 33%;
+        background: #ef4444;
+    }
+
+    .password-strength-fill.medium {
+        width: 66%;
+        background: #f59e0b;
+    }
+
+    .password-strength-fill.strong {
+        width: 100%;
+        background: #22c55e;
+    }
+
+    .password-strength-text {
+        font-size: 0.8125rem;
+        color: #cbd5e1 !important;
+        text-align: right;
+    }
+
+    .password-requirements {
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 0.5rem;
+        border: 1px solid var(--card-border);
+    }
+
+    .requirement-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #cbd5e1 !important;
+        font-size: 0.875rem;
+        margin: 0.25rem 0;
+        transition: color 0.3s ease;
+    }
+
+    .requirement-item i {
+        font-size: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .requirement-item.met {
+        color: #22c55e;
+    }
+
+    .requirement-item.met i {
+        color: #22c55e;
+    }
+
+    .requirement-item.met i::before {
+        content: '\f058';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        font-size: 0.875rem;
+    }
+
+    .error-message {
+        display: block;
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .error-message::before {
+        content: '⚠';
+        font-size: 0.875rem;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        border: none;
+        border-radius: 0.75rem;
+        color: white;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+    }
+
+    .btn-submit:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .auth-divider {
+        text-align: center;
+        margin: 2rem 0;
+        position: relative;
+    }
+
+    .auth-divider::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 1px;
+        background: var(--card-border);
+    }
+
+    .auth-divider span {
+        background: var(--panel);
+        padding: 0 1rem;
+        color: #94a3b8 !important;
+        font-size: 0.875rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--card-border);
+    }
+
+    .footer-text {
+        color: #cbd5e1 !important;
+        font-size: 0.9375rem;
+        margin: 0;
+    }
+
+    .link-primary {
+        color: #22c55e;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        margin-left: 0.5rem;
+    }
+
+    .link-primary:hover {
+        color: #16a34a;
+    }
+
+    .auth-features {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        justify-content: center;
+    }
+
+    .feature-item {
+        text-align: center;
+        padding: 2rem;
+        background: var(--panel);
+        border-radius: 1rem;
+        border: 1px solid var(--card-border);
+        transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        border-color: rgba(34, 197, 94, 0.3);
+    }
+
+    .feature-item i {
+        font-size: 3rem;
+        color: #22c55e;
+        margin-bottom: 1rem;
+    }
+
+    .feature-item h3 {
+        color: #ffffff !important;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-item p {
+        color: #cbd5e1 !important;
+        font-size: 0.9375rem;
+        margin: 0;
+    }
+
+    @@media (max-width: 992px) {
+        .auth-container {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .auth-features {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .feature-item {
+            flex: 1;
+            min-width: 200px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .auth-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .auth-title {
+            font-size: 1.75rem;
+        }
+
+        .auth-features {
+            flex-direction: column;
+        }
+    }
+
+    /* Kullanım Şartları Onay Stilleri */
+    .consent-wrapper {
+        padding: 1.25rem;
+        background: rgba(255, 193, 7, 0.08);
+        border: 1px solid rgba(255, 193, 7, 0.2);
+        border-radius: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    .consent-checkbox-custom {
+        margin: 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .consent-checkbox-custom .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-top: 0.25rem;
+        margin-left: 0;
+        background-color: rgba(15, 23, 42, 0.6);
+        border: 2px solid rgba(255, 193, 7, 0.3);
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .consent-checkbox-custom .form-check-input:checked {
+        background-color: var(--accent);
+        border-color: var(--accent);
+    }
+
+    .consent-checkbox-custom .form-check-input:focus {
+        box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.25);
+        outline: none;
+    }
+
+    .consent-checkbox-custom .form-check-label {
+        color: #e2e8f0 !important;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        cursor: pointer;
+        flex: 1;
+    }
+
+    .consent-label-text {
+        display: block;
+    }
+
+    .consent-link {
+        color: var(--accent);
+        text-decoration: underline;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .consent-link:hover {
+        color: #ffd700;
+        text-decoration: none;
+    }
+
+    /* Kullanım Şartları Modal Stilleri */
+    .consent-modal-content {
+        background: rgba(17, 24, 39, 0.95);
+        border: 1px solid rgba(255, 193, 7, 0.2);
+        border-radius: 1.25rem;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        color: var(--text);
+    }
+
+    .consent-modal-header {
+        border-bottom: 2px solid rgba(255, 193, 7, 0.2);
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 193, 7, 0.05));
+    }
+
+    .consent-icon-wrapper {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
+        border-radius: 50%;
+        border: 3px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .consent-icon-wrapper i {
+        font-size: 2rem;
+        color: #22c55e;
+    }
+
+    .consent-modal-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff !important;
+        margin: 0;
+    }
+
+    .consent-modal-body {
+        padding: 2rem;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .consent-content {
+        color: #e2e8f0 !important;
+    }
+
+    .consent-text {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+        color: #e2e8f0 !important;
+    }
+
+    .consent-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 2rem 0;
+    }
+
+    .consent-list li {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        background: rgba(15, 23, 42, 0.4);
+        border-left: 3px solid rgba(34, 197, 94, 0.5);
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .consent-list li:hover {
+        background: rgba(15, 23, 42, 0.6);
+        border-left-color: #22c55e;
+        transform: translateX(5px);
+    }
+
+    .consent-list li i {
+        margin-top: 0.2rem;
+        flex-shrink: 0;
+    }
+
+    .consent-note {
+        padding: 1rem;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 0.5rem;
+        color: #e2e8f0 !important;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .consent-modal-footer {
+        border-top: 1px solid rgba(148, 163, 184, 0.1);
+        padding: 1.5rem 2rem;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .consent-modal-footer .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .consent-modal-footer .btn-secondary {
+        background: rgba(148, 163, 184, 0.2);
+        border-color: rgba(148, 163, 184, 0.3);
+        color: #ffffff !important;
+    }
+
+    .consent-modal-footer .btn-secondary:hover {
+        background: rgba(148, 163, 184, 0.3);
+        transform: translateY(-2px);
+    }
+
+    /* Google Login Button */
+    .social-login-section {
+        margin: 1.5rem 0;
+    }
+
+    .btn-google {
+        width: 100%;
+        padding: 1rem;
+        background: white;
+        color: #4285f4;
+        border: 2px solid #4285f4;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-google:hover {
+        background: #4285f4;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+    }
+
+    .btn-google i {
+        font-size: 1.25rem;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('passwordInput');
+            const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+            const passwordToggle = document.getElementById('passwordToggle');
+            const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+            const passwordToggleIcon = document.getElementById('passwordToggleIcon');
+            const confirmPasswordToggleIcon = document.getElementById('confirmPasswordToggleIcon');
+            const registerForm = document.getElementById('registerForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnLoader = submitBtn.querySelector('.btn-loader');
+            const passwordStrengthContainer = document.getElementById('passwordStrengthContainer');
+            const passwordStrengthFill = document.getElementById('passwordStrengthFill');
+            const passwordStrengthText = document.getElementById('passwordStrengthText');
+            const passwordRequirements = document.getElementById('passwordRequirements');
+            const reqLength = document.getElementById('reqLength');
+            const passwordMatchStatus = document.getElementById('passwordMatchStatus');
+            const emailInput = document.getElementById('emailInput');
+            const emailStatus = document.getElementById('emailStatus');
+
+            // Password toggle
+            function setupPasswordToggle(toggle, input, icon) {
+                if (toggle && input) {
+                    toggle.addEventListener('click', function() {
+                        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                        input.setAttribute('type', type);
+                        
+                        if (type === 'text') {
+                            icon.classList.remove('fa-eye');
+                            icon.classList.add('fa-eye-slash');
+                        } else {
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
+                    });
+                }
+            }
+
+            setupPasswordToggle(passwordToggle, passwordInput, passwordToggleIcon);
+            setupPasswordToggle(confirmPasswordToggle, confirmPasswordInput, confirmPasswordToggleIcon);
+
+            // Password strength checker
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    const password = this.value;
+                    
+                    if (password.length > 0) {
+                        passwordStrengthContainer.classList.add('active');
+                        
+                        let strength = 0;
+                        let strengthClass = 'weak';
+                        let strengthLabel = 'Zayıf';
+                        
+                        // Check length
+                        if (password.length >= 6) {
+                            reqLength.classList.add('met');
+                            strength += 100;
+                        } else {
+                            reqLength.classList.remove('met');
+                        }
+                        
+                        // Determine strength
+                        if (password.length >= 6) {
+                            strengthClass = 'strong';
+                            strengthLabel = 'Güçlü';
+                        } else if (password.length >= 4) {
+                            strengthClass = 'medium';
+                            strengthLabel = 'Orta';
+                        }
+                        
+                        passwordStrengthFill.className = 'password-strength-fill ' + strengthClass;
+                        passwordStrengthText.textContent = 'Şifre gücü: ' + strengthLabel;
+                    } else {
+                        passwordStrengthContainer.classList.remove('active');
+                        reqLength.classList.remove('met');
+                    }
+                    
+                    checkPasswordMatch();
+                });
+            }
+
+            // Password match checker
+            function checkPasswordMatch() {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                if (confirmPassword.length > 0) {
+                    if (password === confirmPassword && password.length > 0) {
+                        passwordMatchStatus.innerHTML = '<i class="fas fa-check-circle"></i>';
+                        passwordMatchStatus.className = 'input-status valid';
+                        confirmPasswordInput.style.borderColor = '#22c55e';
+                    } else {
+                        passwordMatchStatus.innerHTML = '<i class="fas fa-times-circle"></i>';
+                        passwordMatchStatus.className = 'input-status invalid';
+                        confirmPasswordInput.style.borderColor = '#ef4444';
+                    }
+                } else {
+                    passwordMatchStatus.innerHTML = '';
+                    passwordMatchStatus.className = 'input-status';
+                    confirmPasswordInput.style.borderColor = '';
+                }
+            }
+
+            if (confirmPasswordInput) {
+                confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+            }
+
+            // Email validation
+            if (emailInput) {
+                emailInput.addEventListener('blur', function() {
+                    const email = this.value;
+                    const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+                    
+                    if (email.length > 0) {
+                        if (emailRegex.test(email)) {
+                            emailStatus.innerHTML = '<i class="fas fa-check-circle"></i>';
+                            emailStatus.className = 'input-status valid';
+                            this.style.borderColor = '#22c55e';
+                        } else {
+                            emailStatus.innerHTML = '<i class="fas fa-times-circle"></i>';
+                            emailStatus.className = 'input-status invalid';
+                            this.style.borderColor = '#ef4444';
+                        }
+                    } else {
+                        emailStatus.innerHTML = '';
+                        emailStatus.className = 'input-status';
+                        this.style.borderColor = '';
+                    }
+                });
+            }
+
+            // Form submission
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    if (registerForm.checkValidity()) {
+                        submitBtn.disabled = true;
+                        btnText.style.display = 'none';
+                        btnLoader.style.display = 'flex';
+                    }
+                });
+            }
+
+            // Input focus animations
+            const inputs = document.querySelectorAll('.form-input-custom');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    const icon = this.parentElement.querySelector('.input-icon');
+                    if (icon) {
+                        if (this.id === 'emailInput' || this.id.includes('Email')) {
+                            icon.style.color = '#22c55e';
+                        } else {
+                            icon.style.color = '#22c55e';
+                        }
+                    }
+                });
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        const icon = this.parentElement.querySelector('.input-icon');
+                        if (icon) {
+                            icon.style.color = '';
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

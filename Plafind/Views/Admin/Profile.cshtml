@@ -1,0 +1,65 @@
+@model ApplicationUser
+@{
+    ViewData["Title"] = "Profil & Güvenlik";
+}
+
+<div class="page-header">
+    <h1>🔐 Profil & Güvenlik</h1>
+    <p>Hesap bilgilerinizi görüntüleyin ve güncelleyin</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-user me-2"></i>Profil Bilgileri</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Kullanıcı Adı:</dt>
+                    <dd class="col-sm-8">@Model.UserName</dd>
+                    
+                    <dt class="col-sm-4">E-posta:</dt>
+                    <dd class="col-sm-8">@Model.Email</dd>
+                    
+                    <dt class="col-sm-4">E-posta Onaylı mı:</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.EmailConfirmed)
+                        {
+                            <span class="badge bg-success">Onaylı</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">Onaylanmamış</span>
+                        }
+                    </dd>
+                    
+                    <dt class="col-sm-4">Telefon:</dt>
+                    <dd class="col-sm-8">@(Model.PhoneNumber ?? "Belirtilmemiş")</dd>
+                    
+                    <dt class="col-sm-4">Hesap Oluşturma:</dt>
+                    <dd class="col-sm-8">@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Hızlı İşlemler</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="@Url.Action("ChangePassword", "Admin")" class="btn btn-warning">
+                        <i class="fas fa-key me-2"></i>Şifre Değiştir
+                    </a>
+                    <a href="@Url.Action("TwoFactor", "Admin")" class="btn btn-primary">
+                        <i class="fas fa-mobile-alt me-2"></i>2FA Ayarları
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin Panel</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #22c55e;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            color: #fff;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .admin-sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+
+        .admin-sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .admin-sidebar-header h4 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .admin-sidebar-header .logo-text {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .admin-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            margin: 0.25rem 0;
+        }
+
+        .nav-link-admin {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.9375rem;
+        }
+
+        .nav-link-admin:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-link-admin.active {
+            background: rgba(102, 126, 234, 0.2);
+            color: #fff;
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-link-admin i {
+            width: 24px;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .admin-main {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .admin-header {
+            height: var(--header-height);
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .admin-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-content {
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .page-header p {
+            color: #64748b;
+            margin: 0.5rem 0 0 0;
+        }
+
+        /* Badge */
+        .nav-badge {
+            margin-left: auto;
+            background: var(--danger-color);
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @@media (max-width: 992px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .admin-sidebar.show {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+                display: none;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+            }
+        }
+
+        /* User Dropdown */
+        .user-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: #1e293b;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown-toggle:hover {
+            background: #f1f5f9;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="admin-sidebar-header">
+            <h4>
+                <i class="fas fa-shield-alt me-2"></i>
+                <span class="logo-text">Admin Panel</span>
+            </h4>
+        </div>
+        <nav class="admin-nav">
+            <!-- Dashboard -->
+            <div class="nav-section">
+                <div class="nav-item">
+                    <a href="@Url.Action("Index", "Admin")" class="nav-link-admin @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Authentication -->
+            <div class="nav-section">
+                <div class="nav-section-title">🔐 Authentication</div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Profile", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Profil & Güvenlik</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("ChangePassword", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-key"></i>
+                        <span>Şifre Değiştir</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("TwoFactor", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>2FA Ayarları</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- User Management -->
+            <div class="nav-section">
+                <div class="nav-section-title">👥 User Management</div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Users", "Admin")" class="nav-link-admin @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")">
+                        <i class="fas fa-users"></i>
+                        <span>Kullanıcı Listesi</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("BannedUsers", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-ban"></i>
+                        <span>Banlı Kullanıcılar</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Role & Permission -->
+            <div class="nav-section">
+                <div class="nav-section-title">🛡 Role & Permission</div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Roles", "Admin")" class="nav-link-admin @(ViewContext.RouteData.Values["action"]?.ToString() == "Roles" ? "active" : "")">
+                        <i class="fas fa-user-tag"></i>
+                        <span>Roller</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Permissions", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-lock"></i>
+                        <span>İzinler</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("AssignRoles", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-user-check"></i>
+                        <span>Rol Atama</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Content Management -->
+            <div class="nav-section">
+                <div class="nav-section-title">📦 Content Management</div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Businesses", "Admin")" class="nav-link-admin @(ViewContext.RouteData.Values["action"]?.ToString() == "Businesses" ? "active" : "")">
+                        <i class="fas fa-building"></i>
+                        <span>İşletmeler</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Categories", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-tags"></i>
+                        <span>Kategoriler</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("News", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-newspaper"></i>
+                        <span>Haberler</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Reviews", "Admin")" class="nav-link-admin @(ViewContext.RouteData.Values["action"]?.ToString() == "Reviews" ? "active" : "")">
+                        <i class="fas fa-comments"></i>
+                        <span>Yorumlar</span>
+                        @if (ViewBag.PendingReviewsCount != null && ViewBag.PendingReviewsCount > 0)
+                        {
+                            <span class="nav-badge">@ViewBag.PendingReviewsCount</span>
+                        }
+                    </a>
+                </div>
+            </div>
+
+            <!-- Analytics -->
+            <div class="nav-section">
+                <div class="nav-section-title">📊 Analytics</div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Analytics", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-chart-line"></i>
+                        <span>İstatistikler</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Reports", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Raporlar</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- System Settings -->
+            <div class="nav-section">
+                <div class="nav-section-title">🛠 System Settings</div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Settings", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-cog"></i>
+                        <span>Site Ayarları</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("EmailSettings", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-envelope"></i>
+                        <span>E-posta SMTP</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Backup", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-database"></i>
+                        <span>Backup Yönetimi</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Media Manager -->
+            <div class="nav-section">
+                <div class="nav-section-title">📂 Media Manager</div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Media", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-images"></i>
+                        <span>Medya Yönetimi</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Upload", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-upload"></i>
+                        <span>Dosya Yükle</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Logs & Tracking -->
+            <div class="nav-section">
+                <div class="nav-section-title">📝 Logs & Tracking</div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Logs", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-list-alt"></i>
+                        <span>Sistem Logları</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("ActivityLog", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-history"></i>
+                        <span>Aktivite Takibi</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Feedback & Support -->
+            <div class="nav-section">
+                <div class="nav-section-title">💬 Feedback & Support</div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Messages", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-inbox"></i>
+                        <span>Kullanıcı Mesajları</span>
+                        @if (ViewBag.UnreadMessagesCount != null && ViewBag.UnreadMessagesCount > 0)
+                        {
+                            <span class="nav-badge">@ViewBag.UnreadMessagesCount</span>
+                        }
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Tickets", "Admin")" class="nav-link-admin">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>Destek Biletleri</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Back to Site -->
+            <div class="nav-section mt-4">
+                <div class="nav-item">
+                    <a href="@Url.Action("Index", "Home")" class="nav-link-admin" target="_blank">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>Siteye Dön</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="admin-header-left">
+                <button class="btn btn-link d-lg-none" id="sidebarToggle" type="button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div>
+                    <h5 class="mb-0">@ViewData["Title"]</h5>
+                </div>
+            </div>
+            <div class="admin-header-right">
+                @await Html.PartialAsync("_LoginPartial")
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="admin-content">
+            @RenderBody()
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    
+    <script>
+        // Sidebar toggle
+        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+            document.getElementById('adminSidebar').classList.toggle('show');
+            document.getElementById('sidebarOverlay').classList.toggle('show');
+        });
+
+        document.getElementById('sidebarOverlay')?.addEventListener('click', function() {
+            document.getElementById('adminSidebar').classList.remove('show');
+            this.classList.remove('show');
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

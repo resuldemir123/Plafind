@@ -1,0 +1,353 @@
+@model Plafind.Models.Business
+
+@{
+    ViewData["Title"] = Model.Name;
+    var isFavorite = ViewBag.IsFavorite as bool? ?? false;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- İşletme Bilgileri -->
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h1 class="h3 mb-3">@Model.Name</h1>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="text-warning mr-3">
+                                    @if (Model.AverageRating > 0)
+                                    {
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= Model.AverageRating)
+                                            {
+                                                <i class="fas fa-star"></i>
+                                            }
+                                            else if (i - 0.5 <= Model.AverageRating)
+                                            {
+                                                <i class="fas fa-star-half-alt"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="far fa-star"></i>
+                                            }
+                                        }
+                                        <span class="ml-2">@Model.AverageRating.ToString("F1") (@Model.TotalReviews yorum)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Henüz değerlendirilmemiş</span>
+                                    }
+                                </div>
+                                <span class="badge badge-primary">@Model.Category</span>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(Model.Description))
+                            {
+                                <p class="mb-3">@Model.Description</p>
+                            }
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <div class="d-flex flex-column gap-2">
+                                @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin"))
+                                {
+                                    <a href="@Url.Action("Create", "Reservations", new { businessId = Model.Id })" class="btn btn-success btn-lg">
+                                        <i class="fas fa-calendar-plus"></i> Rezervasyon Yap
+                                    </a>
+                                    <button class="btn btn-outline-danger btn-lg favorite-btn" data-business-id="@Model.Id">
+                                        <i class="@(isFavorite ? "fas" : "far") fa-heart"></i> 
+                                        @(isFavorite ? "Favorilerden Çıkar" : "Favorilere Ekle")
+                                    </button>
+                                }
+                                else
+                                {
+                                    <a href="@Url.Action("Login", "Account")" class="btn btn-success btn-lg">
+                                        <i class="fas fa-calendar-plus"></i> Rezervasyon Yap
+                                    </a>
+                                    <a href="@Url.Action("Login", "Account")" class="btn btn-outline-danger btn-lg">
+                                        <i class="far fa-heart"></i> Favorilere Ekle
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- İletişim Bilgileri -->
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">İletişim Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><i class="fas fa-map-marker-alt text-primary"></i> <strong>Adres:</strong> @Model.Address</p>
+                            <p><i class="fas fa-phone text-primary"></i> <strong>Telefon:</strong> @Model.Phone</p>
+                        </div>
+                        <div class="col-md-6">
+                            @if (!string.IsNullOrEmpty(Model.Email))
+                            {
+                                <p><i class="fas fa-envelope text-primary"></i> <strong>E-posta:</strong> @Model.Email</p>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Website))
+                            {
+                                <p><i class="fas fa-globe text-primary"></i> <strong>Website:</strong> 
+                                    <a href="@Model.Website" target="_blank">@Model.Website</a>
+                                </p>
+                            }
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.WorkingHours))
+                    {
+                        <p><i class="fas fa-clock text-primary"></i> <strong>Çalışma Saatleri:</strong> @Model.WorkingHours</p>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.PriceRange))
+                    {
+                        <p><i class="fas fa-lira-sign text-primary"></i> <strong>Fiyat Aralığı:</strong> @Model.PriceRange</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Yorumlar -->
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments text-primary"></i> Yorumlar (@Model.Reviews.Count)
+                        <span class="badge badge-info ml-2">
+                            <i class="fas fa-heart"></i> @Model.Favorites.Count Favori
+                        </span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Reviews.Any())
+                    {
+                        @foreach (var review in Model.Reviews.OrderByDescending(r => r.CreatedDate))
+                        {
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">@review.User?.FullName</h6>
+                                        <div class="text-warning">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= review.Rating)
+                                                {
+                                                    <i class="fas fa-star"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-star"></i>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">@review.CreatedDate.ToString("dd.MM.yyyy")</small>
+                                </div>
+                                @if (!string.IsNullOrEmpty(review.Comment))
+                                {
+                                    <p class="mt-2 mb-0">@review.Comment</p>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Henüz yorum yapılmamış.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- İşletme Görseli -->
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-image"></i> İşletme Görseli</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <img src="@Model.ImageUrl" 
+                             class="img-fluid w-100" 
+                             alt="@Model.Name" 
+                             style="max-height: 400px; object-fit: cover; cursor: pointer;"
+                             data-toggle="modal" 
+                             data-target="#imageModal"
+                             onerror="this.src='/images/default.jpg'; this.alt='Varsayılan Resim';" />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-image"></i> İşletme Görseli</h5>
+                    </div>
+                    <div class="card-body text-center" style="min-height: 300px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                        <div>
+                            <i class="fas fa-image fa-4x text-muted mb-3"></i>
+                            <p class="text-muted">Henüz görsel eklenmemiş</p>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Yorum Ekle -->
+            @if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
+            {
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-comment-dots"></i> Yorum Yap</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="reviewForm">
+                        <div class="form-group">
+                            <label for="rating"><i class="fas fa-star text-warning"></i> Puan</label>
+                            <div class="rating">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="far fa-star rating-star" data-rating="@i"></i>
+                                }
+                            </div>
+                            <input type="hidden" id="rating" name="rating" value="0" />
+                        </div>
+                        <div class="form-group">
+                            <label for="comment"><i class="fas fa-pen"></i> Yorumunuz</label>
+                            <textarea id="comment" name="comment" class="form-control" rows="4" placeholder="Deneyiminizi paylaşın..."></textarea>
+                        </div>
+                            <button type="submit" class="btn btn-success btn-block">
+                                <i class="fas fa-paper-plane"></i> Gönder
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card shadow mb-4">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Yorum yapmak için giriş yapmanız gerekiyor.</p>
+                        <a href="@Url.Action("Login", "Account")" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+@if (!string.IsNullOrEmpty(Model.ImageUrl))
+{
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">@Model.Name</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <img src="@Model.ImageUrl" class="img-fluid w-100" alt="@Model.Name" />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Favori butonu
+            $('.favorite-btn').click(function() {
+                var businessId = $(this).data('business-id');
+                var button = $(this);
+                
+                $.ajax({
+                    url: '@Url.Action("ToggleFavorite")',
+                    type: 'POST',
+                    data: { businessId: businessId },
+                    success: function(response) {
+                        if (response.success) {
+                            if (response.isFavorite) {
+                                button.html('<i class="fas fa-heart"></i> Favorilerden Çıkar');
+                                button.removeClass('btn-outline-danger').addClass('btn-danger');
+                            } else {
+                                button.html('<i class="far fa-heart"></i> Favorilere Ekle');
+                                button.removeClass('btn-danger').addClass('btn-outline-danger');
+                            }
+                        }
+                        alert(response.message);
+                    },
+                    error: function() {
+                        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                    }
+                });
+            });
+
+            // Yıldız puanlama
+            $('.rating-star').click(function() {
+                var rating = $(this).data('rating');
+                $('#rating').val(rating);
+                
+                $('.rating-star').each(function(index) {
+                    if (index < rating) {
+                        $(this).removeClass('far').addClass('fas');
+                    } else {
+                        $(this).removeClass('fas').addClass('far');
+                    }
+                });
+            });
+
+            // Yorum formu
+            $('#reviewForm').submit(function(e) {
+                e.preventDefault();
+                
+                var rating = $('#rating').val();
+                var comment = $('#comment').val();
+                
+                if (rating == 0) {
+                    alert('Lütfen bir puan seçin.');
+                    return;
+                }
+                
+                $.ajax({
+                    url: '@Url.Action("AddReview")',
+                    type: 'POST',
+                    data: { 
+                        businessId: @Model.Id,
+                        comment: comment,
+                        rating: rating
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                    }
+                });
+            });
+        });
+    </script>
+    
+    <style>
+        .rating-star {
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #ffc107;
+        }
+        .rating-star:hover {
+            color: #ffc107;
+        }
+    </style>
+}

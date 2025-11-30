@@ -1,0 +1,70 @@
+@model IEnumerable<ApplicationUser>
+@{
+    ViewData["Title"] = "Banlı Kullanıcılar";
+}
+
+<div class="page-header">
+    <h1>👥 Banlı Kullanıcılar</h1>
+    <p>Banlanmış kullanıcıları görüntüleyin ve yönetin</p>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Kullanıcı Adı</th>
+                            <th>E-posta</th>
+                            <th>Ban Tarihi</th>
+                            <th>Ban Bitiş</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@user.UserName</td>
+                                <td>@user.Email</td>
+                                <td>@(user.LockoutEnd?.ToString("dd.MM.yyyy HH:mm") ?? "Bilinmiyor")</td>
+                                <td>
+                                    @if (user.LockoutEnd.HasValue)
+                                    {
+                                        <span class="badge bg-danger">@user.LockoutEnd.Value.ToString("dd.MM.yyyy HH:mm")</span>
+                                    }
+                                </td>
+                                <td>
+                                    <form asp-action="UnbanUser" method="post" style="display:inline;">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Bu kullanıcının banını kaldırmak istediğinize emin misiniz?');">
+                                            <i class="fas fa-unlock me-1"></i>Banı Kaldır
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Banlı kullanıcı bulunmamaktadır.</p>
+            </div>
+        }
+    </div>
+</div>
+

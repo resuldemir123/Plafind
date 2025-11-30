@@ -1,0 +1,56 @@
+@model IEnumerable<AdminLog>
+@{
+    ViewData["Title"] = "Aktivite Takibi";
+    var adminUsers = ViewBag.AdminUsers as Dictionary<string, ApplicationUser?>;
+}
+
+<div class="page-header">
+    <h1>📝 Aktivite Takibi</h1>
+    <p>Admin aktivitelerini takip edin</p>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="list-group">
+                @foreach (var log in Model)
+                {
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">
+                                <span class="badge bg-@(log.Action == "Create" ? "success" : log.Action == "Update" ? "info" : log.Action == "Delete" ? "danger" : "warning")">
+                                    @log.Action
+                                </span>
+                                @log.Description
+                            </h6>
+                            <small>@log.CreatedDate.ToString("dd.MM.yyyy HH:mm")</small>
+                        </div>
+                        <p class="mb-1">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>
+                                @if (adminUsers != null && !string.IsNullOrEmpty(log.AdminUserId) && adminUsers.ContainsKey(log.AdminUserId))
+                                {
+                                    @adminUsers[log.AdminUserId]?.UserName
+                                }
+                                else
+                                {
+                                    <span>Bilinmiyor</span>
+                                }
+                                <i class="fas fa-tag ms-2 me-1"></i>@log.EntityType
+                            </small>
+                        </p>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Aktivite kaydı bulunmamaktadır.</p>
+            </div>
+        }
+    </div>
+</div>
+

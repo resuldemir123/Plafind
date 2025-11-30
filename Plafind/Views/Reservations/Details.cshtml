@@ -1,0 +1,59 @@
+@model Plafind.Models.Reservation
+@{
+    ViewData["Title"] = "Rezervasyon Detay";
+    var business = Model?.Business;
+    // Hata: 'Business' bir 'Media' tan�m� i�ermiyor.
+    // ��z�m: business nesnesinin Media �zelli�i yoksa, bu sat�r� kald�r�n veya do�ru ili�kiyi kullan�n.
+    // E�er media bilgisi gerekiyorsa, business ile ili�kili media'ya eri�im i�in uygun property'yi kullanmal�s�n�z.
+    // �rne�in, business.Media yerine business.MediaList veya business.MediaCollection gibi bir property olabilir.
+    // E�er b�yle bir property yoksa, media ile ilgili kodu kald�r�n.
+    // A�a��da, media ile ilgili kod kald�r�ld�.
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (Model == null)
+{
+    <div class="alert alert-warning">Rezervasyon bulunamad�.</div>
+}
+else
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <dl class="row">
+                @foreach (var prop in Model.GetType().GetProperties(
+                            System.Reflection.BindingFlags.Public |
+                            System.Reflection.BindingFlags.Instance))
+                {
+                    var value = prop.GetValue(Model);
+                    if (value != null)
+                    {
+                        <dt class="col-sm-3">@prop.Name</dt>
+                        <dd class="col-sm-9">@value</dd>
+                    }
+                }
+            </dl>
+
+            @if (business != null)
+            {
+                <h5>��letme: @business.Name</h5>
+                <!-- media ile ilgili kod kald�r�ld� -->
+            }
+
+            <a asp-action="Index" class="btn btn-secondary">Geri</a>
+        </div>
+    </div>
+}
+
+<style>
+    .card {
+        background: #ffffff;
+        border: 1px solid #dddddd;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+</style>

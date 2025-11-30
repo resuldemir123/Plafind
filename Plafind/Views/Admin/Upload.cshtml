@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "Dosya Yükle";
+}
+
+<div class="page-header">
+    <h1>📂 Dosya Yükle</h1>
+    <p>Yeni dosya veya resim yükleyin</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-upload me-2"></i>Dosya Yükleme</h5>
+            </div>
+            <div class="card-body">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <form asp-action="Upload" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Dosya Seçin</label>
+                        <input type="file" class="form-control" id="file" name="file" required />
+                        <small class="form-text text-muted">Desteklenen formatlar: JPG, PNG, GIF, PDF</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload me-2"></i>Yükle
+                    </button>
+                    <a href="@Url.Action("Media", "Admin")" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>İptal
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
