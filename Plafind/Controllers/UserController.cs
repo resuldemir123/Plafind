@@ -53,56 +53,25 @@ namespace Plafind.Controllers
             return View(user);
         }
 
-        public async Task<IActionResult> Businesses(string? category, string? search)
+        public IActionResult Businesses(string? category, string? search)
         {
-            var query = _context.Businesses
-                .Where(b => b.IsActive && b.IsApproved)
-                .Include(b => b.Reviews)
-                .AsQueryable();
-
+            // User/Businesses route'unu Home/Search'e yönlendir
+            var routeValues = new Dictionary<string, object?>();
             if (!string.IsNullOrEmpty(category))
             {
-                query = query.Where(b => b.CategoryId != null && b.Category!.Name == category); // Category.Name ile karşılaştırma
+                routeValues["category"] = category;
             }
-
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(b => !string.IsNullOrEmpty(b.Name) && b.Name.Contains(search) ||
-                                        !string.IsNullOrEmpty(b.Description) && b.Description.Contains(search));
+                routeValues["query"] = search;
             }
-
-            var businesses = await query
-                .OrderByDescending(b => b.IsFeatured)
-                .ThenByDescending(b => b.AverageRating)
-                .ToListAsync();
-
-            ViewBag.Categories = await _context.Categories // Doğrudan Categories tablosundan al
-                .Where(c => c.Businesses != null && c.Businesses.Any(b => b.IsActive && b.IsApproved))
-                .Select(c => c.Name)
-                .Distinct()
-                .ToListAsync();
-
-            return View(businesses);
+            return RedirectToAction("Search", "Home", routeValues);
         }
 
-        public async Task<IActionResult> BusinessDetails(int id)
+        public IActionResult BusinessDetails(int id)
         {
-            var business = await _context.Businesses
-                .Include(b => b.Reviews.Where(r => r.IsApproved && r.IsActive))
-                .ThenInclude(r => r.User)
-                .Include(b => b.Favorites)
-                .FirstOrDefaultAsync(b => b.Id == id);
-
-            if (business == null) return NotFound();
-
-            var user = await GetCurrentApplicationUserAsync();
-            if (user != null)
-            {
-                ViewBag.IsFavorite = await _context.UserFavorites
-                    .AnyAsync(f => f.UserId == user.Id && f.BusinessId == id);
-            }
-
-            return View(business);
+            // User/BusinessDetails route'unu Businesses/Details'e yönlendir
+            return RedirectToAction("Details", "Businesses", new { id = id });
         }
 
         [HttpGet]

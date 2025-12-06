@@ -205,7 +205,7 @@
 <style>
     .search-hero {
         background: radial-gradient(circle at top, rgba(255, 193, 7, 0.15), transparent 50%), #050c19;
-        color: #f8f9fa;
+        color: #ffffff;
         padding: 4rem 0 2rem;
     }
 
@@ -213,38 +213,49 @@
         text-transform: uppercase;
         letter-spacing: .25em;
         font-size: .85rem;
-        color: rgba(255,255,255,.7);
+        color: #ffffff;
+        font-weight: 600;
     }
 
     .hero-overlay h1 {
-        font-weight: 700;
+        font-weight: 800;
         margin-bottom: 1rem;
+        color: #ffffff;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
 
     .hero-overlay .lead {
-        color: rgba(255,255,255,.8);
+        color: #ffffff;
         margin-bottom: 2rem;
         max-width: 600px;
+        font-weight: 500;
+        text-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
 
     .search-bar .input-pill {
         display: flex;
         align-items: center;
         gap: .5rem;
-        background: rgba(255,255,255,.1);
+        background: rgba(255,255,255,.15);
         border-radius: 999px;
         padding: .75rem 1.2rem;
-        border: 1px solid rgba(255,255,255,.2);
-        color: #fff;
+        border: 1px solid rgba(255,255,255,.3);
+        color: #ffffff;
+        backdrop-filter: blur(10px);
     }
 
     .search-bar input,
     .search-bar select {
         background: transparent;
         border: none;
-        color: #fff;
+        color: #ffffff;
         width: 100%;
         outline: none;
+        font-weight: 500;
+    }
+    
+    .search-bar input::placeholder {
+        color: rgba(255,255,255,.7);
     }
     
     [data-theme="dark"] .search-hero {
@@ -295,12 +306,12 @@
 
     .search-sections {
         background: linear-gradient(180deg, #050c19 0%, #0d1424 50%, #050c19 100%);
-        color: #e5e7eb;
+        color: #ffffff;
     }
     
     [data-theme="dark"] .search-sections {
         background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-        color: var(--text-primary);
+        color: #ffffff;
     }
 
     .section-header {
@@ -313,12 +324,16 @@
 
     .section-header h2 {
         margin: 0;
-        font-weight: 700;
+        font-weight: 800;
+        color: #ffffff;
+        text-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
     .section-header .eyebrow {
-        color: rgba(229,231,235,.6);
+        color: #ffffff;
         margin-bottom: .35rem;
+        font-weight: 600;
+        opacity: 0.9;
     }
 
     .featured-carousel {
@@ -328,19 +343,25 @@
     }
 
     .business-card {
-        background: rgba(13,18,32,.9);
+        background: rgba(13,18,32,.95);
         border-radius: 1.25rem;
         overflow: hidden;
-        border: 1px solid rgba(255,255,255,.05);
+        border: 1px solid rgba(255,255,255,.1);
         display: flex;
         flex-direction: column;
         box-shadow: 0 20px 45px rgba(5,10,20,.6);
-        transition: background-color 0.3s ease;
+        transition: all 0.3s ease;
+    }
+    
+    .business-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 24px 50px rgba(5,10,20,.8);
+        border-color: rgba(255,193,7,.3);
     }
     
     [data-theme="dark"] .business-card {
-        background: var(--card-bg);
-        border-color: var(--border-color);
+        background: rgba(13,18,32,.95);
+        border-color: rgba(255,255,255,.1);
     }
 
     .business-card.highlight {
@@ -358,6 +379,16 @@
         display: flex;
         flex-direction: column;
         gap: .75rem;
+        color: #ffffff;
+    }
+    
+    .business-card h3 {
+        color: #ffffff;
+        font-weight: 700;
+    }
+    
+    .business-card p {
+        color: rgba(255,255,255,.85);
     }
 
     .card-badge {
@@ -376,7 +407,7 @@
         gap: 1rem;
         flex-wrap: wrap;
         font-size: .9rem;
-        color: rgba(229,231,235,.7);
+        color: rgba(255,255,255,.9);
     }
 
     .card-meta span {
@@ -405,7 +436,11 @@
 
     .business-card.compact p {
         margin: 0;
-        color: rgba(229,231,235,.6);
+        color: rgba(255,255,255,.8);
+    }
+    
+    .business-card.compact h3 {
+        color: #ffffff;
     }
 
     .business-card.compact .rating {
@@ -431,13 +466,17 @@
     }
 
     .business-card.basic .muted {
-        color: rgba(229,231,235,.6);
+        color: rgba(255,255,255,.8);
         margin: 0;
+    }
+    
+    .business-card.basic h3 {
+        color: #ffffff;
     }
 
     .business-card.basic .address {
         margin: .75rem 0;
-        color: rgba(229,231,235,.7);
+        color: rgba(255,255,255,.85);
     }
 
     .card-actions {

@@ -44,7 +44,7 @@ namespace Plafind.Controllers
 
             var business = await _context.Businesses
                 .Include(b => b.Category)
-                .Include(b => b.Reviews)
+                .Include(b => b.Reviews.Where(r => r.IsActive))
                     .ThenInclude(r => r.User)
                 .Include(b => b.Favorites)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -99,8 +99,10 @@ namespace Plafind.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Locations()
         {
+            // Hem koordinatı olan hem de adres bilgisi olan işletmeleri getir
             var locations = await _context.Businesses
-                .Where(b => b.IsActive && b.IsApproved && b.Latitude.HasValue && b.Longitude.HasValue)
+                .Where(b => b.IsActive && b.IsApproved && 
+                           (b.Latitude.HasValue && b.Longitude.HasValue || !string.IsNullOrEmpty(b.Address)))
                 .Select(b => new
                 {
                     b.Id,
@@ -112,7 +114,8 @@ namespace Plafind.Controllers
                     b.AverageRating,
                     b.TotalReviews,
                     Latitude = b.Latitude,
-                    Longitude = b.Longitude
+                    Longitude = b.Longitude,
+                    HasCoordinates = b.Latitude.HasValue && b.Longitude.HasValue
                 })
                 .ToListAsync();
 

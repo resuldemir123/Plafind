@@ -31,6 +31,10 @@ namespace Plafind.Models
         public double AverageRating { get; set; } = 0;
         public int TotalReviews { get; set; } = 0;
 
+        // İşletme sahibi (BusinessOwner)
+        public string? OwnerId { get; set; }
+        public ApplicationUser? Owner { get; set; }
+
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<UserFavorite> Favorites { get; set; } = new List<UserFavorite>();
     }

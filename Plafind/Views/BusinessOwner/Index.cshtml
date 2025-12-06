@@ -1,0 +1,162 @@
+@model IEnumerable<Plafind.Models.Business>
+
+@{
+    ViewData["Title"] = "İşletme Sahibi Paneli";
+    var stats = ViewBag.Stats as dynamic;
+}
+
+<section class="py-4">
+    <div class="container-fluid px-3 px-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold">İşletme Sahibi Paneli</h2>
+                <p class="text-muted mb-0">İşletmelerinizi yönetin, rezervasyonları görüntüleyin</p>
+            </div>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Yeni İşletme Ekle
+            </a>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Dashboard İstatistikleri -->
+        @if (stats != null)
+        {
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-subtitle mb-2 text-white-50">Toplam İşletme</h6>
+                                    <h3 class="mb-0">@stats.TotalBusinesses</h3>
+                                </div>
+                                <i class="fas fa-store fa-2x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-subtitle mb-2 text-white-50">Aktif İşletme</h6>
+                                    <h3 class="mb-0">@stats.ActiveBusinesses</h3>
+                                </div>
+                                <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-subtitle mb-2 text-white-50">Onay Bekleyen</h6>
+                                    <h3 class="mb-0">@stats.PendingApprovals</h3>
+                                </div>
+                                <i class="fas fa-clock fa-2x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-subtitle mb-2 text-white-50">Toplam Rezervasyon</h6>
+                                    <h3 class="mb-0">@stats.TotalReservations</h3>
+                                </div>
+                                <i class="fas fa-calendar-alt fa-2x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Henüz işletmeniz yok. <a asp-action="Create" class="alert-link">Yeni işletme ekleyerek</a> başlayabilirsiniz.
+            </div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var business in Model)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card shadow-sm h-100">
+                            @if (!string.IsNullOrEmpty(business.ImageUrl))
+                            {
+                                <img src="@business.ImageUrl" class="card-img-top" style="height:180px;object-fit:cover;" alt="@business.Name" />
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height:180px;">
+                                    <i class="fas fa-store fa-3x text-white-50"></i>
+                                </div>
+                            }
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title mb-0">@business.Name</h5>
+                                    @if (!business.IsApproved)
+                                    {
+                                        <span class="badge bg-warning">Onay Bekliyor</span>
+                                    }
+                                    else if (business.IsActive)
+                                    {
+                                        <span class="badge bg-success">Aktif</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Pasif</span>
+                                    }
+                                </div>
+                                <p class="card-text text-muted small mb-2">
+                                    <i class="fas fa-map-marker-alt me-1"></i>@business.Address
+                                </p>
+                                @if (!string.IsNullOrEmpty(business.Description))
+                                {
+                                    <p class="card-text text-muted small mb-2">
+                                        @(business.Description.Length > 100 ? business.Description.Substring(0, 100) + "..." : business.Description)
+                                    </p>
+                                }
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-star text-warning"></i> @business.AverageRating.ToString("F1") 
+                                        (@business.TotalReviews yorum)
+                                    </small>
+                                </div>
+                                <div class="mt-auto d-flex gap-2 flex-wrap">
+                                    <a asp-action="Edit" asp-route-id="@business.Id" class="btn btn-sm btn-primary flex-fill">
+                                        <i class="fas fa-edit me-1"></i>Düzenle
+                                    </a>
+                                    <a asp-action="Reservations" asp-route-id="@business.Id" class="btn btn-sm btn-outline-info flex-fill">
+                                        <i class="fas fa-calendar-alt me-1"></i>Rezervasyonlar
+                                    </a>
+                                    <a asp-action="Favorites" asp-route-id="@business.Id" class="btn btn-sm btn-outline-danger flex-fill">
+                                        <i class="fas fa-heart me-1"></i>Favoriler
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+

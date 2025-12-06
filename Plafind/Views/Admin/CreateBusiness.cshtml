@@ -200,33 +200,80 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
         window.initBusinessLocationPicker = function () {
-            if (!window.LocationPicker) {
-                return;
+            const apiKey = '@(ViewBag.GoogleMapsApiKey as string ?? "")';
+            
+            // MapsService ile harita yükle
+            if (window.MapsService && apiKey) {
+                window.MapsService.init(apiKey);
             }
-            LocationPicker.init({
-                mapElementId: 'businessFormMap',
-                latInputId: 'Latitude',
-                lngInputId: 'Longitude',
-                addressInputId: 'Address',
-                searchInputId: 'mapSearchInput',
-                searchButtonId: 'mapSearchBtn',
-                statusElementId: 'mapStatusText'
-            });
+            
+            if (window.LocationPicker) {
+                LocationPicker.init({
+                    mapElementId: 'businessFormMap',
+                    latInputId: 'Latitude',
+                    lngInputId: 'Longitude',
+                    addressInputId: 'Address',
+                    searchInputId: 'mapSearchInput',
+                    searchButtonId: 'mapSearchBtn',
+                    statusElementId: 'mapStatusText',
+                    apiKey: apiKey
+                });
+            }
         };
+        
+        // Google Maps yüklenmezse fallback kullan
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (!window.google || !window.google.maps) {
+                    const apiKey = '@(ViewBag.GoogleMapsApiKey as string ?? "")';
+                    if (!apiKey && window.MapsService) {
+                        window.MapsService.enableFallback();
+                        if (window.LocationPicker) {
+                            LocationPicker.init({
+                                mapElementId: 'businessFormMap',
+                                latInputId: 'Latitude',
+                                lngInputId: 'Longitude',
+                                addressInputId: 'Address',
+                                searchInputId: 'mapSearchInput',
+                                searchButtonId: 'mapSearchBtn',
+                                statusElementId: 'mapStatusText'
+                            });
+                        }
+                    }
+                }
+            }, 5000);
+        });
     </script>
     @if (!string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string))
     {
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@ViewBag.GoogleMapsApiKey&callback=initBusinessLocationPicker"></script>
+        <script>
+            // MapsService callback
+            window.mapsServiceCallback = function() {
+                if (window.initBusinessLocationPicker) {
+                    window.initBusinessLocationPicker();
+                }
+            };
+        </script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@ViewBag.GoogleMapsApiKey&libraries=places&callback=mapsServiceCallback"></script>
     }
     else
     {
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                var status = document.getElementById('mapStatusText');
-                if (status) {
-                    status.textContent = 'Google Maps anahtarı bulunamadığından harita yüklenemedi.';
-                    status.classList.remove('text-muted');
-                    status.classList.add('text-danger');
+                // OpenStreetMap fallback kullan
+                if (window.MapsService) {
+                    window.MapsService.enableFallback();
+                }
+                if (window.LocationPicker) {
+                    LocationPicker.init({
+                        mapElementId: 'businessFormMap',
+                        latInputId: 'Latitude',
+                        lngInputId: 'Longitude',
+                        addressInputId: 'Address',
+                        searchInputId: 'mapSearchInput',
+                        searchButtonId: 'mapSearchBtn',
+                        statusElementId: 'mapStatusText'
+                    });
                 }
             });
         </script>

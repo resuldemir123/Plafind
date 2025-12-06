@@ -55,9 +55,25 @@ namespace Plafind.Controllers
                     review.UserId = user.Id; // UserId doğrudan Id'den alınır
                 }
                 review.CreatedDate = DateTime.Now;
+                review.IsApproved = true; // Yorumlar otomatik onaylanır
+                review.IsActive = true;
                 _context.Reviews.Add(review);
+                
+                // İşletme puanını güncelle
+                var business = await _context.Businesses.FindAsync(review.BusinessId);
+                if (business != null)
+                {
+                    var allReviews = await _context.Reviews
+                        .Where(r => r.BusinessId == review.BusinessId && r.IsApproved && r.IsActive)
+                        .ToListAsync();
+
+                    business.AverageRating = allReviews.Any() ? allReviews.Average(r => r.Rating) : 0;
+                    business.TotalReviews = allReviews.Count;
+                    _context.Businesses.Update(business);
+                }
+                
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index", new { businessId = review.BusinessId });
+                return RedirectToAction("Details", "Businesses", new { id = review.BusinessId });
             }
             ViewBag.BusinessId = review.BusinessId;
             return View(review);

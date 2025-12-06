@@ -37,10 +37,17 @@ namespace Plafind.Controllers
         [HttpGet]
         public async Task<IActionResult> Create(int businessId)
         {
-            if (User.IsInRole("Admin"))
+            // Giriş yapmamış kullanıcıları login sayfasına yönlendir
+            if (!User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Create", "Reservations", new { businessId }) });
+            }
+
+            if (User.IsInRole("Admin") || User.IsInRole("BusinessOwner"))
             {
                 return Forbid();
             }
+
             var business = await _context.Businesses.FindAsync(businessId);
             if (business == null) return NotFound();
 
@@ -57,10 +64,16 @@ namespace Plafind.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Reservation reservation)
         {
-            if (User.IsInRole("Admin"))
+            if (!User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (User.IsInRole("Admin") || User.IsInRole("BusinessOwner"))
             {
                 return Forbid();
             }
+
             var user = await GetCurrentApplicationUserAsync();
             if (user == null) return RedirectToAction("Login", "Account");
 

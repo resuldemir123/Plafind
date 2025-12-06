@@ -64,19 +64,20 @@ builder.Services.Configure<GoogleMapsOptions>(builder.Configuration.GetSection("
 builder.Services.AddMemoryCache();
 
 // GOOGLE AUTHENTICATION
-builder.Services.AddAuthentication()
-    .AddGoogle(options =>
-    {
-        var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
-        var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-        
-        if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientSecret))
+// Sadece ClientId ve ClientSecret doluysa Google auth ekle
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientSecret))
+{
+    builder.Services.AddAuthentication()
+        .AddGoogle(options =>
         {
             options.ClientId = googleClientId;
             options.ClientSecret = googleClientSecret;
             options.CallbackPath = "/signin-google"; // Varsayılan path
-        }
-    });
+        });
+}
 
 var app = builder.Build();
 
@@ -94,6 +95,7 @@ if (app.Environment.IsDevelopment() ||
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             await Plafind.Data.IdentitySeeder.SeedAdminAsync(userManager, roleManager);
+            await Plafind.Data.BusinessOwnerSeeder.SeedBusinessOwnerAsync(context, userManager, roleManager);
         }
         catch (Exception ex)
         {

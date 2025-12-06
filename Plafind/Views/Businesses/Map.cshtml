@@ -197,12 +197,66 @@
             googleMap = new google.maps.Map(document.getElementById('businessMap'), {
                 zoom: 12,
                 center: defaultCenter,
-                mapId: 'DEMO_MAP_ID'
+                mapId: 'DEMO_MAP_ID',
+                mapTypeControl: true,
+                streetViewControl: true
             });
 
             infoWindow = new google.maps.InfoWindow();
             loadBusinessMarkers();
         };
+
+        // Geocoding ile adres bilgisinden koordinat bul
+        function geocodeAddress(address, callback) {
+            if (!window.google || !window.google.maps) {
+                // Google Maps yoksa OpenStreetMap Nominatim kullan
+                if (address) {
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address + ', Alanya, Antalya')}&limit=1`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                callback({
+                                    lat: parseFloat(data[0].lat),
+                                    lng: parseFloat(data[0].lon)
+                                });
+                            } else {
+                                callback(null);
+                            }
+                        })
+                        .catch(() => callback(null));
+                } else {
+                    callback(null);
+                }
+                return;
+            }
+
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ address: address + ', Alanya, Antalya' }, (results, status) => {
+                if (status === 'OK' && results && results[0]) {
+                    const location = results[0].geometry.location;
+                    callback({
+                        lat: location.lat(),
+                        lng: location.lng()
+                    });
+                } else {
+                    callback(null);
+                }
+            });
+        }
+
+        // Varsayılan konum etrafında rastgele dağıt (Alanya merkez)
+        function getDefaultLocation(index, total) {
+            const centerLat = 36.5437;
+            const centerLng = 31.9995;
+            const radius = 0.05; // ~5km yarıçap
+            const angle = (index / total) * 2 * Math.PI;
+            const distance = radius * Math.sqrt(Math.random());
+            
+            return {
+                lat: centerLat + distance * Math.cos(angle),
+                lng: centerLng + distance * Math.sin(angle)
+            };
+        }
 
         function loadBusinessMarkers() {
             fetch('@Url.Action("Locations", "Businesses")')
@@ -213,29 +267,31 @@
                         return;
                     }
 
+                    mapStatus?.classList.add('d-none');
                     const bounds = new google.maps.LatLngBounds();
+                    let markerCount = 0;
+                    let firstMarkerAdded = false;
 
-                    data.forEach(item => {
-                        if (!item.latitude || !item.longitude) {
-                            return;
-                        }
-                        const lat = parseFloat(item.latitude);
-                        const lng = parseFloat(item.longitude);
-                        if (Number.isNaN(lat) || Number.isNaN(lng)) {
-                            return;
-                        }
+                    function addMarker(item, position, index) {
+                        if (!position) return;
 
-                        const position = { lat, lng };
+                        markerCount++;
+
                         const marker = new google.maps.Marker({
                             position,
                             map: googleMap,
-                            title: item.name ?? 'İşletme'
+                            title: item.name ?? 'İşletme',
+                            icon: {
+                                url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                                scaledSize: new google.maps.Size(32, 32)
+                            }
                         });
 
                         const popup = `
-                            <div class="map-popup">
+                            <div class="map-popup" style="min-width: 200px;">
                                 <strong>${item.name ?? 'İşletme'}</strong><br/>
-                                ${(item.category ?? '')}
+                                ${item.category ? `<span class="badge bg-info">${item.category}</span>` : ''}
+                                ${item.address ? `<p class="mb-1 mt-2"><i class="fas fa-map-marker-alt"></i> ${item.address}</p>` : ''}
                                 <div class="mt-2">
                                     <span><i class="fas fa-star text-warning"></i> ${(item.averageRating ?? 0).toFixed(1)}</span>
                                     <span class="ms-2"><i class="fas fa-comment text-info"></i> ${item.totalReviews ?? 0}</span>
@@ -252,12 +308,91 @@
 
                         markers[item.id] = marker;
                         bounds.extend(position);
+
+                        // İlk işletme için yakın yerleri göster
+                        if (!firstMarkerAdded && window.NearbyPlacesService) {
+                            firstMarkerAdded = true;
+                            window.NearbyPlacesService.showNearbyPlaces(googleMap, position, item.name || 'İşletme', true);
+                        }
+                    }
+
+                    function finalizeMap() {
+                        if (bounds.isEmpty()) {
+                            googleMap.setCenter(defaultCenter);
+                            googleMap.setZoom(12);
+                        } else {
+                            googleMap.fitBounds(bounds);
+                            // Eğer çok yakınlaştıysa zoom seviyesini ayarla
+                            if (window.google && window.google.maps) {
+                                google.maps.event.addListenerOnce(googleMap, 'bounds_changed', function() {
+                                    if (googleMap.getZoom() > 15) {
+                                        googleMap.setZoom(15);
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    // Önce koordinatı olanları ekle, sonra adres bilgisi olanları geocoding yap
+                    const itemsWithCoords = [];
+                    const itemsNeedingGeocoding = [];
+
+                    data.forEach((item, index) => {
+                        if (item.hasCoordinates && item.latitude && item.longitude) {
+                            const lat = parseFloat(item.latitude);
+                            const lng = parseFloat(item.longitude);
+                            if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+                                itemsWithCoords.push({ item, position: { lat, lng }, index });
+                            } else if (item.address) {
+                                itemsNeedingGeocoding.push({ item, index });
+                            } else {
+                                itemsNeedingGeocoding.push({ item, index });
+                            }
+                        } else if (item.address) {
+                            itemsNeedingGeocoding.push({ item, index });
+                        } else {
+                            itemsNeedingGeocoding.push({ item, index });
+                        }
                     });
 
-                    if (!bounds.isEmpty()) {
-                        googleMap.fitBounds(bounds);
-                    } else {
-                        mapStatus?.classList.remove('d-none');
+                    // Koordinatı olanları hemen ekle
+                    itemsWithCoords.forEach(({ item, position, index }) => {
+                        addMarker(item, position, index);
+                    });
+
+                    // Adres bilgisi olanları geocoding yap
+                    let geocodingCompleted = 0;
+                    itemsNeedingGeocoding.forEach(({ item, index }) => {
+                        if (item.address) {
+                            geocodeAddress(item.address, (coords) => {
+                                geocodingCompleted++;
+                                if (coords) {
+                                    addMarker(item, coords, index);
+                                } else {
+                                    // Geocoding başarısız olursa varsayılan konum kullan
+                                    const defaultPos = getDefaultLocation(index, data.length);
+                                    addMarker(item, defaultPos, index);
+                                }
+                                
+                                if (geocodingCompleted === itemsNeedingGeocoding.length) {
+                                    finalizeMap();
+                                }
+                            });
+                        } else {
+                            geocodingCompleted++;
+                            // Ne koordinat ne de adres varsa varsayılan konum
+                            const defaultPos = getDefaultLocation(index, data.length);
+                            addMarker(item, defaultPos, index);
+                            
+                            if (geocodingCompleted === itemsNeedingGeocoding.length) {
+                                finalizeMap();
+                            }
+                        }
+                    });
+
+                    // Eğer sadece koordinatı olanlar varsa hemen finalize et
+                    if (itemsNeedingGeocoding.length === 0) {
+                        finalizeMap();
                     }
                 })
                 .catch(() => mapStatus?.classList.remove('d-none'));
@@ -351,9 +486,10 @@
                 }
             });
     </script>
+    <script src="~/js/nearby-places.js" asp-append-version="true"></script>
     @if (!string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string))
     {
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@ViewBag.GoogleMapsApiKey&callback=initBusinessMap"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@ViewBag.GoogleMapsApiKey&libraries=places&callback=initBusinessMap"></script>
     }
     else
     {

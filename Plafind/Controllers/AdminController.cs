@@ -36,14 +36,45 @@ namespace Plafind.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var totalBusinesses = await _context.Businesses.CountAsync();
+            var activeBusinesses = await _context.Businesses.CountAsync(b => b.IsActive);
+            var pendingApprovals = await _context.Businesses.CountAsync(b => !b.IsApproved);
+            var totalUsers = await _context.Users.CountAsync();
+            var totalReviews = await _context.Reviews.CountAsync();
+            var pendingReviews = await _context.Reviews.CountAsync(r => !r.IsApproved);
+            var totalFavorites = await _context.UserFavorites.CountAsync();
+            var businessOwners = await _userManager.GetUsersInRoleAsync("BusinessOwner");
+            var totalBusinessOwners = businessOwners.Count;
+
+            // Son 7 günün istatistikleri
+            var sevenDaysAgo = DateTime.Now.AddDays(-7);
+            var newBusinessesThisWeek = await _context.Businesses.CountAsync(b => b.CreatedDate >= sevenDaysAgo);
+            var newUsersThisWeek = await _context.Users.CountAsync(u => u.CreatedDate >= sevenDaysAgo);
+            var newReviewsThisWeek = await _context.Reviews.CountAsync(r => r.CreatedDate >= sevenDaysAgo);
+
+            // Kategori bazında işletme sayıları
+            var businessesByCategory = await _context.Businesses
+                .Include(b => b.Category)
+                .GroupBy(b => b.Category != null ? b.Category.Name : "Kategori Yok")
+                .Select(g => new { Category = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(5)
+                .ToListAsync();
+
             var stats = new
             {
-                TotalBusinesses = await _context.Businesses.CountAsync(),
-                ActiveBusinesses = await _context.Businesses.CountAsync(b => b.IsActive),
-                PendingApprovals = await _context.Businesses.CountAsync(b => !b.IsApproved),
-                TotalUsers = await _context.Users.CountAsync(), // _context.ApplicationUsers yerine _context.Users
-                TotalReviews = await _context.Reviews.CountAsync(),
-                PendingReviews = await _context.Reviews.CountAsync(r => !r.IsApproved)
+                TotalBusinesses = totalBusinesses,
+                ActiveBusinesses = activeBusinesses,
+                PendingApprovals = pendingApprovals,
+                TotalUsers = totalUsers,
+                TotalReviews = totalReviews,
+                PendingReviews = pendingReviews,
+                TotalFavorites = totalFavorites,
+                TotalBusinessOwners = totalBusinessOwners,
+                NewBusinessesThisWeek = newBusinessesThisWeek,
+                NewUsersThisWeek = newUsersThisWeek,
+                NewReviewsThisWeek = newReviewsThisWeek,
+                BusinessesByCategory = businessesByCategory
             };
 
             var recentActivities = await _context.Reviews
@@ -70,8 +101,14 @@ namespace Plafind.Controllers
         {
             var businesses = await _context.Businesses
                 .Include(b => b.Reviews)
+                .Include(b => b.Owner)
                 .OrderByDescending(b => b.CreatedDate)
                 .ToListAsync();
+            
+            // İşletme sahipleri listesi (atama için)
+            var businessOwners = await _userManager.GetUsersInRoleAsync("BusinessOwner");
+            ViewBag.BusinessOwners = businessOwners;
+            
             return View(businesses);
         }
 
@@ -145,15 +182,116 @@ namespace Plafind.Controllers
             return RedirectToAction(nameof(Businesses));
         }
 
+        // İşletme Onaylama
+        [HttpPost]
+        public async Task<IActionResult> ApproveBusiness(int id)
+        {
+            var business = await _context.Businesses.FindAsync(id);
+            if (business == null) return NotFound();
+
+            business.IsApproved = true;
+            business.IsActive = true;
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync();
+
+            await LogAdminAction("Approve", "Business", id.ToString(), $"İşletme onaylandı: {business.Name}");
+
+            TempData["Success"] = "İşletme başarıyla onaylandı ve yayınlandı.";
+            return RedirectToAction(nameof(Businesses));
+        }
+
+        // İşletme Reddetme
+        [HttpPost]
+        public async Task<IActionResult> RejectBusiness(int id)
+        {
+            var business = await _context.Businesses.FindAsync(id);
+            if (business == null) return NotFound();
+
+            business.IsApproved = false;
+            business.IsActive = false;
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync();
+
+            await LogAdminAction("Reject", "Business", id.ToString(), $"İşletme reddedildi: {business.Name}");
+
+            TempData["Success"] = "İşletme reddedildi.";
+            return RedirectToAction(nameof(Businesses));
+        }
+
         public async Task<IActionResult> Users()
         {
             var users = await _context.Users
                 .Include(u => u.Reviews)
                 .Include(u => u.Favorites)
+                .Include(u => u.OwnedBusinesses)
                 .OrderByDescending(u => u.CreatedDate)
-                .ToListAsync(); // _context.ApplicationUsers yerine _context.Users
+                .ToListAsync();
 
             return View(users);
+        }
+
+        // İşletme Sahipleri Yönetimi
+        public async Task<IActionResult> BusinessOwners()
+        {
+            var businessOwners = await _userManager.GetUsersInRoleAsync("BusinessOwner");
+            var ownersWithBusinesses = new List<object>();
+
+            foreach (var owner in businessOwners)
+            {
+                var businesses = await _context.Businesses
+                    .Where(b => b.OwnerId == owner.Id)
+                    .ToListAsync();
+
+                ownersWithBusinesses.Add(new
+                {
+                    Owner = owner,
+                    BusinessCount = businesses.Count,
+                    ActiveBusinessCount = businesses.Count(b => b.IsActive),
+                    PendingApprovalCount = businesses.Count(b => !b.IsApproved)
+                });
+            }
+
+            ViewBag.OwnersWithBusinesses = ownersWithBusinesses;
+            return View(businessOwners);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AssignBusinessToOwner(int businessId, string ownerId)
+        {
+            var business = await _context.Businesses.FindAsync(businessId);
+            if (business == null) return NotFound();
+
+            var owner = await _userManager.FindByIdAsync(ownerId);
+            if (owner == null || !await _userManager.IsInRoleAsync(owner, "BusinessOwner"))
+            {
+                TempData["Error"] = "Geçersiz işletme sahibi.";
+                return RedirectToAction(nameof(Businesses));
+            }
+
+            business.OwnerId = ownerId;
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync();
+
+            await LogAdminAction("Assign", "Business", businessId.ToString(), $"İşletme '{business.Name}' kullanıcı '{owner.Email}' adresine atandı.");
+
+            TempData["Success"] = "İşletme başarıyla atandı.";
+            return RedirectToAction(nameof(Businesses));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveBusinessFromOwner(int businessId)
+        {
+            var business = await _context.Businesses.FindAsync(businessId);
+            if (business == null) return NotFound();
+
+            business.OwnerId = null;
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync();
+
+            await LogAdminAction("Unassign", "Business", businessId.ToString(), $"İşletme '{business.Name}' sahibinden alındı.");
+
+            TempData["Success"] = "İşletme sahibinden alındı.";
+            return RedirectToAction(nameof(Businesses));
         }
 
         public async Task<IActionResult> UserDetails(string id)

@@ -80,11 +80,23 @@
                         }
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <button class="hero-btn hero-btn--favorite favorite-btn" 
-                                    data-business-id="@business.Id" 
-                                    title="Favorilere ekle">
-                                <i class="far fa-heart"></i>
-                            </button>
+                            @if (!User.IsInRole("Admin") && !User.IsInRole("BusinessOwner"))
+                            {
+                                <a asp-controller="Reservations" asp-action="Create" asp-route-businessId="@business.Id" class="hero-btn hero-btn--reservation">
+                                    <i class="fas fa-calendar-check me-2"></i>Rezervasyon Yap
+                                </a>
+                                <button class="hero-btn hero-btn--favorite favorite-btn" 
+                                        data-business-id="@business.Id" 
+                                        title="Favorilere ekle">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            }
+                        }
+                        else
+                        {
+                            <a asp-controller="Reservations" asp-action="Create" asp-route-businessId="@business.Id" class="hero-btn hero-btn--reservation">
+                                <i class="fas fa-calendar-check me-2"></i>Rezervasyon Yap
+                            </a>
                         }
                     </div>
                 </div>
@@ -183,10 +195,10 @@
                         <span class="badge bg-warning text-dark ms-auto">@business.TotalReviews</span>
                     </div>
 
-                    @if (business.Reviews != null && business.Reviews.Any(r => r.IsApproved && r.IsActive))
+                    @if (business.Reviews != null && business.Reviews.Any(r => r.IsActive))
                     {
                         <div class="reviews-list">
-                            @foreach (var review in business.Reviews.Where(r => r.IsApproved && r.IsActive).OrderByDescending(r => r.CreatedDate).Take(5))
+                            @foreach (var review in business.Reviews.Where(r => r.IsActive).OrderByDescending(r => r.CreatedDate).Take(5))
                             {
                                 <div class="review-card">
                                     <div class="review-header">
@@ -440,7 +452,8 @@
         font-size: clamp(2rem, 4vw, 3rem);
         font-weight: 800;
         margin-bottom: .75rem;
-        color: var(--text);
+        color: #ffffff;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.4);
     }
 
     .hero-badge {
@@ -593,11 +606,16 @@
     .meta-value {
         margin: 0;
         font-weight: 600;
-        color: var(--text);
+        color: #ffffff;
+    }
+    
+    .meta-label {
+        color: rgba(255,255,255,.8) !important;
     }
 
     .business-content {
         background: linear-gradient(180deg, rgba(7,12,25,0.95) 0%, rgba(7,12,25,0.7) 100%);
+        color: #ffffff;
     }
 
     .section-card {
@@ -678,12 +696,12 @@
     .info-card h6 {
         margin: .3rem 0;
         font-weight: 700;
-        color: rgba(226,232,240,0.95);
+        color: #ffffff;
     }
 
     .info-card p {
         margin: 0;
-        color: rgba(226,232,240,0.75);
+        color: rgba(255,255,255,.9);
     }
 
     .section-header {
@@ -697,14 +715,16 @@
 
     .section-title {
         margin: 0;
-        font-weight: 700;
-        color: var(--text);
+        font-weight: 800;
+        color: #ffffff;
+        text-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
 
     .section-text {
-        color: rgba(226,232,240,0.8);
+        color: #ffffff;
         font-size: 1.05rem;
         line-height: 1.9;
+        opacity: 0.95;
     }
 
     .reviews-list {
@@ -741,7 +761,7 @@
     .review-user h6 {
         margin: 0 0 .35rem;
         font-weight: 700;
-        color: var(--text);
+        color: #ffffff;
     }
 
     .review-stars {
@@ -768,8 +788,12 @@
 
     .review-text {
         margin: 0;
-        color: rgba(226,232,240,0.75);
+        color: rgba(255,255,255,.9);
         line-height: 1.75;
+    }
+    
+    .review-date {
+        color: rgba(255,255,255,.7) !important;
     }
 
     .empty-state {
@@ -803,12 +827,12 @@
     .contact-label {
         margin: 0;
         font-weight: 600;
-        color: rgba(226,232,240,0.8);
+        color: #ffffff;
     }
 
     .contact-value {
         margin: .2rem 0 0;
-        color: rgba(226,232,240,0.65);
+        color: rgba(255,255,255,.85);
         line-height: 1.6;
     }
 
@@ -916,12 +940,12 @@
         margin: 0;
         font-size: 1.1rem;
         font-weight: 700;
-        color: var(--text);
+        color: #ffffff;
     }
 
     .similar-meta {
         margin: 0;
-        color: rgba(226,232,240,0.65);
+        color: rgba(255,255,255,.85);
         font-size: .95rem;
     }
 
@@ -935,7 +959,23 @@
 
     .similar-rating .count {
         font-size: .85rem;
-        color: rgba(226,232,240,0.6);
+        color: rgba(255,255,255,.8);
+    }
+    
+    .media-title {
+        color: #ffffff !important;
+    }
+    
+    .media-label {
+        color: rgba(255,255,255,.85) !important;
+    }
+    
+    .empty-state {
+        color: rgba(255,255,255,.8) !important;
+    }
+    
+    .map-note {
+        color: rgba(255,255,255,.8) !important;
     }
 
     @@media (max-width: 992px) {
@@ -985,22 +1025,61 @@
 
             const lat = parseFloat(mapEl.dataset.lat);
             const lng = parseFloat(mapEl.dataset.lng);
+            const businessName = mapEl.dataset.name || 'İşletme';
 
             if (Number.isNaN(lat) || Number.isNaN(lng)) {
                 return;
             }
 
+            const businessPosition = { lat: lat, lng: lng };
+
             const map = new google.maps.Map(mapEl, {
-                center: { lat: lat, lng: lng },
+                center: businessPosition,
                 zoom: 15,
-                disableDefaultUI: true
+                disableDefaultUI: false,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
             });
 
-            new google.maps.Marker({
-                position: { lat: lat, lng: lng },
+            // İşletme marker'ı
+            const businessMarker = new google.maps.Marker({
+                position: businessPosition,
                 map: map,
-                title: mapEl.dataset.name || 'İşletme'
+                title: businessName,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: '#ffc107',
+                    fillOpacity: 1,
+                    strokeColor: '#fff',
+                    strokeWeight: 3
+                },
+                animation: google.maps.Animation.DROP
             });
+
+            // İşletme bilgi penceresi
+            const businessInfoWindow = new google.maps.InfoWindow({
+                content: `
+                    <div style="padding: 1rem;">
+                        <h6 style="margin: 0 0 0.5rem 0; color: #667eea; font-weight: 600;">
+                            <i class="fas fa-store me-2"></i>${businessName}
+                        </h6>
+                        <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
+                            <i class="fas fa-map-marker-alt me-1"></i>İşletme Konumu
+                        </p>
+                    </div>
+                `
+            });
+
+            businessMarker.addListener('click', () => {
+                businessInfoWindow.open(map, businessMarker);
+            });
+
+            // Yakın yerleri göster
+            if (window.NearbyPlacesService) {
+                window.NearbyPlacesService.showNearbyPlaces(map, businessPosition, businessName, true);
+            }
         };
             </text>
         }
@@ -1100,17 +1179,40 @@
             }
         });
     </script>
+    <script src="~/js/nearby-places.js" asp-append-version="true"></script>
     @if (hasLocation && !string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string))
     {
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@ViewBag.GoogleMapsApiKey&callback=initBusinessLocationMap"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@ViewBag.GoogleMapsApiKey&libraries=places&callback=initBusinessLocationMap"></script>
     }
     else if (hasLocation)
     {
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                var mapEl = document.getElementById('businessLocationMap');
-                if (mapEl) {
-                    mapEl.innerHTML = '<div class="p-3 text-center text-muted">Google Maps anahtarı bulunamadı.</div>';
+                // OpenStreetMap fallback kullan
+                if (window.NearbyPlacesService) {
+                    const mapEl = document.getElementById('businessLocationMap');
+                    if (mapEl) {
+                        const lat = parseFloat(mapEl.dataset.lat);
+                        const lng = parseFloat(mapEl.dataset.lng);
+                        const businessName = mapEl.dataset.name || 'İşletme';
+                        
+                        if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+                            // Leaflet ile harita oluştur
+                            if (window.L) {
+                                const map = L.map(mapEl).setView([lat, lng], 15);
+                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                    attribution: '© OpenStreetMap contributors',
+                                    maxZoom: 19
+                                }).addTo(map);
+                                
+                                L.marker([lat, lng]).addTo(map)
+                                    .bindPopup(`<strong>${businessName}</strong>`);
+                                
+                                // Yakın yerleri göster
+                                window.NearbyPlacesService.showNearbyPlaces(map, { lat: lat, lng: lng }, businessName, false);
+                            }
+                        }
+                    }
                 }
             });
         </script>

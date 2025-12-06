@@ -195,6 +195,40 @@
                     <span asp-validation-for="Country" class="error-message"></span>
                 </div>
 
+                <!-- Kullanıcı Tipi Seçimi -->
+                <div class="form-group-custom">
+                    <label class="form-label-custom">
+                        <i class="fas fa-user-tag me-2"></i>
+                        Kullanıcı Tipi
+                    </label>
+                    <div class="user-type-selection">
+                        <div class="user-type-option">
+                            <input type="radio" asp-for="UserType" value="User" id="userTypeUser" checked>
+                            <label for="userTypeUser" class="user-type-label">
+                                <i class="fas fa-user"></i>
+                                <div>
+                                    <strong>Kullanıcı</strong>
+                                    <small>İşletmeleri görüntüle, rezervasyon yap, yorum yap</small>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="user-type-option">
+                            <input type="radio" asp-for="UserType" value="BusinessOwner" id="userTypeBusinessOwner">
+                            <label for="userTypeBusinessOwner" class="user-type-label">
+                                <i class="fas fa-store"></i>
+                                <div>
+                                    <strong>İşletme Sahibi</strong>
+                                    <small>İşletmenizi yönetin, rezervasyonları görüntüleyin</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <small class="form-help-text" style="color: var(--muted); font-size: 0.875rem; margin-top: 0.5rem; display: block;">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Kayıt olduktan sonra işletme ekleyebilir ve yönetebilirsiniz
+                    </small>
+                </div>
+
                 <!-- Kullanım Şartları Onayı -->
                 <div class="form-group-custom">
                     <div class="consent-wrapper">
@@ -1037,6 +1071,81 @@
     .consent-modal-footer .btn-secondary:hover {
         background: rgba(148, 163, 184, 0.3);
         transform: translateY(-2px);
+    }
+
+    /* Kullanıcı Tipi Seçimi */
+    .user-type-selection {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 0.75rem;
+    }
+
+    .user-type-option {
+        position: relative;
+    }
+
+    .user-type-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .user-type-label {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid var(--card-border);
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .user-type-label i {
+        font-size: 2rem;
+        color: var(--muted);
+        transition: all 0.3s ease;
+    }
+
+    .user-type-label div {
+        flex: 1;
+    }
+
+    .user-type-label strong {
+        display: block;
+        color: #ffffff !important;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .user-type-label small {
+        display: block;
+        color: var(--muted) !important;
+        font-size: 0.8125rem;
+    }
+
+    .user-type-option input[type="radio"]:checked + .user-type-label {
+        background: rgba(34, 197, 94, 0.15);
+        border-color: #22c55e;
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+    }
+
+    .user-type-option input[type="radio"]:checked + .user-type-label i {
+        color: #22c55e;
+    }
+
+    .user-type-label:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(34, 197, 94, 0.3);
+    }
+
+    @@media (max-width: 768px) {
+        .user-type-selection {
+            grid-template-columns: 1fr;
+        }
     }
 
     /* Google Login Button */

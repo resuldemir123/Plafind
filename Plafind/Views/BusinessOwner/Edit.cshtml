@@ -1,0 +1,105 @@
+@model Plafind.Models.Business
+
+@{
+    ViewData["Title"] = "İşletme Düzenle";
+}
+
+<section class="py-4">
+    <div class="container-fluid px-3 px-md-4">
+        <h2 class="fw-bold mb-3">İşletme Bilgilerini Düzenle</h2>
+        <p class="text-muted mb-4">Bu sayfadan yalnızca size ait işletmenin temel bilgilerini güncelleyebilirsiniz.</p>
+
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Name" class="form-label">İşletme Adı</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Phone" class="form-label">Telefon</label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Address" class="form-label">Adres</label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label">E-posta</label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Website" class="form-label">Web Sitesi</label>
+                <input asp-for="Website" class="form-control" />
+                <span asp-validation-for="Website" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="WorkingHours" class="form-label">Çalışma Saatleri</label>
+                <input asp-for="WorkingHours" class="form-control" />
+                <span asp-validation-for="WorkingHours" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="PriceRange" class="form-label">Fiyat Aralığı</label>
+                <input asp-for="PriceRange" class="form-control" />
+                <span asp-validation-for="PriceRange" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Latitude" class="form-label">Enlem</label>
+                <input asp-for="Latitude" class="form-control" />
+                <span asp-validation-for="Latitude" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Longitude" class="form-label">Boylam</label>
+                <input asp-for="Longitude" class="form-control" />
+                <span asp-validation-for="Longitude" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Description" class="form-label">Açıklama</label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Mevcut Kapak Görseli</label>
+                <div class="mb-2">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Name" style="max-width: 100%; max-height: 200px; object-fit: cover;" class="rounded border" />
+                    }
+                    else
+                    {
+                        <p class="text-muted">Henüz bir görsel yüklenmemiş.</p>
+                    }
+                </div>
+                <label class="form-label">Yeni Görsel Yükle</label>
+                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+            </div>
+
+            <div class="col-12 d-flex justify-content-between mt-3">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Geri Dön
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>Kaydet
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+

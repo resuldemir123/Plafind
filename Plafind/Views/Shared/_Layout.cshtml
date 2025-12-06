@@ -269,6 +269,14 @@
                                 <i class="fas fa-info-circle me-1 text-info"></i> Hakkımızda
                             </a>
                         </li>
+                        @if (!(User.Identity?.IsAuthenticated == true))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link fw-medium" href="@Url.Action("RegisterBusiness", "BusinessOwner")" style="color: #ffc107 !important;">
+                                    <i class="fas fa-store me-1"></i> İşletme Kaydet
+                                </a>
+                            </li>
+                        }
 
                         @* Roles *@
                         @if (User.Identity?.IsAuthenticated == true)
@@ -308,6 +316,14 @@
                         <button id="themeToggle" class="btn btn-outline-light btn-sm" type="button" title="Tema Değiştir">
                             <i class="fas fa-moon" id="themeIcon"></i>
                         </button>
+
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("BusinessOwner"))
+                        {
+                            <a class="btn btn-sm btn-warning text-dark" href="@Url.Action("Index", "BusinessOwner")">
+                                <i class="fas fa-briefcase me-1"></i> İşletmelerim
+                            </a>
+                        }
+
                         @await Html.PartialAsync("_LoginPartial")
                     </div>
                 </div>

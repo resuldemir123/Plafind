@@ -21,5 +21,8 @@ namespace Plafind.Models
         public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
         public virtual ICollection<UserFavorite> Favorites { get; set; } = new List<UserFavorite>();
         public virtual ICollection<UserPhoto> Photos { get; set; } = new List<UserPhoto>();
+
+        // Sahibi olduğu işletmeler (BusinessOwner rolü için)
+        public virtual ICollection<Business> OwnedBusinesses { get; set; } = new List<Business>();
     }
 }

@@ -1,0 +1,129 @@
+@model IEnumerable<Plafind.Models.Reservation>
+
+@{
+    var business = ViewBag.Business as Plafind.Models.Business;
+    ViewData["Title"] = "Rezervasyonlar - " + (business?.Name ?? "");
+}
+
+<section class="py-4">
+    <div class="container-fluid px-3 px-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold">Rezervasyonlar</h2>
+                <p class="text-muted mb-0">@business?.Name işletmesine ait son rezervasyonlar.</p>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>İşletmelerime Dön
+            </a>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                Bu işletme için henüz rezervasyon bulunmuyor.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>Müşteri</th>
+                            <th>İletişim</th>
+                            <th>Kişi Sayısı</th>
+                            <th>Durum</th>
+                            <th>Not</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@r.RequestedDate.ToString("dd.MM.yyyy")</strong><br>
+                                    <small class="text-muted">@r.RequestedTime.ToString(@"hh\:mm")</small>
+                                </td>
+                                <td>
+                                    @{
+                                        var customerName = r.User?.FullName
+                                                            ?? r.User?.UserName
+                                                            ?? r.ContactEmail
+                                                            ?? r.ContactPhone
+                                                            ?? "-";
+                                    }
+                                    <i class="fas fa-user me-1"></i>@customerName
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(r.ContactEmail))
+                                    {
+                                        <div><i class="fas fa-envelope me-1 text-primary"></i>@r.ContactEmail</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(r.ContactPhone))
+                                    {
+                                        <div><i class="fas fa-phone me-1 text-success"></i>@r.ContactPhone</div>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        <i class="fas fa-users me-1"></i>@r.NumberOfPeople
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (r.Status == "Onaylandı")
+                                    {
+                                        <span class="badge bg-success">@r.Status</span>
+                                    }
+                                    else if (r.Status == "Reddedildi")
+                                    {
+                                        <span class="badge bg-danger">@r.Status</span>
+                                    }
+                                    else if (r.Status == "İptal")
+                                    {
+                                        <span class="badge bg-secondary">@r.Status</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">@r.Status</span>
+                                    }
+                                </td>
+                                <td>@(r.Notes ?? "-")</td>
+                                <td>
+                                    @if (r.Status == "Beklemede")
+                                    {
+                                        <div class="btn-group" role="group">
+                                            <form asp-action="ApproveReservation" method="post" style="display: inline;">
+                                                <input type="hidden" name="id" value="@r.Id" />
+                                                <button type="submit" class="btn btn-sm btn-success" 
+                                                        onclick="return confirm('Bu rezervasyonu onaylamak istediğinizden emin misiniz?')"
+                                                        title="Onayla">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                            <form asp-action="RejectReservation" method="post" style="display: inline;">
+                                                <input type="hidden" name="id" value="@r.Id" />
+                                                <button type="submit" class="btn btn-sm btn-danger"
+                                                        onclick="return confirm('Bu rezervasyonu reddetmek istediğinizden emin misiniz?')"
+                                                        title="Reddet">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</section>
+
+

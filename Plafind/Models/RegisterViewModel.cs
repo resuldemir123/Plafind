@@ -25,5 +25,8 @@ namespace Plafind.Models
         [Required(ErrorMessage = "Kullanım şartlarını kabul etmeniz gerekmektedir.")]
         [Display(Name = "Kullanım Şartları")]
         public bool ConsentAccepted { get; set; } = false;
+
+        [Display(Name = "Kullanıcı Tipi")]
+        public string UserType { get; set; } = "User"; // "User" veya "BusinessOwner"
     }
 }

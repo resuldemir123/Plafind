@@ -2,64 +2,199 @@
 
 @{
     ViewData["Title"] = "İşletme Yönetimi";
+    var categories = Model.Select(b => b.Category?.Name).Where(c => c != null).Distinct().ToList();
+    var statuses = new[] { "Tümü", "Aktif", "Pasif", "Onay Bekliyor" };
 }
 
-<div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">İşletme Yönetimi</h1>
-        <a href="@Url.Action("CreateBusiness")" class="btn btn-primary btn-sm shadow-sm">
-            <i class="fas fa-plus fa-sm text-white-50"></i> Yeni İşletme
-        </a>
-    </div>
+<style>
+    .admin-businesses-page {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    .page-header-admin {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .filter-section {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    .business-table-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .table-header-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border: none;
+    }
+    .table-custom {
+        margin: 0;
+    }
+    .table-custom thead th {
+        background: #f8f9fa;
+        color: #495057;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+        padding: 1rem;
+    }
+    .table-custom tbody tr {
+        transition: all 0.2s ease;
+    }
+    .table-custom tbody tr:hover {
+        background: #f8f9fa;
+        transform: translateX(5px);
+    }
+    .badge-custom {
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    .btn-action {
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+</style>
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">İşletmeler</h6>
+<div class="admin-businesses-page">
+    <div class="container-fluid">
+        <div class="page-header-admin">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h1 class="h3 mb-2 fw-bold text-dark">
+                        <i class="fas fa-building me-2 text-primary"></i>İşletme Yönetimi
+                    </h1>
+                    <p class="text-muted mb-0">Tüm işletmeleri görüntüleyin, düzenleyin ve yönetin</p>
+                </div>
+                <a href="@Url.Action("CreateBusiness")" class="btn btn-primary btn-lg shadow-sm">
+                    <i class="fas fa-plus me-2"></i>Yeni İşletme Ekle
+                </a>
+            </div>
         </div>
-        <div class="card-body">
+
+        <div class="filter-section">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Kategori Filtresi</label>
+                    <select id="categoryFilter" class="form-select">
+                        <option value="">Tüm Kategoriler</option>
+                        @foreach (var cat in categories)
+                        {
+                            <option value="@cat">@cat</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Durum Filtresi</label>
+                    <select id="statusFilter" class="form-select">
+                        @foreach (var status in statuses)
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Arama</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="İşletme adı, adres veya telefon ara...">
+                </div>
+            </div>
+        </div>
+
+        <div class="business-table-card">
+            <div class="table-header-custom">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-list me-2"></i>İşletme Listesi
+                    <span class="badge bg-light text-dark ms-2" id="businessCount">@Model.Count()</span>
+                </h5>
+            </div>
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-custom" id="businessTable">
                     <thead>
                         <tr>
                             <th>İşletme Adı</th>
                             <th>Kategori</th>
+                            <th>İşletme Sahibi</th>
                             <th>Adres</th>
                             <th>Telefon</th>
                             <th>Durum</th>
                             <th>Puan</th>
-                            <th>Yorum Sayısı</th>
+                            <th>Yorum</th>
                             <th>İşlemler</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var business in Model)
                         {
-                            <tr>
-                                <td>@business.Name</td>
-                                <td>@business.Category</td>
-                                <td>@business.Address</td>
-                                <td>@business.Phone</td>
+                            <tr data-category="@(business.Category?.Name ?? "")" 
+                                data-status="@(business.IsActive ? (business.IsApproved ? "Aktif" : "Onay Bekliyor") : "Pasif")"
+                                data-search="@($"{business.Name} {business.Address} {business.Phone}".ToLower())">
+                                <td class="fw-semibold">@business.Name</td>
                                 <td>
-                                    @if (business.IsActive)
+                                    <span class="badge bg-info badge-custom">
+                                        <i class="fas fa-tag me-1"></i>@(business.Category?.Name ?? "Kategori Yok")
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (business.Owner != null)
                                     {
-                                        <span class="badge badge-success">Aktif</span>
+                                        <span class="badge bg-primary badge-custom">
+                                            <i class="fas fa-user me-1"></i>@(business.Owner.FullName ?? business.Owner.Email ?? business.Owner.UserName)
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="badge badge-danger">Pasif</span>
+                                        <span class="badge bg-secondary badge-custom">Sahip Atanmamış</span>
                                     }
-                                    @if (!business.IsApproved)
+                                </td>
+                                <td class="text-muted">@(string.IsNullOrEmpty(business.Address) ? "-" : business.Address)</td>
+                                <td>@(string.IsNullOrEmpty(business.Phone) ? "-" : business.Phone)</td>
+                                <td>
+                                    @if (business.IsActive && business.IsApproved)
                                     {
-                                        <span class="badge badge-warning">Onay Bekliyor</span>
+                                        <span class="badge bg-success badge-custom">
+                                            <i class="fas fa-check-circle me-1"></i>Aktif
+                                        </span>
+                                    }
+                                    else if (!business.IsApproved)
+                                    {
+                                        <span class="badge bg-warning badge-custom">
+                                            <i class="fas fa-clock me-1"></i>Onay Bekliyor
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger badge-custom">
+                                            <i class="fas fa-times-circle me-1"></i>Pasif
+                                        </span>
                                     }
                                 </td>
                                 <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="mr-1">@business.AverageRating.ToString("F1")</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="fw-bold">@business.AverageRating.ToString("F1")</span>
                                         <div class="text-warning">
                                             @for (int i = 1; i <= 5; i++)
                                             {
-                                                if (i <= business.AverageRating)
+                                                if (i <= Math.Floor(business.AverageRating))
                                                 {
                                                     <i class="fas fa-star"></i>
                                                 }
@@ -75,16 +210,40 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>@business.TotalReviews</td>
                                 <td>
-                                    <div class="btn-group" role="group">
+                                    <span class="badge bg-secondary badge-custom">
+                                        <i class="fas fa-comments me-1"></i>@business.TotalReviews
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        @if (!business.IsApproved)
+                                        {
+                                            <form asp-action="ApproveBusiness" method="post" style="display: inline;">
+                                                <input type="hidden" name="id" value="@business.Id" />
+                                                <button type="submit" class="btn btn-success btn-action" 
+                                                        onclick="return confirm('Bu işletmeyi onaylamak istediğinizden emin misiniz?')"
+                                                        title="Onayla">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                            <form asp-action="RejectBusiness" method="post" style="display: inline;">
+                                                <input type="hidden" name="id" value="@business.Id" />
+                                                <button type="submit" class="btn btn-warning btn-action"
+                                                        onclick="return confirm('Bu işletmeyi reddetmek istediğinizden emin misiniz?')"
+                                                        title="Reddet">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        }
                                         <a href="@Url.Action("EditBusiness", new { id = business.Id })" 
-                                           class="btn btn-sm btn-primary">
+                                           class="btn btn-primary btn-action" title="Düzenle">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="@Url.Action("DeleteBusiness", new { id = business.Id })" 
-                                           class="btn btn-sm btn-danger"
-                                           onclick="return confirm('Bu işletmeyi silmek istediğinizden emin misiniz?')">
+                                           class="btn btn-danger btn-action"
+                                           onclick="return confirm('Bu işletmeyi silmek istediğinizden emin misiniz?')"
+                                           title="Sil">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
@@ -97,3 +256,45 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const categoryFilter = document.getElementById('categoryFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const searchInput = document.getElementById('searchInput');
+        const businessTable = document.getElementById('businessTable');
+        const businessCount = document.getElementById('businessCount');
+
+        function filterTable() {
+            const category = categoryFilter.value.toLowerCase();
+            const status = statusFilter.value;
+            const search = searchInput.value.toLowerCase();
+
+            const rows = businessTable.querySelectorAll('tbody tr');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const rowCategory = (row.dataset.category || '').toLowerCase();
+                const rowStatus = row.dataset.status || '';
+                const rowSearch = row.dataset.search || '';
+
+                const matchCategory = !category || rowCategory.includes(category);
+                const matchStatus = status === 'Tümü' || rowStatus === status;
+                const matchSearch = !search || rowSearch.includes(search);
+
+                if (matchCategory && matchStatus && matchSearch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            businessCount.textContent = visibleCount;
+        }
+
+        categoryFilter.addEventListener('change', filterTable);
+        statusFilter.addEventListener('change', filterTable);
+        searchInput.addEventListener('input', filterTable);
+    });
+</script>

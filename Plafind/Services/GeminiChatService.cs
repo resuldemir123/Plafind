@@ -10,8 +10,9 @@ namespace Plafind.Services
 {
     public class GeminiChatService : IGeminiChatService
     {
+        // Gemini endpoint (v1beta API + gemini-1.5-flash-latest modeli)
         private const string Endpoint =
-            "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=";
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=";
 
         private readonly HttpClient _httpClient;
         private readonly ILogger<GeminiChatService> _logger;
@@ -81,7 +82,9 @@ namespace Plafind.Services
                 {
                     var error = await response.Content.ReadAsStringAsync();
                     _logger.LogWarning("Gemini API başarısız oldu: {Status} - {Body}", response.StatusCode, error);
-                    throw new ApplicationException("Gemini API isteği başarısız oldu.");
+
+                    // Kullanıcıya exception fırlatmak yerine kibar bir mesaj dönelim
+                    return "Şu anda yapay zekâ servisine bağlanamıyorum. Lütfen daha sonra tekrar deneyin.";
                 }
 
                 using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -99,7 +102,7 @@ namespace Plafind.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Gemini isteği sırasında hata oluştu.");
-                throw;
+                return "Şu anda yapay zekâ servisine bağlanamıyorum. Lütfen daha sonra tekrar deneyin.";
             }
         }
     }

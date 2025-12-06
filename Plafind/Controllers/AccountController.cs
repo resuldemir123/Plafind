@@ -60,7 +60,19 @@ namespace Plafind.Controllers
                 var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    // Rol bazlı yönlendirme
+                    if (await _userManager.IsInRoleAsync(user, "Admin"))
+                    {
+                        return RedirectToAction("Index", "Admin");
+                    }
+                    else if (await _userManager.IsInRoleAsync(user, "BusinessOwner"))
+                    {
+                        return RedirectToAction("Index", "BusinessOwner");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
             }
             ModelState.AddModelError(string.Empty, "Geçersiz e-posta veya şifre.");
@@ -108,12 +120,29 @@ namespace Plafind.Controllers
 
                 if (result.Succeeded)
                 {
-                    if (await _roleManager.RoleExistsAsync("User"))
+                    // Kullanıcı tipine göre rol atama
+                    string roleName = "User";
+                    if (model.UserType == "BusinessOwner" && await _roleManager.RoleExistsAsync("BusinessOwner"))
                     {
-                        await _userManager.AddToRoleAsync(user, "User");
+                        roleName = "BusinessOwner";
                     }
+                    else if (await _roleManager.RoleExistsAsync("User"))
+                    {
+                        roleName = "User";
+                    }
+
+                    await _userManager.AddToRoleAsync(user, roleName);
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    
+                    // Rol bazlı yönlendirme
+                    if (roleName == "BusinessOwner")
+                    {
+                        return RedirectToAction("Index", "BusinessOwner");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
                 foreach (var error in result.Errors)
                 {
@@ -148,17 +177,6 @@ namespace Plafind.Controllers
 
             var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             
-            if (signInResult.Succeeded)
-            {
-                return RedirectToLocal(returnUrl);
-            }
-
-            if (signInResult.IsLockedOut)
-            {
-                TempData["ErrorMessage"] = "Hesabınız kilitlenmiş.";
-                return RedirectToAction("Login");
-            }
-
             // Kullanıcı yoksa oluştur
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
             var name = info.Principal.FindFirstValue(ClaimTypes.Name);
@@ -170,6 +188,29 @@ namespace Plafind.Controllers
             }
 
             var user = await _userManager.FindByEmailAsync(email);
+            
+            if (signInResult.Succeeded && user != null)
+            {
+                // Rol bazlı yönlendirme
+                if (await _userManager.IsInRoleAsync(user, "Admin"))
+                {
+                    return RedirectToAction("Index", "Admin");
+                }
+                else if (await _userManager.IsInRoleAsync(user, "BusinessOwner"))
+                {
+                    return RedirectToAction("Index", "BusinessOwner");
+                }
+                else
+                {
+                    return RedirectToLocal(returnUrl);
+                }
+            }
+
+            if (signInResult.IsLockedOut)
+            {
+                TempData["ErrorMessage"] = "Hesabınız kilitlenmiş.";
+                return RedirectToAction("Login");
+            }
             if (user == null)
             {
                 user = new ApplicationUser
@@ -205,7 +246,20 @@ namespace Plafind.Controllers
             }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
-            return RedirectToLocal(returnUrl);
+            
+            // Rol bazlı yönlendirme
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+            else if (await _userManager.IsInRoleAsync(user, "BusinessOwner"))
+            {
+                return RedirectToAction("Index", "BusinessOwner");
+            }
+            else
+            {
+                return RedirectToLocal(returnUrl);
+            }
         }
 
         private IActionResult RedirectToLocal(string returnUrl)

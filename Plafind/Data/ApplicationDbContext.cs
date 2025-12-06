@@ -75,10 +75,17 @@ namespace Plafind.Data
 
             modelBuilder.Entity<Business>(entity =>
             {
+                // Kategori ilişkisi
                 entity.HasOne(b => b.Category)
                       .WithMany(c => c.Businesses)
                       .HasForeignKey(b => b.CategoryId)
                       .OnDelete(DeleteBehavior.SetNull);
+
+                // İşletme sahibi (BusinessOwner)
+                entity.HasOne(b => b.Owner)
+                      .WithMany(u => u.OwnedBusinesses)
+                      .HasForeignKey(b => b.OwnerId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<UserPhoto>(entity =>
