@@ -1,4 +1,4 @@
-﻿using Plafind.Data;
+using Plafind.Data;
 using Plafind.Models;
 using Plafind.Options;
 using Plafind.Services;
@@ -9,12 +9,48 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // DATABASE
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var databaseProvider = builder.Configuration["Database:Provider"] ?? "MySQL"; // MySQL veya SqlServer
+
+// Connection string'e göre veritabanı tipini belirle
+var isMySql = databaseProvider.Equals("MySQL", StringComparison.OrdinalIgnoreCase) ||
+              (!string.IsNullOrEmpty(connectionString) && 
+               (connectionString.Contains("Port=") || 
+                connectionString.Contains("User=") || 
+                connectionString.Contains("CharSet=")) &&
+               !connectionString.Contains("MSSQLLocalDB") &&
+               !connectionString.Contains("Trusted_Connection") &&
+               !connectionString.Contains("Integrated Security"));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    if (isMySql)
+    {
+        // MySQL bağlantısı
+        // ServerVersion otomatik algılama yerine manuel versiyon belirtiyoruz
+        var serverVersion = ServerVersion.Parse("8.0.21-mysql"); // MySQL 8.0.21 veya üzeri
+        
+        options.UseMySql(connectionString, serverVersion, mySqlOptions =>
+        {
+            mySqlOptions.SchemaBehavior(MySqlSchemaBehavior.Ignore);
+            mySqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+            mySqlOptions.MigrationsAssembly("Plafind");
+        });
+    }
+    else
+    {
+        // SQL Server bağlantısı (fallback)
+        options.UseSqlServer(connectionString);
+    }
+});
 
 // IDENTITY
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -44,6 +80,15 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
+// SESSION
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 // MVC
 builder.Services.AddControllersWithViews();
 
@@ -56,9 +101,13 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // SMS SERVICE
 builder.Services.AddScoped<ISmsService, SmsService>();
 
+// NOTIFICATION SERVICE
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
 builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("GoogleGemini"));
 builder.Services.AddHttpClient<IGeminiChatService, GeminiChatService>();
 builder.Services.Configure<GoogleMapsOptions>(builder.Configuration.GetSection("GoogleMaps"));
+builder.Services.Configure<TomTomOptions>(builder.Configuration.GetSection("TomTom"));
 
 // MEMORY CACHE (SMS kodları için)
 builder.Services.AddMemoryCache();
@@ -90,17 +139,21 @@ if (app.Environment.IsDevelopment() ||
         var services = scope.ServiceProvider;
         try
         {
+            // Veritabanının hazır olduğundan emin ol
             var context = services.GetRequiredService<ApplicationDbContext>();
-            await Plafind.Data.DbSeeder.SeedDataAsync(context);
+            await context.Database.EnsureCreatedAsync();
+            
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+            
+            await Plafind.Data.DbSeeder.SeedDataAsync(context);
             await Plafind.Data.IdentitySeeder.SeedAdminAsync(userManager, roleManager);
             await Plafind.Data.BusinessOwnerSeeder.SeedBusinessOwnerAsync(context, userManager, roleManager);
         }
         catch (Exception ex)
         {
             var logger = services.GetRequiredService<ILogger<Program>>();
-            logger.LogError(ex, "Seed data oluşturulurken bir hata oluştu.");
+            logger.LogError(ex, "Seed data oluşturulurken bir hata oluştu: {Message}", ex.Message);
         }
     }
 }
@@ -152,6 +205,7 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/images"
 });
 
+app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

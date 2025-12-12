@@ -1,0 +1,598 @@
+@model List<Plafind.Models.Business>
+@Html.AntiForgeryToken()
+@{
+    ViewData["Title"] = "İşletme Karşılaştırma";
+}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="fw-bold mb-0">
+                    <i class="fas fa-balance-scale me-2 text-primary"></i>İşletme Karşılaştırma
+                </h2>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-sm btn-outline-primary" id="toggleView" title="Görünümü değiştir">
+                        <i class="fas fa-th-large me-1"></i>Kart Görünümü
+                    </button>
+                    <button class="btn btn-sm btn-outline-success" id="exportCompare" title="CSV olarak dışa aktar">
+                        <i class="fas fa-download me-1"></i>CSV İndir
+                    </button>
+                    <button class="btn btn-sm btn-outline-info" id="printCompare" title="Yazdır">
+                        <i class="fas fa-print me-1"></i>Yazdır
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" id="shareCompare" title="Paylaş">
+                        <i class="fas fa-share-alt me-1"></i>Paylaş
+                    </button>
+                    @if (Model.Count > 0)
+                    {
+                        <button class="btn btn-sm btn-outline-danger" id="clearCompare">
+                            <i class="fas fa-trash me-1"></i>Listeyi Temizle
+                        </button>
+                    }
+                </div>
+            </div>
+            @if (Model.Count == 0)
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>@ViewBag.Message
+                    <a href="@Url.Action("Search", "Home")" class="alert-link ms-2">İşletme Ara</a>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-success d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-check-circle me-2"></i><strong>@Model.Count işletme</strong> karşılaştırılıyor</span>
+                    <span class="badge bg-warning text-dark">Maksimum: 4 işletme</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (Model.Count > 0)
+    {
+        <!-- Grafiksel Karşılaştırma -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Grafiksel Karşılaştırma</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="compareChart" height="80"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tablo Görünümü -->
+        <div id="tableView" class="row">
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width: 200px;" class="align-middle">Özellik</th>
+                                @foreach (var business in Model)
+                                {
+                                    <th class="text-center align-middle" style="min-width: 280px;">
+                                        <div class="d-flex flex-column align-items-center p-2">
+                                            @if (!string.IsNullOrEmpty(business.ImageUrl))
+                                            {
+                                                <img src="@business.ImageUrl" alt="@business.Name" class="img-thumbnail mb-2 shadow-sm" style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px;">
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-secondary d-flex align-items-center justify-content-center mb-2 shadow-sm" style="width: 120px; height: 120px; border-radius: 12px;">
+                                                    <i class="fas fa-store fa-3x text-white"></i>
+                                                </div>
+                                            }
+                                            <h5 class="mb-1 text-center">@business.Name</h5>
+                                            @if (business.Category != null)
+                                            {
+                                                <span class="badge bg-info mb-2">@business.Category.Name</span>
+                                            }
+                                            <div class="mb-2">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    <i class="@(i <= Math.Round(business.AverageRating) ? "fas" : "far") fa-star text-warning"></i>
+                                                }
+                                                <strong class="ms-1">@business.AverageRating.ToString("F1")</strong>
+                                                <small class="text-muted d-block">@business.TotalReviews yorum</small>
+                                            </div>
+                                            <div class="d-flex gap-2 flex-wrap justify-content-center">
+                                                <a href="@Url.Action("Details", "Businesses", new { id = business.Id })" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-eye me-1"></i>Detaylar
+                                                </a>
+                                                <button class="btn btn-sm btn-outline-danger remove-compare" data-business-id="@business.Id">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-info">
+                                <td class="fw-bold"><i class="fas fa-tag me-2"></i>Kategori</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td class="text-center">
+                                        <span class="badge bg-primary">@(business.Category?.Name ?? "Belirtilmemiş")</span>
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i>Adres</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(business.Address))
+                                        {
+                                            <i class="fas fa-location-dot me-1 text-danger"></i>@business.Address
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Belirtilmemiş</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-phone me-2"></i>Telefon</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(business.Phone))
+                                        {
+                                            <a href="tel:@business.Phone" class="text-decoration-none">
+                                                <i class="fas fa-phone-alt me-1 text-success"></i>@business.Phone
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Belirtilmemiş</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-envelope me-2"></i>E-posta</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(business.Email))
+                                        {
+                                            <a href="mailto:@business.Email" class="text-decoration-none">
+                                                <i class="fas fa-envelope me-1 text-primary"></i>@business.Email
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Belirtilmemiş</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-globe me-2"></i>Website</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(business.Website))
+                                        {
+                                            <a href="@business.Website" target="_blank" class="text-decoration-none">
+                                                <i class="fas fa-external-link-alt me-1 text-info"></i>Website'yi Ziyaret Et
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Belirtilmemiş</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-dollar-sign me-2"></i>Fiyat Aralığı</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td class="text-center">
+                                        @if (!string.IsNullOrEmpty(business.PriceRange))
+                                        {
+                                            <span class="badge bg-success">@business.PriceRange</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Belirtilmemiş</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                            <tr class="table-warning">
+                                <td class="fw-bold"><i class="fas fa-star me-2"></i>Ortalama Puan</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td class="text-center">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <strong class="text-warning fs-4">@business.AverageRating.ToString("F1")</strong>
+                                            <div class="mb-2">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    <i class="@(i <= Math.Round(business.AverageRating) ? "fas" : "far") fa-star text-warning"></i>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-comments me-2"></i>Toplam Yorum</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td class="text-center">
+                                        <span class="badge bg-info fs-6">@business.TotalReviews yorum</span>
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-check-circle me-2"></i>Aktif Yorumlar</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td class="text-center">
+                                        <span class="badge bg-success">@(business.Reviews?.Count(r => r.IsActive && r.IsApproved) ?? 0) aktif</span>
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-clock me-2"></i>Çalışma Saatleri</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(business.WorkingHours))
+                                        {
+                                            <i class="fas fa-clock me-1 text-info"></i>@business.WorkingHours
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Belirtilmemiş</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-star me-2"></i>Öne Çıkan</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td class="text-center">
+                                        @if (business.IsFeatured)
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-star me-1"></i>Evet
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Hayır</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-images me-2"></i>Görsel Sayısı</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">@(business.Images?.Count(img => img.IsActive) ?? 0) görsel</span>
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-ticket-alt me-2"></i>Aktif Kampanyalar</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td class="text-center">
+                                        @{
+                                            var activeCampaigns = business.Campaigns?.Where(c => c.IsActive && c.IsApproved && c.EndDate >= DateTime.Now).Count() ?? 0;
+                                        }
+                                        @if (activeCampaigns > 0)
+                                        {
+                                            <span class="badge bg-danger">@activeCampaigns kampanya</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Yok</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-calendar-alt me-2"></i>Yaklaşan Etkinlikler</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td class="text-center">
+                                        @{
+                                            var upcomingEvents = business.Events?.Where(e => e.IsActive && e.IsApproved && e.StartDate >= DateTime.Now).Count() ?? 0;
+                                        }
+                                        @if (upcomingEvents > 0)
+                                        {
+                                            <span class="badge bg-primary">@upcomingEvents etkinlik</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Yok</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td class="fw-bold"><i class="fas fa-calendar me-2"></i>Oluşturulma Tarihi</td>
+                                @foreach (var business in Model)
+                                {
+                                    <td class="text-center">
+                                        <small class="text-muted">@business.CreatedDate.ToString("dd.MM.yyyy")</small>
+                                    </td>
+                                }
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kart Görünümü (Gizli) -->
+        <div id="cardView" class="row" style="display: none;">
+            @foreach (var business in Model)
+            {
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        @if (!string.IsNullOrEmpty(business.ImageUrl))
+                        {
+                            <img src="@business.ImageUrl" class="card-img-top" alt="@business.Name" style="height: 200px; object-fit: cover;">
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title">@business.Name</h5>
+                            @if (business.Category != null)
+                            {
+                                <span class="badge bg-info mb-2">@business.Category.Name</span>
+                            }
+                            <div class="mb-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="@(i <= Math.Round(business.AverageRating) ? "fas" : "far") fa-star text-warning"></i>
+                                }
+                                <strong>@business.AverageRating.ToString("F1")</strong>
+                                <small class="text-muted">(@business.TotalReviews yorum)</small>
+                            </div>
+                            <p class="card-text text-muted small">
+                                <i class="fas fa-map-marker-alt me-1"></i>@(business.Address ?? "Adres belirtilmemiş")
+                            </p>
+                            <div class="d-flex gap-2">
+                                <a href="@Url.Action("Details", "Businesses", new { id = business.Id })" class="btn btn-sm btn-primary flex-fill">
+                                    <i class="fas fa-eye me-1"></i>Detaylar
+                                </a>
+                                <button class="btn btn-sm btn-outline-danger remove-compare" data-business-id="@business.Id">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    @@media print {
+        .btn, #toggleView, #exportCompare, #printCompare, #shareCompare, #clearCompare {
+            display: none !important;
+        }
+        .card {
+            border: 1px solid #ddd !important;
+        }
+        .table {
+            font-size: 12px;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Grafik oluştur
+            @if (Model.Count > 0)
+            {
+                <text>
+                const ctx = document.getElementById('compareChart');
+                if (ctx) {
+                    const businesses = @Html.Raw(Json.Serialize(Model.Select(b => b.Name)));
+                    const ratings = @Html.Raw(Json.Serialize(Model.Select(b => b.AverageRating)));
+                    const reviews = @Html.Raw(Json.Serialize(Model.Select(b => b.TotalReviews)));
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: businesses,
+                            datasets: [
+                                {
+                                    label: 'Ortalama Puan',
+                                    data: ratings,
+                                    backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                                    borderColor: 'rgba(255, 193, 7, 1)',
+                                    borderWidth: 2,
+                                    yAxisID: 'y'
+                                },
+                                {
+                                    label: 'Toplam Yorum',
+                                    data: reviews,
+                                    backgroundColor: 'rgba(0, 123, 255, 0.8)',
+                                    borderColor: 'rgba(0, 123, 255, 1)',
+                                    borderWidth: 2,
+                                    yAxisID: 'y1'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'İşletme Karşılaştırması'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    title: {
+                                        display: true,
+                                        text: 'Puan (0-5)'
+                                    },
+                                    min: 0,
+                                    max: 5
+                                },
+                                y1: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'right',
+                                    title: {
+                                        display: true,
+                                        text: 'Yorum Sayısı'
+                                    },
+                                    grid: {
+                                        drawOnChartArea: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                </text>
+            }
+
+            // Görünüm değiştir
+            $('#toggleView').on('click', function() {
+                const tableView = $('#tableView');
+                const cardView = $('#cardView');
+                const btn = $(this);
+                
+                if (tableView.is(':visible')) {
+                    tableView.hide();
+                    cardView.show();
+                    btn.html('<i class="fas fa-table me-1"></i>Tablo Görünümü');
+                } else {
+                    tableView.show();
+                    cardView.hide();
+                    btn.html('<i class="fas fa-th-large me-1"></i>Kart Görünümü');
+                }
+            });
+
+            // Dışa aktar
+            $('#exportCompare').on('click', function() {
+                const table = $('table').first();
+                let csv = '';
+                
+                table.find('tr').each(function() {
+                    const row = [];
+                    $(this).find('th, td').each(function() {
+                        let text = $(this).text().trim();
+                        text = text.replace(/"/g, '""');
+                        row.push('"' + text + '"');
+                    });
+                    csv += row.join(',') + '\n';
+                });
+                
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'isletme-karsilastirma-' + new Date().toISOString().split('T')[0] + '.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // Yazdır
+            $('#printCompare').on('click', function() {
+                window.print();
+            });
+
+            // Paylaş
+            $('#shareCompare').on('click', function() {
+                const businessIds = @Html.Raw(Json.Serialize(Model.Select(b => b.Id)));
+                const shareUrl = window.location.origin + '/Compare/Index?ids=' + businessIds.join(',');
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'İşletme Karşılaştırması',
+                        text: '@Model.Count işletme karşılaştırması',
+                        url: shareUrl
+                    }).catch(err => console.log('Paylaşım hatası:', err));
+                } else {
+                    // Fallback: kopyala
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        alert('Link panoya kopyalandı!');
+                    }).catch(() => {
+                        // Eski yöntem
+                        const textarea = document.createElement('textarea');
+                        textarea.value = shareUrl;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        alert('Link panoya kopyalandı!');
+                    });
+                }
+            });
+
+            // Kaldır
+            $('.remove-compare').on('click', function() {
+                const businessId = $(this).data('business-id');
+                const btn = $(this);
+                
+                if (confirm('Bu işletmeyi karşılaştırmadan kaldırmak istediğinize emin misiniz?')) {
+                    $.ajax({
+                        url: '/Compare/Remove',
+                        type: 'POST',
+                        data: { businessId: businessId },
+                        headers: {
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Temizle
+            $('#clearCompare').on('click', function() {
+                if (confirm('Karşılaştırma listesini temizlemek istediğinize emin misiniz?')) {
+                    $.ajax({
+                        url: '/Compare/Clear',
+                        type: 'POST',
+                        headers: {
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

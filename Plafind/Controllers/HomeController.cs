@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Plafind.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Plafind.Models;
 using Plafind.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace Plafind.Controllers
 {
@@ -12,11 +13,13 @@ namespace Plafind.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
 
-        public HomeController(ApplicationDbContext context, IEmailService emailService)
+        public HomeController(ApplicationDbContext context, IEmailService emailService, IConfiguration configuration)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         public async Task<IActionResult> Index()
@@ -24,6 +27,18 @@ namespace Plafind.Controllers
             try
             {
                 ViewData["Title"] = "Alanya İşletme Rehberi - Ana Sayfa";
+
+                var siteUrl = _configuration["SiteSettings:SiteUrl"] ?? "https://plafind.com";
+                var siteName = _configuration["SiteSettings:SiteName"] ?? "Plafind";
+                
+                // Open Graph bilgilerini set et
+                ViewData["SiteUrl"] = siteUrl;
+                ViewData["SiteName"] = siteName;
+                ViewData["OgTitle"] = "Plafind - Alanya İşletme Rehberi";
+                ViewData["OgDescription"] = "Alanya'nın en kapsamlı işletme rehberi. Restoranlar, oteller, mağazalar ve daha fazlasını keşfedin. Deneyimlerinizi paylaşın ve favori yerlerinizi kaydedin.";
+                ViewData["OgImage"] = $"{siteUrl}/images/Logo.png";
+                ViewData["OgUrl"] = $"{siteUrl}";
+                ViewData["OgType"] = "website";
 
                 var featuredBusinesses = await _context.Businesses
                     .Where(b => b.IsActive && b.IsApproved && b.IsFeatured)
@@ -172,6 +187,22 @@ namespace Plafind.Controllers
 
             try
             {
+                // Veritabanına kaydet
+                var contactMessage = new ContactMessage
+                {
+                    Name = model.Name,
+                    Email = model.Email,
+                    Phone = model.Phone,
+                    Subject = model.Subject,
+                    Message = model.Message,
+                    CreatedDate = DateTime.Now,
+                    IsRead = false
+                };
+
+                _context.ContactMessages.Add(contactMessage);
+                await _context.SaveChangesAsync();
+
+                // E-posta gönder
                 var emailSent = await _emailService.SendContactEmailAsync(
                     model.Name,
                     model.Email,
@@ -187,7 +218,8 @@ namespace Plafind.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "E-posta gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+                    TempData["SuccessMessage"] = "Mesajınız kaydedildi ancak e-posta gönderilemedi. En kısa sürede size dönüş yapacağız.";
+                    return RedirectToAction(nameof(Contact));
                 }
             }
             catch (Exception ex)

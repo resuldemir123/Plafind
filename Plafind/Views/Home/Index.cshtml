@@ -63,6 +63,12 @@
                                     <i class="fas fa-cog"></i> Admin Panel
                                 </a>
                             }
+                            else if (User.IsInRole("BusinessOwner"))
+                            {
+                                <a href="@Url.Action("Index", "BusinessOwner")" class="btn btn-primary btn-lg mb-2">
+                                    <i class="fas fa-store"></i> İşletme Paneli
+                                </a>
+                            }
                             else if (User.IsInRole("User"))
                             {
                                 <a href="@Url.Action("Index", "User")" class="btn btn-primary btn-lg mb-2">

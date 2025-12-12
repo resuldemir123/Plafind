@@ -38,7 +38,7 @@ namespace Plafind.Controllers
         public async Task<IActionResult> Create(int businessId)
         {
             // Giriş yapmamış kullanıcıları login sayfasına yönlendir
-            if (!User.Identity?.IsAuthenticated == true)
+            if (User.Identity?.IsAuthenticated != true)
             {
                 return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Create", "Reservations", new { businessId }) });
             }
@@ -64,7 +64,7 @@ namespace Plafind.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Reservation reservation)
         {
-            if (!User.Identity?.IsAuthenticated == true)
+            if (User.Identity?.IsAuthenticated != true)
             {
                 return RedirectToAction("Login", "Account");
             }

@@ -1,4 +1,5 @@
 @model IEnumerable<Plafind.Models.Business>
+@Html.AntiForgeryToken()
 @{
     var businesses = Model?.ToList() ?? new List<Plafind.Models.Business>();
     var featuredBusinesses = businesses
@@ -166,7 +167,10 @@
                             <div class="card-top">
                                 <div>
                                     <h3>@business.Name</h3>
-                                    <p class="muted">@business.Category?.Name ?? "Kategori yok"</p>
+                                    @if (business.Category != null)
+                                    {
+                                        <p class="muted">@business.Category.Name</p>
+                                    }
                                 </div>
                                 <div class="rating">
                                     <strong>@business.AverageRating.ToString("F1")</strong>
@@ -185,6 +189,11 @@
                                     </a>
                                 }
                                 <a asp-controller="Businesses" asp-action="Details" asp-route-id="@business.Id" class="btn btn-warning btn-sm rounded-pill">Detay</a>
+                                <button class="btn btn-sm btn-outline-primary rounded-pill compare-btn-search" 
+                                        data-business-id="@business.Id" 
+                                        title="Karşılaştırmaya ekle">
+                                    <i class="fas fa-balance-scale"></i>
+                                </button>
                             </div>
                         </div>
                     </article>
@@ -527,5 +536,85 @@
             window.location.href = url.toString();
         });
     });
+
+    // Karşılaştırma butonları
+    $(document).ready(function() {
+        $('.compare-btn-search').on('click', function() {
+            const businessId = $(this).data('business-id');
+            const btn = $(this);
+            
+            $.ajax({
+                url: '/Compare/Add',
+                type: 'POST',
+                data: { businessId: businessId },
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        btn.addClass('active');
+                        btn.html('<i class="fas fa-check"></i>');
+                        btn.removeClass('btn-outline-primary').addClass('btn-success');
+                        updateCompareCount();
+                        showToast(response.message, 'success');
+                    } else {
+                        showToast(response.message, 'warning');
+                    }
+                },
+                error: function() {
+                    showToast('Bir hata oluştu.', 'error');
+                }
+            });
+        });
+
+        // Karşılaştırma durumunu kontrol et
+        $('.compare-btn-search').each(function() {
+            const businessId = $(this).data('business-id');
+            const btn = $(this);
+            $.get('/Compare/Check?businessId=' + businessId, function(response) {
+                if (response.isInCompare) {
+                    btn.addClass('active');
+                    btn.html('<i class="fas fa-check"></i>');
+                    btn.removeClass('btn-outline-primary').addClass('btn-success');
+                }
+            });
+        });
+
+        // Karşılaştırma sayısını güncelle
+        function updateCompareCount() {
+            $.get('/Compare/GetCount', function(response) {
+                $('#compareCount').text(response.count);
+            });
+        }
+
+        updateCompareCount();
+    });
+
+    function showToast(message, type) {
+        const toast = $('<div class="toast-notification toast-' + type + '">' + message + '</div>');
+        $('body').append(toast);
+        setTimeout(() => toast.fadeOut(() => toast.remove()), 3000);
+    }
 </script>
+
+<style>
+    .toast-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        color: white;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        animation: slideIn 0.3s ease;
+    }
+    .toast-success { background-color: #28a745; }
+    .toast-warning { background-color: #ffc107; color: #000; }
+    .toast-error { background-color: #dc3545; }
+    @@keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+</style>
 

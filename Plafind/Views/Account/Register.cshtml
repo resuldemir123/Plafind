@@ -199,33 +199,34 @@
                 <div class="form-group-custom">
                     <label class="form-label-custom">
                         <i class="fas fa-user-tag me-2"></i>
-                        Kullanıcı Tipi
+                        Kullanıcı Tipi <span class="text-danger">*</span>
                     </label>
                     <div class="user-type-selection">
                         <div class="user-type-option">
-                            <input type="radio" asp-for="UserType" value="User" id="userTypeUser" checked>
+                            <input type="radio" asp-for="UserType" value="User" id="userTypeUser" checked required>
                             <label for="userTypeUser" class="user-type-label">
                                 <i class="fas fa-user"></i>
                                 <div>
                                     <strong>Kullanıcı</strong>
-                                    <small>İşletmeleri görüntüle, rezervasyon yap, yorum yap</small>
+                                    <small>İşletmeleri görüntüle, rezervasyon yap, yorum yap ve favorilere ekle</small>
                                 </div>
                             </label>
                         </div>
                         <div class="user-type-option">
-                            <input type="radio" asp-for="UserType" value="BusinessOwner" id="userTypeBusinessOwner">
+                            <input type="radio" asp-for="UserType" value="BusinessOwner" id="userTypeBusinessOwner" required>
                             <label for="userTypeBusinessOwner" class="user-type-label">
                                 <i class="fas fa-store"></i>
                                 <div>
                                     <strong>İşletme Sahibi</strong>
-                                    <small>İşletmenizi yönetin, rezervasyonları görüntüleyin</small>
+                                    <small>İşletmenizi ekleyin, yönetin ve rezervasyonları görüntüleyin</small>
                                 </div>
                             </label>
                         </div>
                     </div>
+                    <span asp-validation-for="UserType" class="error-message"></span>
                     <small class="form-help-text" style="color: var(--muted); font-size: 0.875rem; margin-top: 0.5rem; display: block;">
                         <i class="fas fa-info-circle me-1"></i>
-                        Kayıt olduktan sonra işletme ekleyebilir ve yönetebilirsiniz
+                        Lütfen hesap tipinizi seçin. İşletme sahibi olarak kayıt olursanız, kayıt sonrası işletmenizi ekleyebilirsiniz.
                     </small>
                 </div>
 

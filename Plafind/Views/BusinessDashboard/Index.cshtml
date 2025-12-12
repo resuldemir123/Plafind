@@ -1,0 +1,415 @@
+@model Plafind.ViewModels.BusinessDashboardViewModel
+@{
+    ViewData["Title"] = "İşletme Dashboard";
+    var userBusinesses = ViewBag.UserBusinesses as List<Plafind.Models.Business> ?? new List<Plafind.Models.Business>();
+    var currentBusinessId = ViewBag.CurrentBusinessId as int?;
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-chart-line me-2"></i>İşletme Dashboard
+                </h2>
+                @if (userBusinesses.Count > 1)
+                {
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="businessDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-building me-2"></i>
+                            @(Model.Business?.Name ?? "İşletme Seçin")
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="businessDropdown">
+                            @foreach (var business in userBusinesses)
+                            {
+                                <li>
+                                    <a class="dropdown-item @(business.Id == currentBusinessId ? "active" : "")" 
+                                       href="@Url.Action("Index", new { businessId = business.Id })">
+                                        @business.Name
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Business != null)
+    {
+        <!-- İstatistik Kartları -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-2">Toplam Rezervasyon</h6>
+                                <h3 class="mb-0">@Model.TotalReservations</h3>
+                            </div>
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-calendar-check fa-2x text-primary"></i>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <span class="text-success">@Model.ConfirmedReservations Onaylı</span> | 
+                            <span class="text-warning">@Model.PendingReservations Beklemede</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-2">Ortalama Puan</h6>
+                                <h3 class="mb-0">@Model.AverageRating.ToString("F1")</h3>
+                            </div>
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-star fa-2x text-warning"></i>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            @Model.TotalReviews Yorum | 
+                            <span class="text-success">@Model.PositiveReviews Pozitif</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-2">Toplam Müşteri</h6>
+                                <h3 class="mb-0">@Model.TotalCustomers</h3>
+                            </div>
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-users fa-2x text-success"></i>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <span class="text-info">@Model.NewCustomersThisMonth Yeni</span> | 
+                            <span class="text-primary">@Model.ReturningCustomers Dönen</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-2">Bu Ay Gelir</h6>
+                                <h3 class="mb-0">@Model.RevenueThisMonth.ToString("C")</h3>
+                            </div>
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-lira-sign fa-2x text-info"></i>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            Toplam: @Model.TotalRevenue.ToString("C") | 
+                            @if (Model.RevenueLastMonth > 0)
+                            {
+                                var change = ((Model.RevenueThisMonth - Model.RevenueLastMonth) / Model.RevenueLastMonth * 100);
+                                <span class="@(change >= 0 ? "text-success" : "text-danger")">
+                                    @(change >= 0 ? "+" : "")@change.ToString("F1")%
+                                </span>
+                            }
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grafikler -->
+        <div class="row mb-4">
+            <div class="col-md-8 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-chart-area me-2"></i>Aylık Gelir Trendi</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="monthlyRevenueChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-star me-2"></i>Puan Dağılımı</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="ratingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-calendar-day me-2"></i>Son 30 Gün Rezervasyon</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="dailyReservationChart" height="80"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.TotalBranches > 0)
+            {
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0"><i class="fas fa-code-branch me-2"></i>Şube Performansı</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="branchChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Son Aktiviteler -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Son Rezervasyonlar</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.RecentReservations.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var reservation in Model.RecentReservations.Take(5))
+                                {
+                                    <div class="list-group-item border-0 px-0">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">@reservation.NumberOfPeople kişi</h6>
+                                                <small class="text-muted">
+                                                    @reservation.RequestedDate.ToString("dd MMM yyyy") - 
+                                                    @reservation.RequestedTime.ToString(@"hh\:mm")
+                                                </small>
+                                            </div>
+                                            <span class="badge bg-@(reservation.Status == "Onaylandı" ? "success" : reservation.Status == "Beklemede" ? "warning" : "secondary")">
+                                                @reservation.Status
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center">Henüz rezervasyon yok</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Son Yorumlar</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.RecentReviews.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var review in Model.RecentReviews.Take(5))
+                                {
+                                    <div class="list-group-item border-0 px-0">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <div class="mb-1">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        <i class="fas fa-star @(i <= review.Rating ? "text-warning" : "text-muted")"></i>
+                                                    }
+                                                </div>
+                                                <p class="mb-1 small">@(review.Comment?.Length > 50 ? review.Comment.Substring(0, 50) + "..." : review.Comment)</p>
+                                                <small class="text-muted">@review.CreatedDate.ToString("dd MMM yyyy")</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center">Henüz yorum yok</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>Henüz işletme bulunmamaktadır.
+        </div>
+    }
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Aylık Gelir Grafiği
+    const monthlyRevenueCtx = document.getElementById('monthlyRevenueChart');
+    if (monthlyRevenueCtx) {
+        const monthlyData = @Html.Raw(Json.Serialize(Model.MonthlyRevenues));
+        new Chart(monthlyRevenueCtx, {
+            type: 'line',
+            data: {
+                labels: monthlyData.map(d => d.month),
+                datasets: [{
+                    label: 'Gelir (₺)',
+                    data: monthlyData.map(d => d.revenue),
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('tr-TR') + ' ₺';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Puan Dağılımı Grafiği
+    const ratingCtx = document.getElementById('ratingChart');
+    if (ratingCtx) {
+        const ratingData = @Html.Raw(Json.Serialize(Model.RatingDistributions));
+        new Chart(ratingCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ratingData.map(d => d.rating + ' Yıldız'),
+                datasets: [{
+                    data: ratingData.map(d => d.count),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(255, 159, 64, 0.8)',
+                        'rgba(255, 205, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(54, 162, 235, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Günlük Rezervasyon Grafiği
+    const dailyReservationCtx = document.getElementById('dailyReservationChart');
+    if (dailyReservationCtx) {
+        const dailyData = @Html.Raw(Json.Serialize(Model.DailyReservations));
+        new Chart(dailyReservationCtx, {
+            type: 'bar',
+            data: {
+                labels: dailyData.map(d => d.date),
+                datasets: [{
+                    label: 'Rezervasyon Sayısı',
+                    data: dailyData.map(d => d.count),
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    @if (Model.TotalBranches > 0)
+    {
+        <text>
+        // Şube Performans Grafiği
+        const branchCtx = document.getElementById('branchChart');
+        if (branchCtx) {
+            const branchData = @Html.Raw(Json.Serialize(Model.BranchStatistics));
+            new Chart(branchCtx, {
+                type: 'bar',
+                data: {
+                    labels: branchData.map(d => d.branchName),
+                    datasets: [{
+                        label: 'Gelir (₺)',
+                        data: branchData.map(d => d.revenue),
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('tr-TR') + ' ₺';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        </text>
+    }
+</script>

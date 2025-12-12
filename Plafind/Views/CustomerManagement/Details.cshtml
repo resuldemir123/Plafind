@@ -1,0 +1,273 @@
+@model Plafind.ViewModels.CustomerDetailViewModel
+@{
+    ViewData["Title"] = "Müşteri Detayı";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-user me-2"></i>Müşteri Detayı
+                </h2>
+                <a href="@Url.Action("Index", new { businessId = Model.BusinessId })" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Geri Dön
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Customer != null && Model.CustomerInfo != null)
+    {
+        <!-- Müşteri Bilgileri -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        @if (!string.IsNullOrEmpty(Model.Customer.AvatarUrl))
+                        {
+                            <img src="@Model.Customer.AvatarUrl" class="rounded-circle mb-3" 
+                                 style="width: 120px; height: 120px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div class="bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                                 style="width: 120px; height: 120px; font-size: 3rem;">
+                                @Model.CustomerInfo.FullName?.Substring(0, 1).ToUpper()
+                            </div>
+                        }
+                        <h4>@Model.CustomerInfo.FullName</h4>
+                        <p class="text-muted mb-0">@Model.Customer.Email</p>
+                        @if (!string.IsNullOrEmpty(Model.Customer.PhoneNumber))
+                        {
+                            <p class="text-muted"><i class="fas fa-phone me-1"></i>@Model.Customer.PhoneNumber</p>
+                        }
+                        <span class="badge bg-@(Model.CustomerInfo.CustomerSegment == "VIP" ? "danger" : Model.CustomerInfo.CustomerSegment == "Regular" ? "primary" : Model.CustomerInfo.CustomerSegment == "New" ? "success" : "warning") mb-3">
+                            @Model.CustomerInfo.CustomerSegment
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted mb-2">Toplam Ziyaret</h6>
+                                <h3 class="mb-0">@Model.TotalVisits</h3>
+                                <small class="text-muted">
+                                    İlk: @(Model.CustomerInfo.FirstVisitDate?.ToString("dd MMM yyyy") ?? "-")<br />
+                                    Son: @(Model.CustomerInfo.LastVisitDate?.ToString("dd MMM yyyy") ?? "-")
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted mb-2">Yaşam Boyu Değer</h6>
+                                <h3 class="mb-0">@Model.LifetimeValue.ToString("C")</h3>
+                                <small class="text-muted">
+                                    Ortalama: @Model.AverageSpending.ToString("C")
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted mb-2">Tercih Edilen Saat</h6>
+                                <h3 class="mb-0">@Model.PreferredTime</h3>
+                                <small class="text-muted">
+                                    Kişi Sayısı: @Model.PreferredPartySize
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted mb-2">Ortalama Puan</h6>
+                                <h3 class="mb-0">@Model.CustomerInfo.AverageRating.ToString("F1")</h3>
+                                <small class="text-muted">
+                                    @Model.CustomerInfo.TotalReviews Yorum
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#reservations" type="button">
+                    Rezervasyonlar (@Model.Reservations.Count)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#reviews" type="button">
+                    Yorumlar (@Model.Reviews.Count)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#interactions" type="button">
+                    İletişim Geçmişi (@Model.Interactions.Count)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#messages" type="button">
+                    Mesajlar (@Model.Messages.Count)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Rezervasyonlar -->
+            <div class="tab-pane fade show active" id="reservations" role="tabpanel">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        @if (Model.Reservations.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Tarih</th>
+                                            <th>Saat</th>
+                                            <th>Kişi</th>
+                                            <th>Şube</th>
+                                            <th>Durum</th>
+                                            <th>Tutar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var reservation in Model.Reservations)
+                                        {
+                                            <tr>
+                                                <td>@reservation.RequestedDate.ToString("dd MMM yyyy")</td>
+                                                <td>@reservation.RequestedTime.ToString(@"hh\:mm")</td>
+                                                <td>@reservation.NumberOfPeople</td>
+                                                <td>@(reservation.Branch?.Name ?? "-")</td>
+                                                <td>
+                                                    <span class="badge bg-@(reservation.Status == "Onaylandı" ? "success" : reservation.Status == "Beklemede" ? "warning" : "secondary")">
+                                                        @reservation.Status
+                                                    </span>
+                                                </td>
+                                                <td>@(reservation.Amount?.ToString("C") ?? "-")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center">Henüz rezervasyon yok</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yorumlar -->
+            <div class="tab-pane fade" id="reviews" role="tabpanel">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        @if (Model.Reviews.Any())
+                        {
+                            @foreach (var review in Model.Reviews)
+                            {
+                                <div class="border-bottom pb-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <i class="fas fa-star @(i <= review.Rating ? "text-warning" : "text-muted")"></i>
+                                            }
+                                        </div>
+                                        <small class="text-muted">@review.CreatedDate.ToString("dd MMM yyyy")</small>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(review.Comment))
+                                    {
+                                        <p>@review.Comment</p>
+                                    }
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center">Henüz yorum yok</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- İletişim Geçmişi -->
+            <div class="tab-pane fade" id="interactions" role="tabpanel">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        @if (Model.Interactions.Any())
+                        {
+                            @foreach (var interaction in Model.Interactions.OrderByDescending(i => i.InteractionDate))
+                            {
+                                <div class="border-bottom pb-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <span class="badge bg-@(interaction.InteractionType == "Reservation" ? "primary" : interaction.InteractionType == "Review" ? "warning" : "info") me-2">
+                                                @interaction.InteractionType
+                                            </span>
+                                            <strong>@interaction.Subject</strong>
+                                        </div>
+                                        <small class="text-muted">@interaction.InteractionDate.ToString("dd MMM yyyy HH:mm")</small>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(interaction.Notes))
+                                    {
+                                        <p class="mb-0">@interaction.Notes</p>
+                                    }
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center">Henüz iletişim kaydı yok</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mesajlar -->
+            <div class="tab-pane fade" id="messages" role="tabpanel">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        @if (Model.Messages.Any())
+                        {
+                            @foreach (var message in Model.Messages.OrderByDescending(m => m.CreatedDate))
+                            {
+                                <div class="border-bottom pb-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <strong>@message.Subject</strong>
+                                            <br />
+                                            <small class="text-muted">
+                                                @(message.Sender?.FullName ?? message.Sender?.UserName ?? "Gönderen") → 
+                                                @(message.Receiver?.FullName ?? message.Receiver?.UserName ?? "Alıcı")
+                                            </small>
+                                        </div>
+                                        <small class="text-muted">@message.CreatedDate.ToString("dd MMM yyyy HH:mm")</small>
+                                    </div>
+                                    <p class="mb-0">@message.Content</p>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center">Henüz mesaj yok</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,4 +1,4 @@
-﻿@using System.Globalization
+@using System.Globalization
 @model Plafind.ViewModels.BusinessDetailsViewModel
 @{
     var business = Model.Business;
@@ -48,9 +48,12 @@
                     </div>
 
                     <div class="hero-tags">
-                        <span class="tag tag-category">
-                            <i class="fas fa-tag me-1"></i>@(business.Category?.Name ?? "Kategori Yok")
-                        </span>
+                        @if (business.Category != null)
+                        {
+                            <span class="tag tag-category">
+                                <i class="fas fa-tag me-1"></i>@business.Category.Name
+                            </span>
+                        }
                         @if (!string.IsNullOrEmpty(business.PriceRange))
                         {
                             <span class="tag tag-price">
@@ -92,6 +95,11 @@
                                 </button>
                             }
                         }
+                        <button class="hero-btn hero-btn--compare compare-btn" 
+                                data-business-id="@business.Id" 
+                                title="Karşılaştırmaya ekle">
+                            <i class="fas fa-balance-scale me-2"></i>Karşılaştır
+                        </button>
                         else
                         {
                             <a asp-controller="Reservations" asp-action="Create" asp-route-businessId="@business.Id" class="hero-btn hero-btn--reservation">
@@ -155,11 +163,14 @@
                 }
 
                 <div class="info-grid mb-4">
-                    <div class="info-card">
-                        <span class="info-icon text-primary"><i class="fas fa-tags"></i></span>
-                        <h6>Kategori</h6>
-                        <p>@(business.Category?.Name ?? "Belirtilmemiş")</p>
-                    </div>
+                    @if (business.Category != null)
+                    {
+                        <div class="info-card">
+                            <span class="info-icon text-primary"><i class="fas fa-tags"></i></span>
+                            <h6>Kategori</h6>
+                            <p>@business.Category.Name</p>
+                        </div>
+                    }
                     <div class="info-card">
                         <span class="info-icon text-success"><i class="fas fa-dollar-sign"></i></span>
                         <h6>Fiyat Aralığı</h6>
@@ -192,13 +203,16 @@
                     <div class="section-header">
                         <i class="fas fa-comments me-2 text-warning"></i>
                         <h3 class="section-title">Yorumlar</h3>
-                        <span class="badge bg-warning text-dark ms-auto">@business.TotalReviews</span>
+                        @{
+                            var activeReviewCount = business.Reviews?.Count(r => r.IsActive && r.IsApproved) ?? 0;
+                        }
+                        <span class="badge bg-warning text-dark ms-auto">@activeReviewCount</span>
                     </div>
 
-                    @if (business.Reviews != null && business.Reviews.Any(r => r.IsActive))
+                    @if (business.Reviews != null && business.Reviews.Any(r => r.IsActive && r.IsApproved))
                     {
                         <div class="reviews-list">
-                            @foreach (var review in business.Reviews.Where(r => r.IsActive).OrderByDescending(r => r.CreatedDate).Take(5))
+                            @foreach (var review in business.Reviews.Where(r => r.IsActive && r.IsApproved).OrderByDescending(r => r.CreatedDate).Take(5))
                             {
                                 <div class="review-card">
                                     <div class="review-header">
@@ -1214,6 +1228,55 @@
                         }
                     }
                 }
+            });
+
+            // Karşılaştırma butonu
+            $(document).ready(function() {
+                $('.compare-btn').on('click', function() {
+                    const businessId = $(this).data('business-id');
+                    const btn = $(this);
+                    
+                    $.ajax({
+                        url: '/Compare/Add',
+                        type: 'POST',
+                        data: { businessId: businessId },
+                        headers: {
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                btn.addClass('active');
+                                btn.html('<i class="fas fa-check me-2"></i>Eklendi');
+                                updateCompareCount();
+                                alert(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                        },
+                        error: function() {
+                            alert('Bir hata oluştu.');
+                        }
+                    });
+                });
+
+                // Karşılaştırma durumunu kontrol et
+                const businessId = $('.compare-btn').data('business-id');
+                if (businessId) {
+                    $.get('/Compare/Check?businessId=' + businessId, function(response) {
+                        if (response.isInCompare) {
+                            $('.compare-btn').addClass('active').html('<i class="fas fa-check me-2"></i>Eklendi');
+                        }
+                    });
+                }
+
+                // Karşılaştırma sayısını güncelle
+                function updateCompareCount() {
+                    $.get('/Compare/GetCount', function(response) {
+                        $('#compareCount').text(response.count);
+                    });
+                }
+
+                updateCompareCount();
             });
         </script>
     }

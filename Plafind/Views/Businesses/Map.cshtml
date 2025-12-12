@@ -5,179 +5,654 @@
 }
 
 <section class="map-shell">
+    <!-- Harita Paneli -->
     <div class="map-panel">
+        <div class="map-header">
+            <h2 class="map-title">
+                <i class="fas fa-map-marked-alt me-2"></i>
+                Alanya İşletme Haritası
+            </h2>
+            <p class="map-subtitle">İşletmeleri haritada keşfedin ve konumlarını görüntüleyin</p>
+        </div>
         <div id="businessMap" class="map-canvas" aria-label="İşletme haritası"></div>
         <div id="mapStatus" class="map-status d-none">
+            <div class="map-status-content">
             <i class="fas fa-map-marker-alt"></i>
-            <p>Henüz konumu belirtilmiş bir işletme bulunamadı.</p>
+                <h4>Harita Hazırlanıyor</h4>
+                <p>İşletme konumları yükleniyor...</p>
+            </div>
         </div>
     </div>
+    
+    <!-- AI Asistan Paneli -->
     <div class="ai-panel">
         <div class="ai-card">
-                    <div class="ai-header d-flex align-items-center justify-content-between">
-                        <div>
-                            <p class="eyebrow mb-1">Gemini Destekli Asistan</p>
-                            <h3 class="mb-0">Konuma göre öneri al</h3>
-                        </div>
-                        <button type="button" id="aiLocationBtn" class="btn btn-outline-warning btn-sm rounded-pill">
-                            <i class="fas fa-location-arrow me-1"></i> Konumumu Kullan
-                        </button>
+            <div class="ai-header">
+                <div class="ai-header-content">
+                    <div class="ai-icon-wrapper">
+                        <i class="fas fa-robot"></i>
                     </div>
-                    <div id="aiLocationInfo" class="ai-location-info d-none">
-                        <i class="fas fa-check-circle text-success me-1"></i> Konum bilgisi eklendi.
+                    <div>
+                        <h3 class="ai-title">AI Asistan</h3>
+                        <p class="ai-subtitle">Konuma göre öneri alın</p>
                     </div>
+                </div>
+                <button type="button" id="aiLocationBtn" class="btn-location">
+                    <i class="fas fa-location-arrow"></i>
+                    <span>Konumum</span>
+                </button>
+            </div>
+            
+            <div id="aiLocationInfo" class="ai-location-info d-none">
+                <i class="fas fa-check-circle"></i>
+                <span>Konum bilgisi eklendi</span>
+            </div>
+            
                     <div id="aiMessages" class="ai-messages">
                         <div class="ai-message assistant">
-                            <p>Merhaba! Bulunduğun bölgeye göre restoran, otel veya aktivite önerileri sunabilirim. Bana ne aradığını söylemen yeterli.</p>
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
                         </div>
+                    <div class="message-content">
+                        <p>Merhaba! Bulunduğunuz bölgeye göre restoran, otel veya aktivite önerileri sunabilirim. Ne aradığınızı yazabilirsiniz.</p>
                     </div>
+                </div>
+            </div>
+            
                     <form id="aiForm" class="ai-input">
-                        <textarea id="aiPrompt" class="form-control" rows="2" placeholder="Örn: 'Konaklı'da çocukla gidilebilecek restoran önerir misin?"></textarea>
-                        <div class="ai-actions">
-                            <small id="aiStatus" class="text-muted">Gemini ile sohbet ediyorsun.</small>
-                            <button type="submit" id="aiSendBtn" class="btn btn-warning rounded-pill">
-                                <i class="fas fa-paper-plane me-1"></i> Gönder
+                <div class="input-wrapper">
+                    <textarea id="aiPrompt" class="form-control" rows="3" placeholder="Örn: Konaklı'da çocukla gidilebilecek restoran önerir misiniz?"></textarea>
+                    <button type="submit" id="aiSendBtn" class="btn-send">
+                        <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
+                <div class="ai-actions">
+                    <small id="aiStatus" class="ai-status">Hazır</small>
+                </div>
                     </form>
         </div>
     </div>
 </section>
 
 <style>
+    /* Ana Container */
     .map-shell {
-        min-height: calc(100vh - 140px);
-        background: radial-gradient(circle at top, rgba(255,193,7,0.08), transparent 50%), #040b19;
-        color: #f8f9fa;
+        min-height: calc(100vh - 80px);
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         display: grid;
-        grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
-        gap: 1.25rem;
-        padding: 1.5rem;
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+        gap: 1.5rem;
+        padding: 2rem;
+        margin-top: 80px;
     }
 
-    .map-panel,
-    .ai-panel {
-        position: relative;
-        border-radius: 1.5rem;
-        background: rgba(8,12,25,.7);
-        border: 1px solid rgba(255,255,255,.08);
-        box-shadow: 0 20px 50px rgba(4,6,15,.6);
-    }
-
+    /* Harita Paneli */
     .map-panel {
+        position: relative;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 600px;
+    }
+
+    .map-header {
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .map-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        color: white;
+        display: flex;
+        align-items: center;
+    }
+
+    .map-title i {
+        font-size: 1.75rem;
+        margin-right: 0.75rem;
+    }
+
+    .map-subtitle {
+        font-size: 0.9375rem;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 400;
     }
 
     .map-canvas {
+        flex: 1;
         width: 100%;
-        height: 100%;
-        min-height: 520px;
-        border-radius: inherit;
-    }
-
-    .ai-panel {
-        display: flex;
+        min-height: 500px;
+        position: relative;
     }
 
     .map-status {
         position: absolute;
         inset: 0;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 1rem;
-        background: rgba(5,10,20,.8);
-        color: rgba(255,255,255,.8);
-        text-align: center;
+        background: rgba(255, 255, 255, 0.95);
+        z-index: 1000;
     }
 
-    .map-status i {
-        font-size: 2.5rem;
-        color: #ffc107;
+    .map-status-content {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .map-status-content i {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .map-status-content h4 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .map-status-content p {
+        font-size: 0.9375rem;
+        color: #718096;
+        margin: 0;
+    }
+
+    /* AI Panel */
+    .ai-panel {
+        display: flex;
+        flex-direction: column;
     }
 
     .ai-card {
-        background: rgba(13,18,32,.95);
-        border-radius: 1.5rem;
-        border: 1px solid rgba(255,255,255,.08);
-        padding: 1.25rem;
-        box-shadow: 0 20px 45px rgba(5,10,20,.5);
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 0;
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        height: 100%;
+        overflow: hidden;
     }
 
-    .ai-messages {
-        background: rgba(5,10,20,.6);
-        border-radius: 1rem;
-        padding: 1rem;
-        max-height: 260px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: .75rem;
-    }
-
-    .ai-message {
-        padding: .85rem 1rem;
-        border-radius: 1rem;
-        font-size: .95rem;
-        line-height: 1.6;
-    }
-
-    .ai-message.assistant {
-        background: rgba(255,193,7,.1);
-        border: 1px solid rgba(255,193,7,.3);
-        color: #fefce8;
-    }
-
-    .ai-message.user {
-        background: rgba(96,165,250,.12);
-        border: 1px solid rgba(96,165,250,.35);
-        color: #dbeafe;
-        align-self: flex-end;
-    }
-
-    .ai-input textarea {
-        background: rgba(5,10,20,.6);
-        border: 1px solid rgba(255,255,255,.1);
-        color: #f8fafc;
-        border-radius: 1rem;
-    }
-
-    .ai-input textarea:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(255,193,7,.3);
-    }
-
-    .ai-actions {
-        margin-top: .5rem;
+    .ai-header {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
     }
 
+    .ai-header-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .ai-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .ai-icon-wrapper i {
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .ai-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+        color: white;
+    }
+
+    .ai-subtitle {
+        font-size: 0.875rem;
+        margin: 0.25rem 0 0 0;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 400;
+    }
+
+    .btn-location {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 0.625rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+    }
+
+    .btn-location:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-1px);
+    }
+
     .ai-location-info {
-        font-size: .9rem;
-        color: #86efac;
+        padding: 0.75rem 1.5rem;
+        background: #f0fdf4;
+        border-left: 4px solid #22c55e;
+        color: #166534;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 1.5rem;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .ai-location-info i {
+        color: #22c55e;
+    }
+
+    .ai-messages {
+        flex: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        background: #f8f9fa;
+        min-height: 300px;
+        max-height: 400px;
+    }
+
+    .ai-message {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .ai-message.assistant {
+        align-self: flex-start;
+    }
+
+    .ai-message.user {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .ai-message.assistant .message-avatar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .ai-message.user .message-avatar {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .message-content {
+        flex: 1;
+        padding: 0.875rem 1rem;
+        border-radius: 12px;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        max-width: 85%;
+    }
+
+    .ai-message.assistant .message-content {
+        background: white;
+        color: #2d3748;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .ai-message.user .message-content {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .message-content p {
+        margin: 0;
+    }
+
+    /* Input Alanı */
+    .ai-input {
+        padding: 1.5rem;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-end;
+    }
+
+    .ai-input textarea {
+        flex: 1;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.9375rem;
+        color: #2d3748;
+        background: #f8f9fa;
+        resize: none;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .ai-input textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .ai-input textarea::placeholder {
+        color: #a0aec0;
+    }
+
+    .btn-send {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .btn-send:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-send:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .ai-actions {
+        margin-top: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .ai-status {
+        font-size: 0.8125rem;
+        color: #718096;
+        font-style: italic;
+    }
+
+    /* Responsive */
+    @@media (max-width: 1200px) {
+        .map-shell {
+            grid-template-columns: 1.5fr 1fr;
+            gap: 1rem;
+            padding: 1.5rem;
+        }
     }
 
     @@media (max-width: 992px) {
         .map-shell {
             grid-template-columns: 1fr;
+            gap: 1.5rem;
         }
 
         .map-panel {
-            min-height: 420px;
+            min-height: 500px;
+        }
+
+        .ai-card {
+            min-height: 500px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .map-shell {
+            padding: 1rem;
+            margin-top: 70px;
+        }
+
+        .map-header {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .map-title {
+            font-size: 1.25rem;
+        }
+
+        .map-subtitle {
+            font-size: 0.875rem;
+        }
+
+        .ai-header {
+            padding: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .ai-title {
+            font-size: 1.125rem;
+        }
+
+        .btn-location span {
+            display: none;
+        }
+
+        .ai-messages {
+            padding: 1rem;
+            min-height: 250px;
+            max-height: 300px;
+        }
+
+        .ai-input {
+            padding: 1rem;
         }
     }
 
     @@media (max-width: 576px) {
         .map-shell {
+            padding: 0.75rem;
+        }
+
+        .map-header {
             padding: 1rem;
         }
+
+        .map-title {
+            font-size: 1.125rem;
+        }
+
+        .map-title i {
+            font-size: 1.5rem;
+        }
+
+        .ai-header {
+            padding: 1rem;
+        }
+
+        .ai-icon-wrapper {
+            width: 40px;
+            height: 40px;
+        }
+
+        .message-content {
+            max-width: 90%;
+            font-size: 0.875rem;
+        }
+    }
+
+    /* Scrollbar Styling */
+    .ai-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .ai-messages::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .ai-messages::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 10px;
+    }
+
+    .ai-messages::-webkit-scrollbar-thumb:hover {
+        background: #a0aec0;
+    }
+
+    /* Map Popup Styling */
+    .map-popup {
+        min-width: 280px;
+        max-width: 320px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    .popup-header {
+        margin-bottom: 0.75rem;
+    }
+
+    .popup-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.4;
+    }
+
+    .popup-category {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .popup-address {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin: 0.75rem 0;
+        padding: 0.5rem;
+        background: #f7fafc;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: #4a5568;
+        line-height: 1.5;
+    }
+
+    .popup-address i {
+        color: #667eea;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+    }
+
+    .popup-stats {
+        display: flex;
+        gap: 1rem;
+        margin: 0.75rem 0;
+        padding-top: 0.75rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .popup-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.875rem;
+        color: #4a5568;
+    }
+
+    .popup-stat i {
+        color: #f59e0b;
+        font-size: 0.875rem;
+    }
+
+    .popup-stat:last-child i {
+        color: #3b82f6;
+    }
+
+    .popup-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-top: 0.75rem;
+    }
+
+    .popup-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .popup-button i {
+        font-size: 0.75rem;
+        transition: transform 0.3s ease;
+    }
+
+    .popup-button:hover i {
+        transform: translateX(2px);
     }
 </style>
 
@@ -288,17 +763,31 @@
                         });
 
                         const popup = `
-                            <div class="map-popup" style="min-width: 200px;">
-                                <strong>${item.name ?? 'İşletme'}</strong><br/>
-                                ${item.category ? `<span class="badge bg-info">${item.category}</span>` : ''}
-                                ${item.address ? `<p class="mb-1 mt-2"><i class="fas fa-map-marker-alt"></i> ${item.address}</p>` : ''}
-                                <div class="mt-2">
-                                    <span><i class="fas fa-star text-warning"></i> ${(item.averageRating ?? 0).toFixed(1)}</span>
-                                    <span class="ms-2"><i class="fas fa-comment text-info"></i> ${item.totalReviews ?? 0}</span>
+                            <div class="map-popup">
+                                <div class="popup-header">
+                                    <h4 class="popup-title">${item.name ?? 'İşletme'}</h4>
+                                    ${item.category ? `<span class="popup-category">${item.category}</span>` : ''}
                                 </div>
-                                <div class="mt-2">
-                                    <a href="/Businesses/Details/${item.id}" class="btn btn-sm btn-warning rounded-pill">Detay</a>
+                                ${item.address ? `
+                                    <div class="popup-address">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>${item.address}</span>
+                                    </div>
+                                ` : ''}
+                                <div class="popup-stats">
+                                    <div class="popup-stat">
+                                        <i class="fas fa-star"></i>
+                                        <span>${(item.averageRating ?? 0).toFixed(1)}</span>
+                                    </div>
+                                    <div class="popup-stat">
+                                        <i class="fas fa-comment"></i>
+                                        <span>${item.totalReviews ?? 0}</span>
+                                    </div>
                                 </div>
+                                <a href="/Businesses/Details/${item.id}" class="popup-button">
+                                    <span>Detayları Gör</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
                             </div>`;
 
                         marker.addListener('click', () => {
@@ -411,7 +900,19 @@
             function appendMessage(role, text) {
                 const wrapper = document.createElement('div');
                 wrapper.classList.add('ai-message', role);
-                wrapper.innerHTML = `<p>${text}</p>`;
+                
+                const avatar = document.createElement('div');
+                avatar.classList.add('message-avatar');
+                avatar.innerHTML = role === 'assistant' 
+                    ? '<i class="fas fa-robot"></i>' 
+                    : '<i class="fas fa-user"></i>';
+                
+                const content = document.createElement('div');
+                content.classList.add('message-content');
+                content.innerHTML = `<p>${text}</p>`;
+                
+                wrapper.appendChild(avatar);
+                wrapper.appendChild(content);
                 aiMessages.appendChild(wrapper);
                 aiMessages.scrollTop = aiMessages.scrollHeight;
             }
@@ -487,9 +988,248 @@
             });
     </script>
     <script src="~/js/nearby-places.js" asp-append-version="true"></script>
-    @if (!string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string))
+    @{
+        var tomTomApiKey = ViewBag.TomTomApiKey as string ?? "";
+        var googleMapsApiKey = ViewBag.GoogleMapsApiKey as string ?? "";
+    }
+    
+    @if (!string.IsNullOrEmpty(tomTomApiKey))
     {
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@ViewBag.GoogleMapsApiKey&libraries=places&callback=initBusinessMap"></script>
+        <!-- TomTom Maps API -->
+        <link rel="stylesheet" type="text/css" href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/maps/maps.css" />
+        <script>
+            // TomTom API key'i global olarak ayarla
+            window.tomtomApiKey = '@tomTomApiKey';
+            
+            // TomTom haritasını başlat (SDK yüklendikten sonra çağrılacak)
+            function initTomTomMap() {
+                // SDK'nın yüklenmesini bekle
+                if (typeof tt === 'undefined' || typeof tt.map === 'undefined') {
+                    console.warn('TomTom SDK henüz yüklenmedi, tekrar deneniyor...');
+                    setTimeout(initTomTomMap, 100);
+                    return;
+                }
+
+                if (!document.getElementById('businessMap')) {
+                    console.error('Harita elementi bulunamadı: businessMap');
+                    return;
+                }
+
+                try {
+                    // TomTom haritasını oluştur
+                    // Style için TomTom'un standart formatı kullanılıyor
+                    const tomtomMap = tt.map({
+                        key: '@tomTomApiKey',
+                        container: 'businessMap',
+                        center: [31.9995, 36.5437], // [lng, lat] formatında
+                        zoom: 12
+                        // style parametresi kaldırıldı - varsayılan style kullanılacak
+                    });
+
+                    window.tomtomMap = tomtomMap;
+                    window.infoWindow = null; // TomTom'da popup farklı çalışır
+                    
+                    tomtomMap.on('load', function() {
+                        console.log('TomTom haritası yüklendi');
+                        loadBusinessMarkersTomTom();
+                    });
+
+                    tomtomMap.on('error', function(error) {
+                        console.error('TomTom harita hatası:', error);
+                        if (mapStatus) {
+                            mapStatus.classList.remove('d-none');
+                            mapStatus.querySelector('p').textContent = 'Harita yüklenirken bir hata oluştu.';
+                        }
+                    });
+                } catch (error) {
+                    console.error('TomTom haritası oluşturulurken hata:', error);
+                    if (mapStatus) {
+                        mapStatus.classList.remove('d-none');
+                        mapStatus.querySelector('p').textContent = 'Harita oluşturulurken bir hata oluştu: ' + error.message;
+                    }
+                }
+            }
+
+            // DOM yüklendikten sonra da kontrol et
+            document.addEventListener('DOMContentLoaded', function() {
+                // SDK yüklendikten sonra kontrol et
+                if (typeof tt !== 'undefined' && typeof tt.map !== 'undefined') {
+                    // SDK zaten yüklenmiş
+                    initTomTomMap();
+                } else {
+                    // SDK henüz yüklenmemiş, script onload bekleniyor
+                    console.log('TomTom SDK yüklenmesi bekleniyor...');
+                }
+            });
+        </script>
+        <!-- TomTom SDK'yı fonksiyon tanımlandıktan sonra yükle -->
+        <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/maps/maps-web.min.js" 
+                onload="if(typeof initTomTomMap === 'function') { initTomTomMap(); } else { console.warn('initTomTomMap fonksiyonu bulunamadı'); }" 
+                onerror="console.error('TomTom Maps SDK yüklenemedi')"></script>
+        <script>
+            // TomTom için marker yükleme fonksiyonu
+            function loadBusinessMarkersTomTom() {
+                if (!window.tomtomMap) {
+                    console.error('TomTom haritası henüz hazır değil');
+                    return;
+                }
+                
+                fetch('@Url.Action("Locations", "Businesses")')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!Array.isArray(data) || data.length === 0) {
+                            if (mapStatus) {
+                                mapStatus.classList.remove('d-none');
+                                mapStatus.querySelector('p').textContent = 'Henüz konumu belirtilmiş bir işletme bulunamadı.';
+                            }
+                            return;
+                        }
+
+                        if (mapStatus) {
+                            mapStatus.classList.add('d-none');
+                        }
+                        
+                        const bounds = [];
+                        const markers = [];
+                        let processedCount = 0;
+                        const totalItems = data.length;
+
+                        // Tüm işletmeleri işle
+                        data.forEach((item, index) => {
+                            let position = null;
+                            
+                            if (item.hasCoordinates && item.latitude && item.longitude) {
+                                position = [item.longitude, item.latitude];
+                                addTomTomMarker(item, position);
+                            } else if (item.address) {
+                                // Geocoding için TomTom Search API kullan
+                                geocodeAddressTomTom(item.address, function(coords) {
+                                    processedCount++;
+                                    if (coords) {
+                                        addTomTomMarker(item, coords);
+                                    }
+                                    checkIfAllProcessed();
+                                });
+                            } else {
+                                processedCount++;
+                                checkIfAllProcessed();
+                            }
+                        });
+                        
+                        function addTomTomMarker(item, position) {
+                            if (!position || !Array.isArray(position) || position.length !== 2) {
+                                return;
+                            }
+                            
+                            try {
+                                // TomTom marker oluştur
+                                const marker = new tt.Marker()
+                                    .setLngLat(position)
+                                    .addTo(window.tomtomMap);
+                                
+                                bounds.push(position);
+                                markers.push(marker);
+                                
+                                // Popup oluştur
+                                const popup = new tt.Popup({ offset: 30 })
+                                    .setHTML(`
+                                        <div class="map-popup">
+                                            <div class="popup-header">
+                                                <h4 class="popup-title">${item.name ?? 'İşletme'}</h4>
+                                                ${item.category ? `<span class="popup-category">${item.category}</span>` : ''}
+                                            </div>
+                                            ${item.address ? `
+                                                <div class="popup-address">
+                                                    <i class="fas fa-map-marker-alt"></i>
+                                                    <span>${item.address}</span>
+                                                </div>
+                                            ` : ''}
+                                            <div class="popup-stats">
+                                                <div class="popup-stat">
+                                                    <i class="fas fa-star"></i>
+                                                    <span>${(item.averageRating ?? 0).toFixed(1)}</span>
+                                                </div>
+                                                <div class="popup-stat">
+                                                    <i class="fas fa-comment"></i>
+                                                    <span>${item.totalReviews ?? 0}</span>
+                                                </div>
+                                            </div>
+                                            <a href="/Businesses/Details/${item.id}" class="popup-button">
+                                                <span>Detayları Gör</span>
+                                                <i class="fas fa-arrow-right"></i>
+                                            </a>
+                                        </div>
+                                    `);
+                                
+                                marker.setPopup(popup);
+                                
+                                processedCount++;
+                                checkIfAllProcessed();
+                            } catch (error) {
+                                console.error('Marker eklenirken hata:', error, item);
+                                processedCount++;
+                                checkIfAllProcessed();
+                            }
+                        }
+                        
+                        function checkIfAllProcessed() {
+                            if (processedCount >= totalItems && bounds.length > 0) {
+                                // Tüm marker'lar eklendi, haritayı ayarla
+                                try {
+                                    const boundsObj = bounds.reduce(function(bounds, coord) {
+                                        return bounds.extend(coord);
+                                    }, new tt.LngLatBounds(bounds[0], bounds[0]));
+                                    
+                                    window.tomtomMap.fitBounds(boundsObj, {
+                                        padding: 50,
+                                        maxZoom: 15
+                                    });
+                                    
+                                    console.log(`${markers.length} marker haritaya eklendi`);
+                                } catch (error) {
+                                    console.error('Harita bounds ayarlanırken hata:', error);
+                                }
+                            } else if (processedCount >= totalItems && bounds.length === 0) {
+                                // Hiç marker eklenemedi
+                                if (mapStatus) {
+                                    mapStatus.classList.remove('d-none');
+                                    mapStatus.querySelector('p').textContent = 'İşletme konumları yüklenemedi.';
+                                }
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Harita verileri yüklenirken hata:', error);
+                        if (mapStatus) {
+                            mapStatus.classList.remove('d-none');
+                            mapStatus.querySelector('p').textContent = 'Harita verileri yüklenirken bir hata oluştu: ' + error.message;
+                        }
+                    });
+            }
+            
+            // TomTom Geocoding
+            function geocodeAddressTomTom(address, callback) {
+                const apiKey = window.tomtomApiKey || '@tomTomApiKey';
+                const query = encodeURIComponent(address + ', Alanya, Antalya');
+                
+                fetch(`https://api.tomtom.com/search/2/geocode/${query}.json?key=${apiKey}&limit=1`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.results && data.results.length > 0) {
+                            const result = data.results[0];
+                            callback([result.position.lon, result.position.lat]);
+                        } else {
+                            callback(null);
+                        }
+                    })
+                    .catch(() => callback(null));
+            }
+        </script>
+    }
+    else if (!string.IsNullOrEmpty(googleMapsApiKey))
+    {
+        <!-- Google Maps API (Fallback) -->
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@googleMapsApiKey&libraries=places&callback=initBusinessMap"></script>
     }
     else
     {
@@ -498,7 +1238,7 @@
                 var fallbackStatus = document.getElementById('mapStatus');
                 if (fallbackStatus) {
                     fallbackStatus.classList.remove('d-none');
-                    fallbackStatus.querySelector('p').textContent = 'Google Maps anahtarı bulunamadı.';
+                    fallbackStatus.querySelector('p').textContent = 'Harita API anahtarı bulunamadı.';
                 }
             });
         </script>

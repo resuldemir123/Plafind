@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Plafind.Data;
 using Plafind.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Plafind.Controllers
 {
@@ -11,11 +12,13 @@ namespace Plafind.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfiguration _configuration;
 
-        public NewsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public NewsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
             _context = context;
             _userManager = userManager;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         // GET: News
@@ -44,6 +47,22 @@ namespace Plafind.Controllers
             {
                 return NotFound();
             }
+
+            var siteUrl = _configuration["SiteSettings:SiteUrl"] ?? "https://plafind.com";
+            var siteName = _configuration["SiteSettings:SiteName"] ?? "Plafind";
+            
+            // Open Graph bilgilerini set et
+            ViewData["SiteUrl"] = siteUrl;
+            ViewData["SiteName"] = siteName;
+            ViewData["OgTitle"] = $"{news.Title} | {siteName}";
+            ViewData["OgDescription"] = !string.IsNullOrWhiteSpace(news.Content) 
+                ? (news.Content.Length > 200 ? news.Content.Substring(0, 200).Replace("<p>", "").Replace("</p>", "").Replace("<br>", " ").Replace("<br/>", " ").Trim() + "..." : news.Content.Replace("<p>", "").Replace("</p>", "").Replace("<br>", " ").Replace("<br/>", " ").Trim())
+                : $"{news.Title} - {siteName}";
+            ViewData["OgImage"] = !string.IsNullOrWhiteSpace(news.ImageUrl) 
+                ? (news.ImageUrl.StartsWith("http") ? news.ImageUrl : $"{siteUrl}{news.ImageUrl}")
+                : $"{siteUrl}/images/Logo.png";
+            ViewData["OgUrl"] = $"{siteUrl}/News/Details/{news.Id}";
+            ViewData["OgType"] = "article";
 
             // Görüntülenme sayısını artır (isteğe bağlı)
             if (news.ViewCount == null)

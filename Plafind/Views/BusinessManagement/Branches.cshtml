@@ -1,0 +1,209 @@
+@model List<Plafind.Models.Branch>
+@{
+    ViewData["Title"] = "Şube Yönetimi";
+    var business = ViewBag.Business as Plafind.Models.Business;
+    var businessId = ViewBag.BusinessId as int?;
+    var userBusinesses = ViewBag.UserBusinesses as List<Plafind.Models.Business> ?? new List<Plafind.Models.Business>();
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-code-branch me-2"></i>Şube Yönetimi
+                </h2>
+                @if (userBusinesses.Count > 1)
+                {
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="businessDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-building me-2"></i>
+                            @(business?.Name ?? "İşletme Seçin")
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="businessDropdown">
+                            @foreach (var b in userBusinesses)
+                            {
+                                <li>
+                                    <a class="dropdown-item @(b.Id == businessId ? "active" : "")" 
+                                       href="@Url.Action("Branches", new { businessId = b.Id })">
+                                        @b.Name
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (business != null)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#branchModal" onclick="openBranchModal(null)">
+                    <i class="fas fa-plus me-2"></i>Yeni Şube Ekle
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach (var branch in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title mb-0">@branch.Name</h5>
+                                <span class="badge bg-@(branch.IsActive ? "success" : "secondary")">
+                                    @(branch.IsActive ? "Aktif" : "Pasif")
+                                </span>
+                            </div>
+                            <p class="card-text text-muted small">
+                                <i class="fas fa-map-marker-alt me-1"></i>@branch.Address
+                            </p>
+                            @if (!string.IsNullOrEmpty(branch.Phone))
+                            {
+                                <p class="card-text text-muted small">
+                                    <i class="fas fa-phone me-1"></i>@branch.Phone
+                                </p>
+                            }
+                            @if (!string.IsNullOrEmpty(branch.ManagerName))
+                            {
+                                <p class="card-text text-muted small">
+                                    <i class="fas fa-user-tie me-1"></i>@branch.ManagerName
+                                </p>
+                            }
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                        onclick="openBranchModal(@branch.Id)" data-bs-toggle="modal" data-bs-target="#branchModal">
+                                    <i class="fas fa-edit me-1"></i>Düzenle
+                                </button>
+                                <form asp-action="DeleteBranch" method="post" class="d-inline" 
+                                      onsubmit="return confirm('Bu şubeyi silmek istediğinize emin misiniz?');">
+                                    <input type="hidden" name="id" value="@branch.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash me-1"></i>Sil
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle me-2"></i>Henüz şube eklenmemiş.
+            </div>
+        }
+    }
+</div>
+
+<!-- Şube Ekleme/Düzenleme Modal -->
+<div class="modal fade" id="branchModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="branchModalTitle">Yeni Şube Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="branchForm" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="BusinessId" value="@businessId" />
+                    <input type="hidden" name="Id" id="branchId" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Şube Adı *</label>
+                        <input type="text" class="form-control" name="Name" id="branchName" required />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Adres</label>
+                        <textarea class="form-control" name="Address" id="branchAddress" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Telefon</label>
+                            <input type="text" class="form-control" name="Phone" id="branchPhone" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">E-posta</label>
+                            <input type="email" class="form-control" name="Email" id="branchEmail" />
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Müdür Adı</label>
+                        <input type="text" class="form-control" name="ManagerName" id="branchManagerName" />
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Enlem</label>
+                            <input type="number" step="any" class="form-control" name="Latitude" id="branchLatitude" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Boylam</label>
+                            <input type="number" step="any" class="form-control" name="Longitude" id="branchLongitude" />
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Çalışma Saatleri</label>
+                        <input type="text" class="form-control" name="WorkingHours" id="branchWorkingHours" 
+                               placeholder="Örn: Pazartesi-Cuma: 09:00-18:00" />
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="IsActive" id="branchIsActive" checked />
+                        <label class="form-check-label" for="branchIsActive">Aktif</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openBranchModal(branchId) {
+        const modal = document.getElementById('branchModal');
+        const form = document.getElementById('branchForm');
+        const title = document.getElementById('branchModalTitle');
+        
+        if (branchId) {
+            title.textContent = 'Şube Düzenle';
+            form.action = '@Url.Action("EditBranch")';
+            
+            // Şube verilerini yükle
+            const branch = @Html.Raw(Json.Serialize(Model));
+            const selectedBranch = branch.find(b => b.id === branchId);
+            
+            if (selectedBranch) {
+                document.getElementById('branchId').value = selectedBranch.id;
+                document.getElementById('branchName').value = selectedBranch.name || '';
+                document.getElementById('branchAddress').value = selectedBranch.address || '';
+                document.getElementById('branchPhone').value = selectedBranch.phone || '';
+                document.getElementById('branchEmail').value = selectedBranch.email || '';
+                document.getElementById('branchManagerName').value = selectedBranch.managerName || '';
+                document.getElementById('branchLatitude').value = selectedBranch.latitude || '';
+                document.getElementById('branchLongitude').value = selectedBranch.longitude || '';
+                document.getElementById('branchWorkingHours').value = selectedBranch.workingHours || '';
+                document.getElementById('branchIsActive').checked = selectedBranch.isActive;
+            }
+        } else {
+            title.textContent = 'Yeni Şube Ekle';
+            form.action = '@Url.Action("CreateBranch")';
+            form.reset();
+            document.getElementById('branchId').value = '';
+            document.getElementById('branchIsActive').checked = true;
+        }
+    }
+</script>

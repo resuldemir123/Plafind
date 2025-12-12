@@ -1,9 +1,37 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr" data-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - PlaceFind</title>
+    
+    @{
+        var siteUrl = ViewData["SiteUrl"] as string ?? "https://plafind.com";
+        var siteName = ViewData["SiteName"] as string ?? "Plafind";
+        var ogTitle = ViewData["OgTitle"] as string ?? ViewData["Title"] as string ?? "Plafind - Alanya İşletme Rehberi";
+        var ogDescription = ViewData["OgDescription"] as string ?? "Alanya'nın en kapsamlı işletme rehberi. Restoranlar, oteller, mağazalar ve daha fazlasını keşfedin.";
+        var ogImage = ViewData["OgImage"] as string ?? $"{siteUrl}/images/Logo.png";
+        var ogUrl = ViewData["OgUrl"] as string ?? $"{siteUrl}{Context.Request.Path}{Context.Request.QueryString}";
+        var ogType = ViewData["OgType"] as string ?? "website";
+    }
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="@ogTitle" />
+    <meta property="og:type" content="@ogType" />
+    <meta property="og:url" content="@ogUrl" />
+    <meta property="og:image" content="@ogImage" />
+    <meta property="og:description" content="@ogDescription" />
+    <meta property="og:site_name" content="@siteName" />
+    <meta property="og:locale" content="tr_TR" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="@ogTitle" />
+    <meta name="twitter:description" content="@ogDescription" />
+    <meta name="twitter:image" content="@ogImage" />
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="description" content="@ogDescription" />
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
@@ -269,7 +297,34 @@
                                 <i class="fas fa-info-circle me-1 text-info"></i> Hakkımızda
                             </a>
                         </li>
-                        @if (!(User.Identity?.IsAuthenticated == true))
+                        <li class="nav-item dropdown">
+                            <a class="nav-link fw-medium text-white dropdown-toggle" href="#" id="compareDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-balance-scale me-1 text-warning"></i> Karşılaştır
+                                <span class="badge bg-warning text-dark ms-1" id="compareCount">0</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="compareDropdown" id="compareDropdownMenu" style="min-width: 300px; max-width: 400px;">
+                                <li class="dropdown-header">
+                                    <i class="fas fa-balance-scale me-2"></i>Karşılaştırma Listesi
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li id="compareEmpty" class="px-3 py-2 text-muted small">
+                                    <i class="fas fa-info-circle me-2"></i>Henüz işletme eklenmedi
+                                </li>
+                                <li id="compareList"></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <div class="d-flex gap-2 px-3 pb-2">
+                                        <a href="@Url.Action("Index", "Compare")" class="btn btn-sm btn-primary flex-fill">
+                                            <i class="fas fa-eye me-1"></i>Tümünü Gör
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger" id="clearCompareNav">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
                                 <a class="nav-link fw-medium" href="@Url.Action("RegisterBusiness", "BusinessOwner")" style="color: #ffc107 !important;">
@@ -296,16 +351,10 @@
                             }
                             else if (User.IsInRole("User"))
                             {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle fw-medium text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <li class="nav-item">
+                                    <a class="nav-link fw-medium text-white" href="@Url.Action("Index", "User")">
                                         <i class="fas fa-user me-1 text-success"></i> Panelim
                                     </a>
-                                    <ul class="dropdown-menu shadow border-0" aria-labelledby="userDropdown">
-                                        <li><a class="dropdown-item py-2" href="@Url.Action("Index", "User")"><i class="fas fa-tachometer-alt me-2 text-primary"></i> Dashboard</a></li>
-                                        <li><a class="dropdown-item py-2" href="@Url.Action("Favorites", "User")"><i class="fas fa-heart me-2 text-danger"></i> Favorilerim</a></li>
-                                        <li><a class="dropdown-item py-2" href="@Url.Action("MyReviews", "User")"><i class="fas fa-comments me-2 text-warning"></i> Yorumlarım</a></li>
-                                        <li><a class="dropdown-item py-2" href="@Url.Action("Index", "Reservations")"><i class="fas fa-calendar-check me-2 text-info"></i> Rezervasyonlarım</a></li>
-                                    </ul>
                                 </li>
                             }
                         }
@@ -420,6 +469,94 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/location-picker.js" asp-append-version="true"></script>
     <script src="~/js/theme-toggle.js" asp-append-version="true"></script>
+    <script>
+        // Karşılaştırma sayısını ve listesini güncelle
+        $(document).ready(function() {
+            function updateCompareCount() {
+                $.get('/Compare/GetCount', function(response) {
+                    $('#compareCount').text(response.count);
+                    if (response.count > 0) {
+                        loadCompareList();
+                    } else {
+                        $('#compareEmpty').show();
+                        $('#compareList').empty();
+                    }
+                });
+            }
+
+            function loadCompareList() {
+                $.get('/Compare/GetList', function(response) {
+                    if (response.businesses && response.businesses.length > 0) {
+                        $('#compareEmpty').hide();
+                        let html = '';
+                        response.businesses.forEach(function(business) {
+                            html += `
+                                <li class="px-3 py-2">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold small">${business.name}</div>
+                                            <div class="small text-muted">${business.category || 'Kategori yok'}</div>
+                                        </div>
+                                        <div class="d-flex gap-1">
+                                            <a href="/Businesses/Details/${business.id}" class="btn btn-sm btn-outline-primary" title="Detaylar">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-outline-danger remove-compare-nav" data-business-id="${business.id}" title="Kaldır">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                            `;
+                        });
+                        $('#compareList').html(html);
+                    } else {
+                        $('#compareEmpty').show();
+                        $('#compareList').empty();
+                    }
+                });
+            }
+
+            // Navbar'dan kaldır
+            $(document).on('click', '.remove-compare-nav', function() {
+                const businessId = $(this).data('business-id');
+                $.ajax({
+                    url: '/Compare/Remove',
+                    type: 'POST',
+                    data: { businessId: businessId },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            updateCompareCount();
+                        }
+                    }
+                });
+            });
+
+            // Navbar'dan temizle
+            $('#clearCompareNav').on('click', function() {
+                if (confirm('Karşılaştırma listesini temizlemek istediğinize emin misiniz?')) {
+                    $.ajax({
+                        url: '/Compare/Clear',
+                        type: 'POST',
+                        headers: {
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                updateCompareCount();
+                            }
+                        }
+                    });
+                }
+            });
+
+            updateCompareCount();
+            setInterval(updateCompareCount, 5000); // Her 5 saniyede bir güncelle
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

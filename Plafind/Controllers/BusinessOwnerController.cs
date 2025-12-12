@@ -18,6 +18,7 @@ namespace Plafind.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IWebHostEnvironment _environment;
         private readonly GoogleMapsOptions _mapsOptions;
+        private readonly TomTomOptions _tomTomOptions;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public BusinessOwnerController(
@@ -26,13 +27,15 @@ namespace Plafind.Controllers
             SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManager,
             IWebHostEnvironment environment,
-            IOptions<GoogleMapsOptions> mapsOptions)
+            IOptions<GoogleMapsOptions> mapsOptions,
+            IOptions<TomTomOptions> tomTomOptions)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             _mapsOptions = mapsOptions?.Value ?? new GoogleMapsOptions();
+            _tomTomOptions = tomTomOptions?.Value ?? new TomTomOptions();
         }
 
         private async Task<ApplicationUser?> GetCurrentUserAsync()
@@ -46,6 +49,7 @@ namespace Plafind.Controllers
         {
             ViewBag.Categories = _context.Categories.ToList();
             ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
+            ViewBag.TomTomApiKey = _tomTomOptions.ApiKey;
             return View();
         }
 

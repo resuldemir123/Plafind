@@ -1,115 +1,439 @@
 @model Plafind.Models.ApplicationUser
+@using Plafind.Models
 
 @{
-    ViewData["Title"] = "Kullanıcı Paneli";
+    ViewData["Title"] = "Kullanıcı Dashboard";
+    var favorites = ViewBag.Favorites as List<UserFavorite> ?? new List<UserFavorite>();
+    var reviews = ViewBag.Reviews as List<Review> ?? new List<Review>();
+    var reservations = ViewBag.Reservations as List<Reservation> ?? new List<Reservation>();
+    var totalFavorites = ViewBag.TotalFavorites as int? ?? 0;
+    var totalReviews = ViewBag.TotalReviews as int? ?? 0;
+    var totalReservations = ViewBag.TotalReservations as int? ?? 0;
+    var pendingReservations = ViewBag.PendingReservations as int? ?? 0;
 }
 
-<div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Hoş Geldiniz, @Model.FullName</h1>
-    </div>
+<style>
+    .user-dashboard {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    .dashboard-header {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        height: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 4px solid;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .stat-card.primary { border-left-color: #007bff; }
+    .stat-card.success { border-left-color: #28a745; }
+    .stat-card.warning { border-left-color: #ffc107; }
+    .stat-card.info { border-left-color: #17a2b8; }
+    .stat-card.danger { border-left-color: #dc3545; }
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .stat-icon.primary { background: rgba(0, 123, 255, 0.1); color: #007bff; }
+    .stat-icon.success { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+    .stat-icon.warning { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+    .stat-icon.info { background: rgba(23, 162, 184, 0.1); color: #17a2b8; }
+    .stat-icon.danger { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+    .content-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    .content-card-header {
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .business-item {
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    .business-item:hover {
+        background: #f8f9fa;
+        border-color: #007bff;
+        transform: translateX(5px);
+    }
+    .review-item {
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        border-left: 3px solid #ffc107;
+        background: #fffbf0;
+    }
+    .reservation-item {
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        border-left: 3px solid #17a2b8;
+        background: #f0f9ff;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+    }
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+</style>
 
-    <!-- İstatistikler -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Favorilerim</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Favorites.Count</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-heart fa-2x text-gray-300"></i>
-                        </div>
+<div class="user-dashboard">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h1 class="h3 mb-2 fw-bold text-dark">
+                        <i class="fas fa-tachometer-alt me-2 text-primary"></i>Hoş Geldiniz, @(Model.FullName ?? Model.UserName ?? "Kullanıcı")
+                    </h1>
+                    <p class="text-muted mb-0">Dashboard'unuzdan tüm aktivitelerinizi takip edebilirsiniz</p>
+                </div>
+                <a href="@Url.Action("Profile", "User")" class="btn btn-primary">
+                    <i class="fas fa-user-edit me-2"></i>Profili Düzenle
+                </a>
+            </div>
+        </div>
+
+        <!-- İstatistikler -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stat-card primary">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-heart"></i>
                     </div>
+                    <h3 class="fw-bold mb-1">@totalFavorites</h3>
+                    <p class="text-muted mb-0">Favori İşletme</p>
+                    <a href="@Url.Action("Favorites", "User")" class="btn btn-sm btn-outline-primary mt-2 w-100">
+                        <i class="fas fa-eye me-1"></i>Görüntüle
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stat-card success">
+                    <div class="stat-icon success">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">@totalReviews</h3>
+                    <p class="text-muted mb-0">Yorumlarım</p>
+                    <a href="@Url.Action("MyReviews", "User")" class="btn btn-sm btn-outline-success mt-2 w-100">
+                        <i class="fas fa-eye me-1"></i>Görüntüle
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stat-card info">
+                    <div class="stat-icon info">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">@totalReservations</h3>
+                    <p class="text-muted mb-0">Rezervasyonlarım</p>
+                    <a href="@Url.Action("Index", "Reservations")" class="btn btn-sm btn-outline-info mt-2 w-100">
+                        <i class="fas fa-eye me-1"></i>Görüntüle
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stat-card warning">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">@pendingReservations</h3>
+                    <p class="text-muted mb-0">Bekleyen Rezervasyon</p>
+                    <a href="@Url.Action("Index", "Reservations")" class="btn btn-sm btn-outline-warning mt-2 w-100">
+                        <i class="fas fa-eye me-1"></i>Görüntüle
+                    </a>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Yorumlarım</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Reviews.Count</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-comments fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Hızlı Erişim -->
-    <div class="row">
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Hızlı Erişim</h6>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <a href="@Url.Action("Search", "Home")" class="list-group-item list-group-item-action">
-                            <i class="fas fa-building mr-2"></i>İşletmeleri Görüntüle
-                        </a>
-                        <a href="@Url.Action("Favorites", "User")" class="list-group-item list-group-item-action">
-                            <i class="fas fa-heart mr-2"></i>Favorilerim
-                        </a>
-                        <a href="@Url.Action("MyReviews", "User")" class="list-group-item list-group-item-action">
-                            <i class="fas fa-comments mr-2"></i>Yorumlarım
-                        </a>
-                        <a href="@Url.Action("Profile", "User")" class="list-group-item list-group-item-action">
-                            <i class="fas fa-user mr-2"></i>Profilimi Düzenle
+        <!-- İçerik Bölümleri -->
+        <div class="row">
+            <!-- Favoriler -->
+            <div class="col-lg-6 mb-4">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-heart text-danger me-2"></i>Son Favorilerim
+                        </h5>
+                        <a href="@Url.Action("Favorites", "User")" class="btn btn-sm btn-outline-primary">
+                            Tümünü Gör <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Son Favorilerim</h6>
-                </div>
-                <div class="card-body">
-                    @if (Model.Favorites.Any())
+                    @if (favorites.Any())
                     {
-                        @foreach (var favorite in Model.Favorites.Take(3))
+                        @foreach (var favorite in favorites)
                         {
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">@favorite.Business?.Name</h6>
-                                    <small class="text-muted">@favorite.Business?.Category</small>
-                                </div>
-                                <div class="text-warning">
-                                    @if (favorite.Business?.AverageRating > 0)
-                                    {
-                                        @for (int i = 1; i <= 5; i++)
+                            <div class="business-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-1">
+                                            <a href="@Url.Action("Details", "Businesses", new { id = favorite.BusinessId })" class="text-decoration-none">
+                                                @favorite.Business?.Name
+                                            </a>
+                                        </h6>
+                                        <p class="text-muted small mb-2">
+                                            <i class="fas fa-tag me-1"></i>@(favorite.Business?.Category?.Name ?? "Kategori yok")
+                                        </p>
+                                        @if (favorite.Business?.AverageRating > 0)
                                         {
-                                            if (i <= favorite.Business.AverageRating)
-                                            {
-                                                <i class="fas fa-star"></i>
-                                            }
-                                            else
-                                            {
-                                                <i class="far fa-star"></i>
-                                            }
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="fw-bold">@favorite.Business.AverageRating.ToString("F1")</span>
+                                                <div class="text-warning">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        if (i <= Math.Floor(favorite.Business.AverageRating))
+                                                        {
+                                                            <i class="fas fa-star"></i>
+                                                        }
+                                                        else if (i - 0.5 <= favorite.Business.AverageRating)
+                                                        {
+                                                            <i class="fas fa-star-half-alt"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="far fa-star"></i>
+                                                        }
+                                                    }
+                                                </div>
+                                                <span class="text-muted small">(@favorite.Business.TotalReviews yorum)</span>
+                                            </div>
                                         }
-                                    }
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>@favorite.AddedDate.ToString("dd MMMM yyyy")
+                                        </small>
+                                    </div>
+                                    <div class="ms-3">
+                                        <a href="@Url.Action("Details", "Businesses", new { id = favorite.BusinessId })" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         }
                     }
                     else
                     {
-                        <p class="text-muted">Henüz favori işletmeniz yok.</p>
+                        <div class="empty-state">
+                            <i class="fas fa-heart"></i>
+                            <p class="mb-0">Henüz favori işletmeniz yok</p>
+                            <a href="@Url.Action("Search", "Home")" class="btn btn-primary mt-3">
+                                <i class="fas fa-search me-2"></i>İşletme Ara
+                            </a>
+                        </div>
                     }
+                </div>
+            </div>
+
+            <!-- Yorumlar -->
+            <div class="col-lg-6 mb-4">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-comments text-warning me-2"></i>Son Yorumlarım
+                        </h5>
+                        <a href="@Url.Action("MyReviews", "User")" class="btn btn-sm btn-outline-warning">
+                            Tümünü Gör <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    @if (reviews.Any())
+                    {
+                        @foreach (var review in reviews)
+                        {
+                            <div class="review-item">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="fw-bold mb-1">
+                                            <a href="@Url.Action("Details", "Businesses", new { id = review.BusinessId })" class="text-decoration-none">
+                                                @review.Business?.Name
+                                            </a>
+                                        </h6>
+                                        <div class="text-warning mb-2">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= review.Rating)
+                                                {
+                                                    <i class="fas fa-star"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-star"></i>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-@(review.IsApproved ? "success" : "warning")">
+                                        @(review.IsApproved ? "Onaylandı" : "Beklemede")
+                                    </span>
+                                </div>
+                                <p class="mb-2">@(review.Comment?.Length > 100 ? review.Comment.Substring(0, 100) + "..." : review.Comment)</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>@review.CreatedDate.ToString("dd MMMM yyyy")
+                                </small>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <p class="mb-0">Henüz yorum yapmadınız</p>
+                            <a href="@Url.Action("Search", "Home")" class="btn btn-warning mt-3">
+                                <i class="fas fa-comment me-2"></i>Yorum Yap
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Rezervasyonlar -->
+        <div class="row">
+            <div class="col-12">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-calendar-check text-info me-2"></i>Son Rezervasyonlarım
+                        </h5>
+                        <a href="@Url.Action("Index", "Reservations")" class="btn btn-sm btn-outline-info">
+                            Tümünü Gör <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    @if (reservations.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>İşletme</th>
+                                        <th>Tarih</th>
+                                        <th>Saat</th>
+                                        <th>Kişi Sayısı</th>
+                                        <th>Durum</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var reservation in reservations)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@(reservation.Branch?.Business?.Name ?? reservation.Business?.Name ?? "Bilinmiyor")</strong>
+                                                @if (reservation.Branch != null)
+                                                {
+                                                    <br><small class="text-muted">@reservation.Branch.Name</small>
+                                                }
+                                            </td>
+                                            <td>@reservation.RequestedDate.ToString("dd MMMM yyyy")</td>
+                                            <td>@reservation.RequestedTime.ToString(@"hh\:mm")</td>
+                                            <td>@reservation.NumberOfPeople kişi</td>
+                                            <td>
+                                                @{
+                                                    var statusClass = (reservation.Status?.ToLower()) switch
+                                                    {
+                                                        "onaylandı" or "approved" => "success",
+                                                        "reddedildi" or "rejected" => "danger",
+                                                        "iptal edildi" or "cancelled" => "secondary",
+                                                        "beklemede" or "pending" => "warning",
+                                                        _ => "warning"
+                                                    };
+                                                }
+                                                <span class="badge bg-@statusClass">@(reservation.Status ?? "Beklemede")</span>
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("Details", "Reservations", new { id = reservation.Id })" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-check"></i>
+                            <p class="mb-0">Henüz rezervasyonunuz yok</p>
+                            <a href="@Url.Action("Search", "Home")" class="btn btn-info mt-3">
+                                <i class="fas fa-calendar-plus me-2"></i>Rezervasyon Yap
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Hızlı Erişim -->
+        <div class="row">
+            <div class="col-12">
+                <div class="content-card">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-bolt text-warning me-2"></i>Hızlı Erişim
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="@Url.Action("Search", "Home")" class="btn btn-outline-primary w-100 py-3">
+                                <i class="fas fa-building fa-2x mb-2 d-block"></i>
+                                İşletme Ara
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="@Url.Action("Favorites", "User")" class="btn btn-outline-danger w-100 py-3">
+                                <i class="fas fa-heart fa-2x mb-2 d-block"></i>
+                                Favorilerim
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="@Url.Action("MyReviews", "User")" class="btn btn-outline-warning w-100 py-3">
+                                <i class="fas fa-comments fa-2x mb-2 d-block"></i>
+                                Yorumlarım
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="@Url.Action("Profile", "User")" class="btn btn-outline-info w-100 py-3">
+                                <i class="fas fa-user-edit fa-2x mb-2 d-block"></i>
+                                Profilim
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

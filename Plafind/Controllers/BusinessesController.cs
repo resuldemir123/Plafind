@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Plafind.Data;
 using Plafind.Models;
@@ -6,6 +6,7 @@ using Plafind.Options;
 using Plafind.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace Plafind.Controllers
 {
@@ -13,11 +14,15 @@ namespace Plafind.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly GoogleMapsOptions _mapsOptions;
+        private readonly TomTomOptions _tomTomOptions;
+        private readonly IConfiguration _configuration;
 
-        public BusinessesController(ApplicationDbContext context, IOptions<GoogleMapsOptions> mapsOptions)
+        public BusinessesController(ApplicationDbContext context, IOptions<GoogleMapsOptions> mapsOptions, IOptions<TomTomOptions> tomTomOptions, IConfiguration configuration)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _mapsOptions = mapsOptions?.Value ?? new GoogleMapsOptions();
+            _tomTomOptions = tomTomOptions?.Value ?? new TomTomOptions();
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         // GET: Businesses (Herkes görebilir)
@@ -44,7 +49,7 @@ namespace Plafind.Controllers
 
             var business = await _context.Businesses
                 .Include(b => b.Category)
-                .Include(b => b.Reviews.Where(r => r.IsActive))
+                .Include(b => b.Reviews.Where(r => r.IsActive && r.IsApproved))
                     .ThenInclude(r => r.User)
                 .Include(b => b.Favorites)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -53,6 +58,22 @@ namespace Plafind.Controllers
             {
                 return NotFound();
             }
+
+            var siteUrl = _configuration["SiteSettings:SiteUrl"] ?? "https://plafind.com";
+            var siteName = _configuration["SiteSettings:SiteName"] ?? "Plafind";
+            
+            // Open Graph bilgilerini set et
+            ViewData["SiteUrl"] = siteUrl;
+            ViewData["SiteName"] = siteName;
+            ViewData["OgTitle"] = $"{business.Name} - {business.Category?.Name ?? "İşletme"} | {siteName}";
+            ViewData["OgDescription"] = !string.IsNullOrWhiteSpace(business.Description) 
+                ? (business.Description.Length > 200 ? business.Description.Substring(0, 200) + "..." : business.Description)
+                : $"{business.Name} hakkında detaylı bilgi. {siteName} üzerinden rezervasyon yapabilir, yorum okuyabilir ve değerlendirme yapabilirsiniz.";
+            ViewData["OgImage"] = !string.IsNullOrWhiteSpace(business.ImageUrl) 
+                ? (business.ImageUrl.StartsWith("http") ? business.ImageUrl : $"{siteUrl}{business.ImageUrl}")
+                : $"{siteUrl}/images/Logo.png";
+            ViewData["OgUrl"] = $"{siteUrl}/Businesses/Details/{business.Id}";
+            ViewData["OgType"] = "business.business";
 
             var similarBusinesses = new List<Business>();
 
@@ -71,6 +92,10 @@ namespace Plafind.Controllers
                     .ToListAsync();
             }
 
+            // Gerçek yorum sayısını hesapla (IsActive && IsApproved olanlar)
+            var activeApprovedReviewsCount = business.Reviews?.Count(r => r.IsActive && r.IsApproved) ?? 0;
+            ViewBag.ActiveApprovedReviewsCount = activeApprovedReviewsCount;
+
             var viewModel = new BusinessDetailsViewModel
             {
                 Business = business,
@@ -78,6 +103,7 @@ namespace Plafind.Controllers
             };
 
             ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
+            ViewBag.TomTomApiKey = _tomTomOptions.ApiKey;
 
             return View(viewModel);
         }
@@ -91,6 +117,7 @@ namespace Plafind.Controllers
                 .ToListAsync();
 
             ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
+            ViewBag.TomTomApiKey = _tomTomOptions.ApiKey;
 
             return View(businesses);
         }

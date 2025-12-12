@@ -1,0 +1,202 @@
+@model Plafind.ViewModels.CustomerListViewModel
+@{
+    ViewData["Title"] = "Müşteri Yönetimi";
+    var userBusinesses = ViewBag.UserBusinesses as List<Plafind.Models.Business> ?? new List<Plafind.Models.Business>();
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-users me-2"></i>Müşteri Yönetimi
+                </h2>
+                <div>
+                    <a href="@Url.Action("Segments", new { businessId = Model.BusinessId })" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-chart-pie me-2"></i>Segmentasyon
+                    </a>
+                    <a href="@Url.Action("Interactions", new { businessId = Model.BusinessId })" class="btn btn-outline-primary">
+                        <i class="fas fa-comments me-2"></i>İletişim Geçmişi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Business != null)
+    {
+        @if (userBusinesses.Count > 1)
+        {
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="businessDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-building me-2"></i>
+                            @Model.Business.Name
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="businessDropdown">
+                            @foreach (var business in userBusinesses)
+                            {
+                                <li>
+                                    <a class="dropdown-item @(business.Id == Model.BusinessId ? "active" : "")" 
+                                       href="@Url.Action("Index", new { businessId = business.Id })">
+                                        @business.Name
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Filtreler -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form method="get" action="@Url.Action("Index")">
+                    <input type="hidden" name="businessId" value="@Model.BusinessId" />
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="searchTerm" 
+                                   placeholder="Ad, e-posta veya telefon ara..." value="@Model.SearchTerm" />
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" name="segmentFilter">
+                                <option value="">Tüm Segmentler</option>
+                                <option value="VIP" selected="@(Model.SegmentFilter == "VIP")">VIP</option>
+                                <option value="Regular" selected="@(Model.SegmentFilter == "Regular")">Düzenli</option>
+                                <option value="New" selected="@(Model.SegmentFilter == "New")">Yeni</option>
+                                <option value="AtRisk" selected="@(Model.SegmentFilter == "AtRisk")">Risk Altında</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" name="sortBy">
+                                <option value="LastVisit" selected="@(Model.SortBy == "LastVisit")">Son Ziyaret</option>
+                                <option value="Name" selected="@(Model.SortBy == "Name")">İsim</option>
+                                <option value="TotalSpent" selected="@(Model.SortBy == "TotalSpent")">Toplam Harcama</option>
+                                <option value="Rating" selected="@(Model.SortBy == "Rating")">Puan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-1"></i>Filtrele
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Müşteri Listesi -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Müşteri</th>
+                                <th>Segment</th>
+                                <th>Rezervasyon</th>
+                                <th>Yorum</th>
+                                <th>Toplam Harcama</th>
+                                <th>Son Ziyaret</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var customer in Model.Customers)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            @if (!string.IsNullOrEmpty(customer.AvatarUrl))
+                                            {
+                                                <img src="@customer.AvatarUrl" class="rounded-circle me-2" 
+                                                     style="width: 40px; height: 40px; object-fit: cover;" />
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center" 
+                                                     style="width: 40px; height: 40px;">
+                                                    @customer.FullName?.Substring(0, 1).ToUpper()
+                                                </div>
+                                            }
+                                            <div>
+                                                <strong>@customer.FullName</strong>
+                                                <br />
+                                                <small class="text-muted">@customer.Email</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-@(customer.CustomerSegment == "VIP" ? "danger" : customer.CustomerSegment == "Regular" ? "primary" : customer.CustomerSegment == "New" ? "success" : "warning")">
+                                            @customer.CustomerSegment
+                                        </span>
+                                    </td>
+                                    <td>@customer.TotalReservations</td>
+                                    <td>
+                                        @if (customer.AverageRating > 0)
+                                        {
+                                            <div>
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    <i class="fas fa-star @(i <= (int)customer.AverageRating ? "text-warning" : "text-muted")" style="font-size: 0.8em;"></i>
+                                                }
+                                                <small class="text-muted">(@customer.TotalReviews)</small>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>@customer.TotalSpent.ToString("C")</td>
+                                    <td>
+                                        @if (customer.LastVisitDate.HasValue)
+                                        {
+                                            @customer.LastVisitDate.Value.ToString("dd MMM yyyy")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a href="@Url.Action("Details", new { customerId = customer.UserId, businessId = Model.BusinessId })" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Detay
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Sayfalama -->
+                @if (Model.TotalPages > 1)
+                {
+                    <nav aria-label="Sayfa navigasyonu">
+                        <ul class="pagination justify-content-center">
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", new { businessId = Model.BusinessId, page = i, searchTerm = Model.SearchTerm, segmentFilter = Model.SegmentFilter, sortBy = Model.SortBy })">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                }
+            </div>
+        </div>
+
+        @if (!Model.Customers.Any())
+        {
+            <div class="alert alert-info text-center mt-4">
+                <i class="fas fa-info-circle me-2"></i>Müşteri bulunamadı.
+            </div>
+        }
+    }
+</div>

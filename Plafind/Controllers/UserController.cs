@@ -50,6 +50,46 @@ namespace Plafind.Controllers
             var user = await GetCurrentApplicationUserAsync();
             if (user == null) return RedirectToAction("Login", "Account");
 
+            // Tüm verileri çek
+            var userId = user.Id;
+            
+            var favorites = await _context.UserFavorites
+                .Include(f => f.Business)
+                    .ThenInclude(b => b.Category)
+                .Where(f => f.UserId == userId)
+                .OrderByDescending(f => f.AddedDate)
+                .Take(6)
+                .ToListAsync();
+
+            var reviews = await _context.Reviews
+                .Include(r => r.Business)
+                    .ThenInclude(b => b.Category)
+                .Where(r => r.UserId == userId)
+                .OrderByDescending(r => r.CreatedDate)
+                .Take(6)
+                .ToListAsync();
+
+            var reservations = await _context.Reservations
+                .Include(r => r.Branch)
+                    .ThenInclude(b => b.Business)
+                .Where(r => r.UserId == userId)
+                .OrderByDescending(r => r.ReservationDate)
+                .Take(6)
+                .ToListAsync();
+
+            var totalFavorites = await _context.UserFavorites.CountAsync(f => f.UserId == userId);
+            var totalReviews = await _context.Reviews.CountAsync(r => r.UserId == userId);
+            var totalReservations = await _context.Reservations.CountAsync(r => r.UserId == userId);
+            var pendingReservations = await _context.Reservations.CountAsync(r => r.UserId == userId && r.Status == "Pending");
+
+            ViewBag.Favorites = favorites;
+            ViewBag.Reviews = reviews;
+            ViewBag.Reservations = reservations;
+            ViewBag.TotalFavorites = totalFavorites;
+            ViewBag.TotalReviews = totalReviews;
+            ViewBag.TotalReservations = totalReservations;
+            ViewBag.PendingReservations = pendingReservations;
+
             return View(user);
         }
 

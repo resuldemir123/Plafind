@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Plafind.Data;
 using Plafind.Models;
@@ -520,6 +520,32 @@ namespace Plafind.Controllers
         }
 
         // ==================== CONTENT MANAGEMENT MODULE ====================
+        [HttpPost]
+        public async Task<IActionResult> ReplaceBusinessesWithRealData()
+        {
+            try
+            {
+                // Mevcut tüm işletmeleri sil
+                var existingBusinesses = await _context.Businesses.ToListAsync();
+                if (existingBusinesses.Any())
+                {
+                    _context.Businesses.RemoveRange(existingBusinesses);
+                    await _context.SaveChangesAsync();
+                }
+
+                // Yeni gerçek işletmeleri ekle
+                await Plafind.Scripts.SeedRealBusinesses.SeedAsync(_context);
+                
+                await LogAdminAction("Replace", "Businesses", "All", "Tüm işletmeler silindi ve yeni gerçek işletmeler eklendi");
+                TempData["SuccessMessage"] = $"{existingBusinesses.Count} işletme silindi ve 20 yeni gerçek işletme eklendi!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Hata: {ex.Message}";
+            }
+            return RedirectToAction(nameof(Businesses));
+        }
+
         public async Task<IActionResult> Categories()
         {
             var categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
@@ -700,10 +726,41 @@ namespace Plafind.Controllers
         // ==================== FEEDBACK & SUPPORT MODULE ====================
         public async Task<IActionResult> Messages()
         {
-            // Contact form mesajları - şimdilik boş liste döndürüyoruz
-            // İleride ContactMessage tablosu eklendiğinde aktif edilebilir
-            var messages = new List<ContactMessage>();
+            var messages = await _context.ContactMessages
+                .OrderByDescending(m => m.CreatedDate)
+                .ToListAsync();
+            
+            ViewBag.UnreadCount = messages.Count(m => !m.IsRead);
             return View(messages);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkMessageAsRead(int id)
+        {
+            var message = await _context.ContactMessages.FindAsync(id);
+            if (message != null)
+            {
+                message.IsRead = true;
+                message.ReadDate = DateTime.Now;
+                _context.ContactMessages.Update(message);
+                await _context.SaveChangesAsync();
+                await LogAdminAction("Read", "ContactMessage", id.ToString(), "Mesaj okundu olarak işaretlendi");
+            }
+            return RedirectToAction(nameof(Messages));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteMessage(int id)
+        {
+            var message = await _context.ContactMessages.FindAsync(id);
+            if (message != null)
+            {
+                _context.ContactMessages.Remove(message);
+                await _context.SaveChangesAsync();
+                await LogAdminAction("Delete", "ContactMessage", id.ToString(), "Mesaj silindi");
+                TempData["Success"] = "Mesaj başarıyla silindi.";
+            }
+            return RedirectToAction(nameof(Messages));
         }
 
         public IActionResult Tickets()

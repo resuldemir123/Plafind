@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Plafind.Models
@@ -37,5 +37,9 @@ namespace Plafind.Models
 
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<UserFavorite> Favorites { get; set; } = new List<UserFavorite>();
+        public ICollection<BusinessImage> Images { get; set; } = new List<BusinessImage>();
+        public ICollection<Campaign> Campaigns { get; set; } = new List<Campaign>();
+        public ICollection<Event> Events { get; set; } = new List<Event>();
+        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }

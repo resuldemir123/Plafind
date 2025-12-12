@@ -1,0 +1,202 @@
+@model List<Plafind.Models.CustomerInteraction>
+@{
+    ViewData["Title"] = "Müşteri İletişim Geçmişi";
+    var business = ViewBag.Business as Plafind.Models.Business;
+    var businessId = ViewBag.BusinessId as int?;
+    var customerId = ViewBag.CustomerId as string;
+    var userBusinesses = ViewBag.UserBusinesses as List<Plafind.Models.Business> ?? new List<Plafind.Models.Business>();
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-comments me-2"></i>Müşteri İletişim Geçmişi
+                </h2>
+                <div>
+                    @if (userBusinesses.Count > 1)
+                    {
+                        <div class="dropdown d-inline-block me-2">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="businessDropdown" data-bs-toggle="dropdown">
+                                <i class="fas fa-building me-2"></i>
+                                @(business?.Name ?? "İşletme Seçin")
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="businessDropdown">
+                                @foreach (var b in userBusinesses)
+                                {
+                                    <li>
+                                        <a class="dropdown-item @(b.Id == businessId ? "active" : "")" 
+                                           href="@Url.Action("Interactions", new { businessId = b.Id })">
+                                            @b.Name
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#interactionModal" onclick="openInteractionModal()">
+                        <i class="fas fa-plus me-2"></i>Yeni İletişim Kaydı
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (business != null)
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                @if (Model.Any())
+                {
+                    <div class="timeline">
+                        @foreach (var interaction in Model)
+                        {
+                            <div class="timeline-item mb-4">
+                                <div class="d-flex">
+                                    <div class="timeline-marker bg-@(interaction.InteractionType == "Reservation" ? "primary" : interaction.InteractionType == "Review" ? "warning" : interaction.InteractionType == "Message" ? "info" : "secondary") rounded-circle me-3" 
+                                         style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="fas fa-@(interaction.InteractionType == "Reservation" ? "calendar" : interaction.InteractionType == "Review" ? "star" : interaction.InteractionType == "Message" ? "envelope" : "phone") text-white"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <div>
+                                                        <h6 class="mb-1">
+                                                            <span class="badge bg-@(interaction.InteractionType == "Reservation" ? "primary" : interaction.InteractionType == "Review" ? "warning" : interaction.InteractionType == "Message" ? "info" : "secondary") me-2">
+                                                                @interaction.InteractionType
+                                                            </span>
+                                                            @interaction.Subject
+                                                        </h6>
+                                                        @if (interaction.Customer != null)
+                                                        {
+                                                            <small class="text-muted">
+                                                                <i class="fas fa-user me-1"></i>@(interaction.Customer.FullName ?? interaction.Customer.UserName ?? "Müşteri")
+                                                            </small>
+                                                        }
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <small class="text-muted">@interaction.InteractionDate.ToString("dd MMM yyyy HH:mm")</small>
+                                                        <br />
+                                                        <span class="badge bg-@(interaction.Status == "Completed" ? "success" : interaction.Status == "Pending" ? "warning" : "secondary")">
+                                                            @interaction.Status
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(interaction.Notes))
+                                                {
+                                                    <p class="mb-2">@interaction.Notes</p>
+                                                }
+                                                @if (!string.IsNullOrEmpty(interaction.InternalNotes))
+                                                {
+                                                    <div class="alert alert-light mb-0">
+                                                        <strong>İç Not:</strong> @interaction.InternalNotes
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>Henüz iletişim kaydı bulunmamaktadır.
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- İletişim Kaydı Ekleme Modal -->
+<div class="modal fade" id="interactionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yeni İletişim Kaydı</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="CreateInteraction" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="BusinessId" value="@businessId" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Müşteri *</label>
+                        <select class="form-select" name="CustomerId" required>
+                            <option value="">Müşteri Seçin</option>
+                            <!-- Bu liste JavaScript ile doldurulabilir veya ayrı bir endpoint'ten alınabilir -->
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">İletişim Tipi *</label>
+                        <select class="form-select" name="InteractionType" required>
+                            <option value="Reservation">Rezervasyon</option>
+                            <option value="Review">Yorum</option>
+                            <option value="Message">Mesaj</option>
+                            <option value="Call">Telefon</option>
+                            <option value="Visit">Ziyaret</option>
+                            <option value="Complaint">Şikayet</option>
+                            <option value="Compliment">Övgü</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Konu</label>
+                        <input type="text" class="form-control" name="Subject" />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Notlar</label>
+                        <textarea class="form-control" name="Notes" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Durum</label>
+                        <select class="form-select" name="Status">
+                            <option value="Pending">Beklemede</option>
+                            <option value="Completed">Tamamlandı</option>
+                            <option value="FollowUp">Takip Gerekli</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">İç Notlar (Sadece siz görebilirsiniz)</label>
+                        <textarea class="form-control" name="InternalNotes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openInteractionModal() {
+        // Modal açıldığında müşteri listesini yükleyebilirsiniz
+    }
+</script>
+
+<style>
+    .timeline-item {
+        position: relative;
+    }
+    
+    .timeline-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: 19px;
+        top: 50px;
+        width: 2px;
+        height: calc(100% + 1rem);
+        background-color: #dee2e6;
+    }
+</style>

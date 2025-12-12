@@ -9,6 +9,7 @@ namespace Plafind.Services
     {
         Task<bool> SendEmailAsync(string toEmail, string subject, string body, string? fromName = null, string? fromEmail = null);
         Task<bool> SendContactEmailAsync(string name, string email, string? phone, string subject, string message);
+        Task<bool> SendNotificationEmailAsync(string toEmail, string title, string message);
     }
 
     public class EmailService : IEmailService
@@ -181,6 +182,40 @@ namespace Plafind.Services
                 _logger.LogError(ex, $"İletişim formu e-postası gönderilirken hata oluştu: {ex.Message}");
                 return false;
             }
+        }
+
+        public async Task<bool> SendNotificationEmailAsync(string toEmail, string title, string message)
+        {
+            var siteName = _configuration["EmailSettings:SiteName"] ?? "Alanya İşletme Rehberi";
+            var emailBody = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <style>
+        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+        .header {{ background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; }}
+        .content {{ background: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 8px 8px; }}
+        .message-box {{ background: white; padding: 15px; border-left: 4px solid #ffc107; margin: 15px 0; border-radius: 4px; }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h2 style='margin: 0;'>{title}</h2>
+        </div>
+        <div class='content'>
+            <div class='message-box'>
+                {message.Replace("\n", "<br>")}
+            </div>
+            <p>İyi günler dileriz,<br><strong>{siteName} Ekibi</strong></p>
+        </div>
+    </div>
+</body>
+</html>";
+
+            return await SendEmailAsync(toEmail, title, emailBody);
         }
     }
 }

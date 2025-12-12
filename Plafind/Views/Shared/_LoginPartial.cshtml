@@ -24,6 +24,10 @@
                 {
                     <span class="badge bg-success ms-1">Admin</span>
                 }
+                else if (User?.IsInRole("BusinessOwner") ?? false)
+                {
+                    <span class="badge bg-warning text-dark ms-1">İşletme Sahibi</span>
+                }
                 else if (User?.IsInRole("User") ?? false)
                 {
                     <span class="badge bg-primary ms-1">Kullanıcı</span>
@@ -33,6 +37,12 @@
                 @if (User?.IsInRole("Admin") ?? false)
                 {
                     <li><a class="dropdown-item" href="@Url.Action("Index", "Admin")"><i class="fas fa-tachometer-alt me-2"></i>Admin Panel</a></li>
+                    <li><a class="dropdown-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card me-2"></i>Profil Ayarları</a></li>
+                }
+                else if (User?.IsInRole("BusinessOwner") ?? false)
+                {
+                    <li><a class="dropdown-item" href="@Url.Action("Index", "BusinessOwner")"><i class="fas fa-store me-2"></i>İşletme Paneli</a></li>
+                    <li><a class="dropdown-item" href="@Url.Action("Create", "BusinessOwner")"><i class="fas fa-plus-circle me-2"></i>Yeni İşletme Ekle</a></li>
                     <li><a class="dropdown-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card me-2"></i>Profil Ayarları</a></li>
                 }
                 else if (User?.IsInRole("User") ?? false)
