@@ -1,9 +1,11 @@
 @model Plafind.ViewModels.UserProfileViewModel
 @using System.IO;
 @using System.Linq;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
-    ViewData["Title"] = "Profil Ayarları";
+    ViewData["Title"] = Localizer["ProfileTitle"];
     var defaultAvatars = Model.DefaultAvatars ?? Enumerable.Empty<string>();
     var currentAvatar = string.IsNullOrWhiteSpace(Model.CurrentAvatarUrl)
         ? Url.Content("~/images/default-avatar.svg")
@@ -14,9 +16,9 @@
     <!-- Header -->
     <div class="profile-header mb-4">
         <h1 class="profile-title">
-            <i class="fas fa-user-cog me-2"></i>Profil Ayarları
+            <i class="fas fa-user-cog me-2"></i>@Localizer["ProfileTitle"]
         </h1>
-        <p class="profile-subtitle">Hesap bilgilerinizi ve tercihlerinizi buradan yönetebilirsiniz</p>
+        <p class="profile-subtitle">@Localizer["ProfileSubtitle"]</p>
     </div>
 
     <!-- Alert Messages -->
@@ -44,15 +46,15 @@
                 <nav class="profile-nav-modern" id="profileNav">
                     <a href="#section-overview" class="nav-item-modern active">
                         <i class="fas fa-user-circle"></i>
-                        <span>Genel Bilgiler</span>
+                        <span>@Localizer["GeneralInfo"]</span>
                     </a>
                     <a href="#section-security" class="nav-item-modern">
                         <i class="fas fa-shield-alt"></i>
-                        <span>Güvenlik</span>
+                        <span>@Localizer["Security"]</span>
                     </a>
                     <a href="#section-media" class="nav-item-modern">
                         <i class="fas fa-images"></i>
-                        <span>Fotoğraflar</span>
+                        <span>@Localizer["Photos"]</span>
                     </a>
                 </nav>
             </div>
@@ -85,55 +87,55 @@
                             <div class="col-md-6">
                                 <div class="info-field-modern">
                                     <label class="info-label-modern">
-                                        <i class="fas fa-at me-2"></i>Kullanıcı Adı
+                                        <i class="fas fa-at me-2"></i>@Localizer["Username"]
                                     </label>
-                                    <div class="info-value-modern">@(Model.UserName ?? "Belirtilmemiş")</div>
+                                    <div class="info-value-modern">@(Model.UserName ?? Localizer["NotSpecified"].Value)</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="info-field-modern">
                                     <label class="info-label-modern">
-                                        <i class="fas fa-user me-2"></i>Görünen Ad
+                                        <i class="fas fa-user me-2"></i>@Localizer["DisplayName"]
                                     </label>
-                                    <div class="info-value-modern">@(Model.DisplayName ?? "Belirtilmemiş")</div>
+                                    <div class="info-value-modern">@(Model.DisplayName ?? Localizer["NotSpecified"].Value)</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="info-field-modern">
                                     <label class="info-label-modern">
-                                        <i class="fas fa-id-card me-2"></i>Ad Soyad
+                                        <i class="fas fa-id-card me-2"></i>@Localizer["FullName"]
                                     </label>
-                                    <div class="info-value-modern">@(Model.FullName ?? "Belirtilmemiş")</div>
+                                    <div class="info-value-modern">@(Model.FullName ?? Localizer["NotSpecified"].Value)</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="info-field-modern">
                                     <label class="info-label-modern">
-                                        <i class="fas fa-phone me-2"></i>Telefon
+                                        <i class="fas fa-phone me-2"></i>@Localizer["Phone"]
                                     </label>
-                                    <div class="info-value-modern">@(Model.PhoneNumber ?? "Belirtilmemiş")</div>
+                                    <div class="info-value-modern">@(Model.PhoneNumber ?? Localizer["NotSpecified"].Value)</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="info-field-modern">
                                     <label class="info-label-modern">
-                                        <i class="fas fa-globe me-2"></i>Ülke
+                                        <i class="fas fa-globe me-2"></i>@Localizer["Country"]
                                     </label>
-                                    <div class="info-value-modern">@(Model.Country ?? "Belirtilmemiş")</div>
+                                    <div class="info-value-modern">@(Model.Country ?? Localizer["NotSpecified"].Value)</div>
                                 </div>
                             </div>
                             <div class="col-md-6" id="cityViewContainer" style="@(Model.Country == "Türkiye" ? "" : "display: none;")">
                                 <div class="info-field-modern">
                                     <label class="info-label-modern">
-                                        <i class="fas fa-map-marker-alt me-2"></i>Şehir
+                                        <i class="fas fa-map-marker-alt me-2"></i>@Localizer["City"]
                                     </label>
-                                    <div class="info-value-modern">@(Model.City ?? "Belirtilmemiş")</div>
+                                    <div class="info-value-modern">@(Model.City ?? Localizer["NotSpecified"].Value)</div>
                                 </div>
                             </div>
                         </div>
                         <div class="d-flex justify-content-end mt-4">
                             <button type="button" class="btn btn-primary btn-lg" id="editProfileBtn">
-                                <i class="fas fa-edit me-2"></i>Düzenle
+                                <i class="fas fa-edit me-2"></i>@Localizer["Edit"]
                             </button>
                         </div>
                     </div>
@@ -358,10 +360,10 @@
 
                         <div class="d-flex justify-content-end gap-3 mt-4" id="saveButtonsContainer" style="display: none;">
                             <button type="button" class="btn btn-outline-secondary" id="cancelEditBtn">
-                                <i class="fas fa-times me-2"></i>Vazgeç
+                                <i class="fas fa-times me-2"></i>@Localizer["Cancel"]
                             </button>
                             <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-save me-2"></i>Değişiklikleri Kaydet
+                                <i class="fas fa-save me-2"></i>@Localizer["SaveChanges"]
                             </button>
                         </div>
                     </form>
@@ -572,46 +574,82 @@
 </form>
 
 <style>
-    /* Genel Container */
+    /* ========================================
+       CSS Değişkenleri - Dark Mode Palette
+       ======================================== */
+    :root {
+        --bg-primary-light: var(--color-primary-soft);
+        --bg-warning-light: var(--color-warning-soft);
+        --bg-surface-secondary: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Tüm yazılar beyaz */
+    .profile-settings-container,
+    .profile-settings-container * {
+        color: #FFFFFF !important;
+    }
+
+    .profile-title,
+    .profile-subtitle,
+    .section-title-modern,
+    .info-label-modern,
+    .info-value-modern,
+    .form-label-modern,
+    .security-title-modern,
+    .security-subtitle-modern {
+        color: #FFFFFF !important;
+    }
+
+    /* ========================================
+       1. Genel Yapı ve Tema Geçişleri
+       ======================================== */
     .profile-settings-container {
         max-width: 1400px;
         margin: 0 auto;
         padding: 2rem 1rem;
+        background-color: var(--bg-body);
+        transition: background-color 0.4s ease;
     }
 
     /* Header */
     .profile-header {
-        border-bottom: 2px solid #e9ecef;
+        border-bottom: 2px solid var(--border-color);
         padding-bottom: 1.5rem;
+        transition: border-color 0.4s ease;
     }
 
     .profile-title {
         font-size: 2rem;
         font-weight: 700;
-        color: #212529;
+        color: var(--text-default);
         margin: 0;
+        transition: color 0.4s ease;
     }
 
     .profile-subtitle {
-        color: #6c757d;
+        color: var(--text-muted);
         margin: 0.5rem 0 0 0;
         font-size: 1rem;
+        transition: color 0.4s ease;
     }
 
-    /* Sol Menü (Sidebar) */
+    /* ========================================
+       2. Sidebar ve Navigasyon
+       ======================================== */
     .profile-sidebar-modern {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        background: var(--bg-surface);
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05), 0 0 0 1px var(--border-color);
         padding: 1.5rem;
         position: sticky;
         top: 100px;
+        transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
     }
 
     .profile-nav-modern {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.35rem;
     }
 
     .nav-item-modern {
@@ -620,62 +658,70 @@
         gap: 0.75rem;
         padding: 0.875rem 1rem;
         border-radius: 8px;
-        color: #495057;
+        color: var(--text-muted);
         text-decoration: none;
         font-weight: 600;
         font-size: 0.95rem;
-        transition: all 0.2s ease;
-        border-left: 3px solid transparent;
+        transition: all 0.3s ease;
+        border-left: none;
     }
 
     .nav-item-modern i {
         width: 20px;
         text-align: center;
-        color: #6c757d;
+        color: var(--text-muted);
+        transition: color 0.3s ease;
     }
 
     .nav-item-modern:hover {
-        background: #f8f9fa;
-        color: #212529;
-        border-left-color: #0d6efd;
+        background: var(--divider-hover-bg);
+        color: var(--text-title);
     }
 
     .nav-item-modern.active {
-        background: #e7f1ff;
-        color: #0d6efd;
-        border-left-color: #0d6efd;
+        background: var(--color-primary-soft);
+        color: var(--color-primary);
+        font-weight: 700;
     }
 
     .nav-item-modern.active i {
-        color: #0d6efd;
+        color: var(--color-primary);
     }
 
-    /* Kartlar */
-    .profile-card-modern {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    /* ========================================
+       3. Kartlar
+       ======================================== */
+    .profile-card-modern,
+    .modal-content {
+        background: var(--bg-surface);
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05), 0 0 0 1px var(--border-color);
         padding: 2rem;
         margin-bottom: 2rem;
+        transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
     }
 
     .section-title-modern {
         font-size: 1.5rem;
         font-weight: 700;
-        color: #212529;
+        color: var(--text-default);
         margin-bottom: 1.5rem;
         padding-bottom: 1rem;
-        border-bottom: 2px solid #e9ecef;
+        border-bottom: 2px solid var(--border-color);
+        transition: color 0.4s ease, border-color 0.4s ease;
     }
 
-    /* Profil Fotoğrafı Bölümü */
+    /* ========================================
+       4. Profil Fotoğrafı ve Bilgileri
+       ======================================== */
     .profile-photo-section {
         display: flex;
         align-items: center;
         gap: 2rem;
         padding-bottom: 2rem;
         margin-bottom: 2rem;
-        border-bottom: 2px solid #e9ecef;
+        border-bottom: 1px solid var(--border-color);
+        transition: border-color 0.4s ease;
     }
 
     .avatar-container-modern {
@@ -684,12 +730,13 @@
     }
 
     .avatar-image-modern {
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
         object-fit: cover;
-        border: 4px solid #e9ecef;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: 3px solid var(--bg-surface);
+        box-shadow: 0 0 0 1px var(--border-color);
+        transition: all 0.3s ease;
     }
 
     .avatar-edit-btn {
@@ -699,20 +746,20 @@
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: #0d6efd;
+        background: var(--color-primary);
         color: #fff;
-        border: 3px solid #fff;
+        border: 3px solid var(--bg-surface);
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
     }
 
     .avatar-edit-btn:hover {
-        background: #0b5ed7;
         transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .profile-info-header {
@@ -722,17 +769,21 @@
     .profile-name {
         font-size: 1.75rem;
         font-weight: 700;
-        color: #212529;
+        color: var(--text-default);
         margin: 0 0 0.5rem 0;
+        transition: color 0.4s ease;
     }
 
     .profile-role {
-        color: #6c757d;
+        color: var(--text-muted);
         margin: 0;
         font-size: 1rem;
+        transition: color 0.4s ease;
     }
 
-    /* Görüntüleme Modu */
+    /* ========================================
+       5. Görüntüleme Modu
+       ======================================== */
     .profile-view-mode-modern {
         animation: fadeIn 0.3s ease;
     }
@@ -746,88 +797,98 @@
         align-items: center;
         font-size: 0.875rem;
         font-weight: 600;
-        color: #6c757d;
+        color: var(--text-muted);
         text-transform: uppercase;
         letter-spacing: 0.5px;
         margin-bottom: 0.5rem;
+        transition: color 0.4s ease;
     }
 
     .info-label-modern i {
-        color: #0d6efd;
+        color: var(--color-primary);
     }
 
     .info-value-modern {
         font-size: 1.1rem;
         font-weight: 600;
-        color: #212529;
+        color: var(--text-default);
         padding: 0.75rem 0;
+        transition: color 0.4s ease;
     }
 
-    /* Form Alanları */
+    /* ========================================
+       6. Form Alanları
+       ======================================== */
     .form-label-modern {
         display: flex;
         align-items: center;
         font-weight: 600;
-        color: #212529;
+        color: var(--text-default);
         margin-bottom: 0.5rem;
         font-size: 0.95rem;
+        transition: color 0.4s ease;
     }
 
     .form-label-modern i {
-        color: #0d6efd;
+        color: var(--color-primary);
         width: 18px;
     }
 
-    .form-control-modern {
+    .form-control-modern,
+    select.form-control-modern {
         width: 100%;
         padding: 0.75rem 1rem;
         font-size: 1rem;
-        color: #212529;
-        background-color: #fff;
-        border: 1px solid #ced4da;
+        color: var(--text-default);
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
-        transition: all 0.2s ease;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.4s ease, color 0.4s ease;
     }
 
     .form-control-modern:focus {
-        border-color: #0d6efd;
+        border-color: var(--color-primary);
         outline: none;
-        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+        box-shadow: 0 0 0 3px var(--color-primary-soft);
     }
 
     .form-control-modern:read-only {
-        background-color: #f8f9fa;
+        background-color: var(--bg-surface-secondary);
         cursor: not-allowed;
     }
 
     .form-control-modern::placeholder {
-        color: #adb5bd;
+        color: var(--text-muted);
     }
 
     .form-text-modern {
         display: block;
         margin-top: 0.5rem;
         font-size: 0.875rem;
-        color: #6c757d;
+        color: var(--text-muted);
+        transition: color 0.4s ease;
     }
 
     select.form-control-modern {
         cursor: pointer;
         appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23212529' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 1rem center;
         padding-right: 2.5rem;
     }
 
-    /* Güvenlik Kartları */
+
+    /* ========================================
+       7. Güvenlik Kartları
+       ======================================== */
     .security-card-modern {
-        background: #f8f9fa;
+        background: var(--bg-surface-secondary);
         border-radius: 12px;
         padding: 1.5rem;
         height: 100%;
-        border: 1px solid #e9ecef;
-        transition: all 0.2s ease;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
     }
 
     .security-card-modern:hover {
@@ -840,70 +901,80 @@
         gap: 1rem;
         margin-bottom: 1.5rem;
         padding-bottom: 1rem;
-        border-bottom: 1px solid #e9ecef;
+        border-bottom: 1px solid var(--border-color);
+        transition: border-color 0.4s ease;
     }
 
     .security-icon-modern {
         width: 50px;
         height: 50px;
         border-radius: 10px;
-        background: #e7f1ff;
+        background: var(--color-primary-soft);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #0d6efd;
+        color: var(--color-primary);
         font-size: 1.25rem;
+        transition: background-color 0.4s ease, color 0.4s ease;
     }
 
     .password-icon-modern {
-        background: #fff3cd;
-        color: #ffc107;
+        background: var(--color-warning-soft);
+        color: var(--color-warning);
     }
 
     .security-title-modern {
         font-size: 1.1rem;
         font-weight: 700;
-        color: #212529;
+        color: var(--text-default);
         margin: 0;
+        transition: color 0.4s ease;
     }
 
     .security-subtitle-modern {
         font-size: 0.875rem;
-        color: #6c757d;
+        color: var(--text-muted);
         margin: 0.25rem 0 0 0;
+        transition: color 0.4s ease;
     }
 
     .security-card-body-modern {
         padding-top: 0;
     }
 
+    /* Email Bilgisi (Mavi Vurgu) */
     .current-email-modern {
         padding: 1rem;
-        background: #e7f1ff;
+        background: var(--color-primary-soft);
         border-radius: 8px;
         display: flex;
         align-items: center;
         gap: 0.5rem;
         flex-wrap: wrap;
         font-size: 0.9rem;
+        transition: background-color 0.4s ease;
     }
 
     .current-email-modern strong {
-        color: #0d6efd;
+        color: var(--color-primary);
     }
 
+    /* Şifre Uyarısı (Sarı Vurgu) */
     .password-info-modern {
         padding: 1rem;
-        background: #fff3cd;
+        background: var(--bg-warning-light);
         border-radius: 8px;
-        color: #856404;
+        color: var(--text-default);
         font-size: 0.9rem;
         display: flex;
         align-items: flex-start;
         gap: 0.5rem;
+        transition: background-color 0.4s ease, color 0.4s ease;
     }
 
-    /* Fotoğraf Galerisi */
+    /* ========================================
+       8. Fotoğraf Galerisi
+       ======================================== */
     .photos-gallery-modern {
         margin-top: 1.5rem;
     }
@@ -913,8 +984,9 @@
         aspect-ratio: 1;
         border-radius: 8px;
         overflow: hidden;
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
+        background: var(--bg-surface-secondary);
+        border: 1px solid var(--border-color);
+        transition: border-color 0.4s ease;
     }
 
     .photo-thumbnail-modern {
@@ -949,10 +1021,13 @@
     .empty-photos-modern {
         text-align: center;
         padding: 4rem 2rem;
-        color: #6c757d;
+        color: var(--text-muted);
+        transition: color 0.4s ease;
     }
 
-    /* Avatar Modal */
+    /* ========================================
+       9. Avatar Modal
+       ======================================== */
     .avatar-grid-modern {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
@@ -967,7 +1042,7 @@
         overflow: hidden;
         border: 3px solid transparent;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
     }
 
     .avatar-option-modern input[type="radio"] {
@@ -982,16 +1057,18 @@
     }
 
     .avatar-option-modern:hover {
-        border-color: #0d6efd;
+        border-color: var(--color-primary);
         transform: scale(1.05);
     }
 
     .avatar-option-modern.active {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px var(--color-primary-soft);
     }
 
-    /* Animasyonlar */
+    /* ========================================
+       10. Animasyonlar
+       ======================================== */
     @@keyframes fadeIn {
         from {
             opacity: 0;
@@ -1003,7 +1080,9 @@
         }
     }
 
-    /* Responsive */
+    /* ========================================
+       11. Responsive
+       ======================================== */
     @@media (max-width: 991px) {
         .profile-sidebar-modern {
             position: static;
@@ -1019,11 +1098,19 @@
             margin-bottom: 1.5rem;
         }
     }
+
+    @@media (min-width: 992px) {
+        .profile-sidebar-modern {
+            position: sticky;
+            top: 100px;
+        }
+    }
 </style>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
         (function () {
             // Sidebar Navigation
             const navContainer = document.getElementById('profileNav');
@@ -1163,21 +1250,51 @@
             const profileForm = document.getElementById('profileForm');
             const saveButtonsContainer = document.getElementById('saveButtonsContainer');
 
+            // Sayfa yüklendiğinde görüntüleme modunu göster, formu gizle
+            function initializeProfileView() {
+                // Eğer form zaten görünür durumdaysa (hata durumunda), form modunda kal
+                const hasErrors = document.querySelector('.text-danger') !== null || 
+                                 document.querySelector('.alert-danger') !== null;
+                
+                if (hasErrors) {
+                    // Hata varsa form modunda kal
+                    if (profileViewMode) profileViewMode.style.display = 'none';
+                    if (profileForm) profileForm.style.display = 'block';
+                    if (saveButtonsContainer) saveButtonsContainer.style.display = 'flex';
+                } else {
+                    // Hata yoksa görüntüleme modunu göster
+                    if (profileViewMode) profileViewMode.style.display = 'block';
+                    if (profileForm) profileForm.style.display = 'none';
+                    if (saveButtonsContainer) saveButtonsContainer.style.display = 'none';
+                }
+            }
+
+            // Sayfa yüklendiğinde başlat
+            initializeProfileView();
+
             if (editProfileBtn) {
                 editProfileBtn.addEventListener('click', function() {
-                    profileViewMode.style.display = 'none';
-                    profileForm.style.display = 'block';
-                    saveButtonsContainer.style.display = 'flex';
-                    profileForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (profileViewMode) profileViewMode.style.display = 'none';
+                    if (profileForm) profileForm.style.display = 'block';
+                    if (saveButtonsContainer) saveButtonsContainer.style.display = 'flex';
+                    if (profileForm) profileForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 });
             }
 
             if (cancelEditBtn) {
                 cancelEditBtn.addEventListener('click', function() {
-                    profileForm.style.display = 'none';
-                    saveButtonsContainer.style.display = 'none';
-                    profileViewMode.style.display = 'block';
-                    profileViewMode.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (profileForm) profileForm.style.display = 'none';
+                    if (saveButtonsContainer) saveButtonsContainer.style.display = 'none';
+                    if (profileViewMode) profileViewMode.style.display = 'block';
+                    if (profileViewMode) profileViewMode.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
+
+            // Form submit edildiğinde görüntüleme moduna geri dön
+            if (profileForm) {
+                profileForm.addEventListener('submit', function() {
+                    // Form submit edildiğinde sayfa yenilenecek, bu yüzden burada bir şey yapmaya gerek yok
+                    // Ancak eğer AJAX kullanılıyorsa burada güncelleme yapılabilir
                 });
             }
 
@@ -1248,5 +1365,6 @@
                 });
             });
         })();
+        }); // DOMContentLoaded end
     </script>
 }

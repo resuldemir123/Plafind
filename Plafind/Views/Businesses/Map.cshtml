@@ -20,8 +20,8 @@
             <i class="fas fa-map-marker-alt"></i>
                 <h4>Harita Hazırlanıyor</h4>
                 <p>İşletme konumları yükleniyor...</p>
-            </div>
         </div>
+    </div>
     </div>
     
     <!-- AI Asistan Paneli -->
@@ -32,21 +32,21 @@
                     <div class="ai-icon-wrapper">
                         <i class="fas fa-robot"></i>
                     </div>
-                    <div>
+                        <div>
                         <h3 class="ai-title">AI Asistan</h3>
                         <p class="ai-subtitle">Konuma göre öneri alın</p>
-                    </div>
+                        </div>
                 </div>
                 <button type="button" id="aiLocationBtn" class="btn-location">
                     <i class="fas fa-location-arrow"></i>
                     <span>Konumum</span>
-                </button>
-            </div>
+                        </button>
+                    </div>
             
-            <div id="aiLocationInfo" class="ai-location-info d-none">
+                    <div id="aiLocationInfo" class="ai-location-info d-none">
                 <i class="fas fa-check-circle"></i>
                 <span>Konum bilgisi eklendi</span>
-            </div>
+                    </div>
             
                     <div id="aiMessages" class="ai-messages">
                         <div class="ai-message assistant">
@@ -68,17 +68,18 @@
                         </div>
                 <div class="ai-actions">
                     <small id="aiStatus" class="ai-status">Hazır</small>
-                </div>
+                        </div>
                     </form>
         </div>
     </div>
 </section>
 
 <style>
+    /* Dark Mode - Harita Sayfası */
     /* Ana Container */
     .map-shell {
         min-height: calc(100vh - 80px);
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        background: linear-gradient(135deg, #0B1220 0%, #1E293B 50%, #0B1220 100%);
         display: grid;
         grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
         gap: 1.5rem;
@@ -89,9 +90,10 @@
     /* Harita Paneli */
     .map-panel {
         position: relative;
-        background: #ffffff;
+        background: #1E293B;
         border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+        border: 1px solid #334155;
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -100,8 +102,8 @@
 
     .map-header {
         padding: 1.5rem 2rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        color: #FFFFFF;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
@@ -109,7 +111,7 @@
         font-size: 1.5rem;
         font-weight: 700;
         margin: 0 0 0.5rem 0;
-        color: white;
+        color: #FFFFFF !important;
         display: flex;
         align-items: center;
     }
@@ -117,12 +119,13 @@
     .map-title i {
         font-size: 1.75rem;
         margin-right: 0.75rem;
+        color: #FFFFFF;
     }
 
     .map-subtitle {
         font-size: 0.9375rem;
         margin: 0;
-        color: rgba(255, 255, 255, 0.9);
+        color: rgba(255, 255, 255, 0.9) !important;
         font-weight: 400;
     }
 
@@ -131,6 +134,23 @@
         width: 100%;
         min-height: 500px;
         position: relative;
+        background: #0B1220;
+    }
+
+    /* TomTom Harita Dark Mode Overlay */
+    .map-canvas .tt-map {
+        filter: brightness(0.8) contrast(1.1);
+    }
+
+    /* TomTom kontrol butonları dark mode */
+    .map-canvas .tt-control-container {
+        filter: invert(1) hue-rotate(180deg);
+    }
+
+    .map-canvas .tt-control-container button {
+        background: #1E293B !important;
+        border-color: #334155 !important;
+        color: #FFFFFF !important;
     }
 
     .map-status {
@@ -139,8 +159,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(30, 41, 59, 0.95);
+        backdrop-filter: blur(10px);
         z-index: 1000;
+        border-radius: 16px;
     }
 
     .map-status-content {
@@ -150,7 +172,7 @@
 
     .map-status-content i {
         font-size: 3rem;
-        color: #667eea;
+        color: #2563EB;
         margin-bottom: 1rem;
         display: block;
     }
@@ -158,13 +180,13 @@
     .map-status-content h4 {
         font-size: 1.25rem;
         font-weight: 600;
-        color: #2d3748;
+        color: #FFFFFF !important;
         margin: 0 0 0.5rem 0;
     }
 
     .map-status-content p {
         font-size: 0.9375rem;
-        color: #718096;
+        color: #94A3B8 !important;
         margin: 0;
     }
 
@@ -175,9 +197,10 @@
     }
 
     .ai-card {
-        background: #ffffff;
+        background: #1E293B;
         border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+        border: 1px solid #334155;
         padding: 0;
         display: flex;
         flex-direction: column;
@@ -187,8 +210,8 @@
 
     .ai-header {
         padding: 1.5rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        color: #FFFFFF;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -215,27 +238,27 @@
 
     .ai-icon-wrapper i {
         font-size: 1.5rem;
-        color: white;
+        color: #FFFFFF;
     }
 
     .ai-title {
         font-size: 1.25rem;
         font-weight: 700;
         margin: 0;
-        color: white;
+        color: #FFFFFF !important;
     }
 
     .ai-subtitle {
         font-size: 0.875rem;
         margin: 0.25rem 0 0 0;
-        color: rgba(255, 255, 255, 0.9);
+        color: rgba(255, 255, 255, 0.9) !important;
         font-weight: 400;
     }
 
     .btn-location {
         background: rgba(255, 255, 255, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
+        color: #FFFFFF;
         padding: 0.625rem 1rem;
         border-radius: 8px;
         font-size: 0.875rem;
@@ -255,9 +278,9 @@
 
     .ai-location-info {
         padding: 0.75rem 1.5rem;
-        background: #f0fdf4;
-        border-left: 4px solid #22c55e;
-        color: #166534;
+        background: rgba(22, 163, 74, 0.15);
+        border-left: 4px solid #16A34A;
+        color: #FFFFFF !important;
         font-size: 0.875rem;
         display: flex;
         align-items: center;
@@ -267,7 +290,7 @@
     }
 
     .ai-location-info i {
-        color: #22c55e;
+        color: #16A34A;
     }
 
     .ai-messages {
@@ -277,7 +300,7 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;
-        background: #f8f9fa;
+        background: #0B1220;
         min-height: 300px;
         max-height: 400px;
     }
@@ -320,13 +343,13 @@
     }
 
     .ai-message.assistant .message-avatar {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        color: #FFFFFF;
     }
 
     .ai-message.user .message-avatar {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
+        background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);
+        color: #FFFFFF;
     }
 
     .message-content {
@@ -339,27 +362,28 @@
     }
 
     .ai-message.assistant .message-content {
-        background: white;
-        color: #2d3748;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        background: #1E293B;
+        color: #FFFFFF !important;
+        border: 1px solid #334155;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     .ai-message.user .message-content {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        color: #FFFFFF !important;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
     }
 
     .message-content p {
         margin: 0;
+        color: inherit !important;
     }
 
     /* Input Alanı */
     .ai-input {
         padding: 1.5rem;
-        background: white;
-        border-top: 1px solid #e2e8f0;
+        background: #1E293B;
+        border-top: 1px solid #334155;
     }
 
     .input-wrapper {
@@ -372,11 +396,11 @@
     .ai-input textarea {
         flex: 1;
         padding: 0.875rem 1rem;
-        border: 2px solid #e2e8f0;
+        border: 2px solid #334155;
         border-radius: 12px;
         font-size: 0.9375rem;
-        color: #2d3748;
-        background: #f8f9fa;
+        color: #FFFFFF !important;
+        background: rgba(255, 255, 255, 0.05);
         resize: none;
         transition: all 0.3s ease;
         font-family: inherit;
@@ -384,19 +408,21 @@
 
     .ai-input textarea:focus {
         outline: none;
-        border-color: #667eea;
-        background: white;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #2563EB;
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        color: #FFFFFF !important;
     }
 
     .ai-input textarea::placeholder {
-        color: #a0aec0;
+        color: #94A3B8 !important;
+        opacity: 0.7;
     }
 
     .btn-send {
         width: 44px;
         height: 44px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
         border: none;
         border-radius: 12px;
         color: white;
@@ -410,7 +436,8 @@
 
     .btn-send:hover:not(:disabled) {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
     }
 
     .btn-send:disabled {
@@ -427,7 +454,7 @@
 
     .ai-status {
         font-size: 0.8125rem;
-        color: #718096;
+        color: #94A3B8 !important;
         font-style: italic;
     }
 
@@ -529,30 +556,34 @@
         }
     }
 
-    /* Scrollbar Styling */
+    /* Scrollbar Styling - Dark Mode */
     .ai-messages::-webkit-scrollbar {
         width: 6px;
     }
 
     .ai-messages::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: rgba(255, 255, 255, 0.05);
         border-radius: 10px;
     }
 
     .ai-messages::-webkit-scrollbar-thumb {
-        background: #cbd5e0;
+        background: #334155;
         border-radius: 10px;
     }
 
     .ai-messages::-webkit-scrollbar-thumb:hover {
-        background: #a0aec0;
+        background: #475569;
     }
 
-    /* Map Popup Styling */
+    /* Map Popup Styling - Dark Mode */
     .map-popup {
         min-width: 280px;
         max-width: 320px;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: #1E293B;
+        color: #FFFFFF;
+        padding: 0.5rem;
+        border-radius: 12px;
     }
 
     .popup-header {
@@ -562,7 +593,7 @@
     .popup-title {
         font-size: 1.125rem;
         font-weight: 700;
-        color: #1a202c;
+        color: #FFFFFF !important;
         margin: 0 0 0.5rem 0;
         line-height: 1.4;
     }
@@ -570,8 +601,8 @@
     .popup-category {
         display: inline-block;
         padding: 0.25rem 0.75rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        color: #FFFFFF !important;
         border-radius: 6px;
         font-size: 0.75rem;
         font-weight: 600;
@@ -585,15 +616,15 @@
         gap: 0.5rem;
         margin: 0.75rem 0;
         padding: 0.5rem;
-        background: #f7fafc;
+        background: rgba(255, 255, 255, 0.05);
         border-radius: 8px;
         font-size: 0.875rem;
-        color: #4a5568;
+        color: #94A3B8 !important;
         line-height: 1.5;
     }
 
     .popup-address i {
-        color: #667eea;
+        color: #2563EB;
         margin-top: 0.125rem;
         flex-shrink: 0;
     }
@@ -603,7 +634,7 @@
         gap: 1rem;
         margin: 0.75rem 0;
         padding-top: 0.75rem;
-        border-top: 1px solid #e2e8f0;
+        border-top: 1px solid #334155;
     }
 
     .popup-stat {
@@ -611,16 +642,16 @@
         align-items: center;
         gap: 0.375rem;
         font-size: 0.875rem;
-        color: #4a5568;
+        color: #94A3B8 !important;
     }
 
     .popup-stat i {
-        color: #f59e0b;
+        color: #2563EB;
         font-size: 0.875rem;
     }
 
     .popup-stat:last-child i {
-        color: #3b82f6;
+        color: #14B8A6;
     }
 
     .popup-button {
@@ -630,8 +661,8 @@
         gap: 0.5rem;
         width: 100%;
         padding: 0.75rem 1rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        color: #FFFFFF !important;
         text-decoration: none;
         border-radius: 8px;
         font-size: 0.875rem;
@@ -642,8 +673,9 @@
 
     .popup-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        color: white;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
+        color: #FFFFFF !important;
     }
 
     .popup-button i {
@@ -674,7 +706,22 @@
                 center: defaultCenter,
                 mapId: 'DEMO_MAP_ID',
                 mapTypeControl: true,
-                streetViewControl: true
+                streetViewControl: true,
+                styles: [
+                    { elementType: 'geometry', stylers: [{ color: '#0B1220' }] },
+                    { elementType: 'labels.text.stroke', stylers: [{ color: '#0B1220' }] },
+                    { elementType: 'labels.text.fill', stylers: [{ color: '#94A3B8' }] },
+                    {
+                        featureType: 'water',
+                        elementType: 'geometry',
+                        stylers: [{ color: '#1E293B' }]
+                    },
+                    {
+                        featureType: 'road',
+                        elementType: 'geometry',
+                        stylers: [{ color: '#334155' }]
+                    }
+                ]
             });
 
             infoWindow = new google.maps.InfoWindow();
@@ -772,7 +819,7 @@
                                     <div class="popup-address">
                                         <i class="fas fa-map-marker-alt"></i>
                                         <span>${item.address}</span>
-                                    </div>
+                                </div>
                                 ` : ''}
                                 <div class="popup-stats">
                                     <div class="popup-stat">
@@ -991,6 +1038,7 @@
     @{
         var tomTomApiKey = ViewBag.TomTomApiKey as string ?? "";
         var googleMapsApiKey = ViewBag.GoogleMapsApiKey as string ?? "";
+        var apiKeyJson = !string.IsNullOrEmpty(tomTomApiKey) ? System.Text.Json.JsonSerializer.Serialize(tomTomApiKey) : "\"\"";
     }
     
     @if (!string.IsNullOrEmpty(tomTomApiKey))
@@ -999,7 +1047,21 @@
         <link rel="stylesheet" type="text/css" href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/maps/maps.css" />
         <script>
             // TomTom API key'i global olarak ayarla
-            window.tomtomApiKey = '@tomTomApiKey';
+            window.tomtomApiKey = @Html.Raw(apiKeyJson);
+            
+            // Debug için
+            if (window.tomtomApiKey && window.tomtomApiKey.length > 0) {
+                var keyPreview = window.tomtomApiKey.substring(0, Math.min(10, window.tomtomApiKey.length)) + '...';
+                console.log('TomTom API Key durumu: Mevcut (' + keyPreview + ')');
+            } else {
+                console.log('TomTom API Key durumu: Bulunamadı veya boş');
+            }
+            
+            // Razor kodunu kontrol etmek için
+            var isValidApiKey = window.tomtomApiKey && 
+                                window.tomtomApiKey.length > 0 && 
+                                window.tomtomApiKey !== 'undefined' &&
+                                window.tomtomApiKey.indexOf('Html.Raw') === -1;
             
             // TomTom haritasını başlat (SDK yüklendikten sonra çağrılacak)
             function initTomTomMap() {
@@ -1016,14 +1078,25 @@
                 }
 
                 try {
-                    // TomTom haritasını oluştur
-                    // Style için TomTom'un standart formatı kullanılıyor
+                    // TomTom haritasını oluştur - Dark Mode tema
+                    const apiKey = window.tomtomApiKey;
+                    
+                    if (!apiKey || apiKey.trim() === '' || typeof apiKey !== 'string') {
+                        console.error('TomTom API anahtarı geçersiz veya bulunamadı');
+                        if (mapStatus) {
+                            mapStatus.classList.remove('d-none');
+                            mapStatus.querySelector('p').textContent = 'TomTom API anahtarı yapılandırılmamış. OpenStreetMap kullanılıyor.';
+                        }
+                        // Harita olmadan devam et, sadece marker'ları göster
+                        return;
+                    }
+                    
                     const tomtomMap = tt.map({
-                        key: '@tomTomApiKey',
+                        key: apiKey,
                         container: 'businessMap',
                         center: [31.9995, 36.5437], // [lng, lat] formatında
                         zoom: 12
-                        // style parametresi kaldırıldı - varsayılan style kullanılacak
+                        // TomTom SDK varsayılan stil kullanılacak, dark mode CSS ile uygulanacak
                     });
 
                     window.tomtomMap = tomtomMap;
@@ -1069,21 +1142,46 @@
         <script>
             // TomTom için marker yükleme fonksiyonu
             function loadBusinessMarkersTomTom() {
+                // Harita yoksa bile geocoding yapılabilir (OpenStreetMap ile)
+                // Ama marker'lar gösterilemez
                 if (!window.tomtomMap) {
-                    console.error('TomTom haritası henüz hazır değil');
+                    console.warn('TomTom haritası henüz hazır değil veya API anahtarı yok. Geocoding yapılıyor ama marker\'lar gösterilemeyecek.');
+                    // Harita yoksa sadece geocoding yap ama marker ekleme
+                    // Kullanıcıya bilgi ver
+                    if (mapStatus) {
+                        mapStatus.classList.remove('d-none');
+                        mapStatus.querySelector('p').textContent = 'Harita yükleniyor veya API anahtarı eksik. Geocoding yapılıyor...';
+                    }
                     return;
                 }
                 
                 fetch('@Url.Action("Locations", "Businesses")')
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        if (!Array.isArray(data) || data.length === 0) {
+                        if (!Array.isArray(data)) {
+                            console.error('Beklenmeyen veri formatı:', data);
+                            if (mapStatus) {
+                                mapStatus.classList.remove('d-none');
+                                mapStatus.querySelector('p').textContent = 'Sunucudan beklenmeyen bir yanıt alındı.';
+                            }
+                            return;
+                        }
+                        
+                        if (data.length === 0) {
+                            console.warn('Konum verisi bulunamadı');
                             if (mapStatus) {
                                 mapStatus.classList.remove('d-none');
                                 mapStatus.querySelector('p').textContent = 'Henüz konumu belirtilmiş bir işletme bulunamadı.';
                             }
                             return;
                         }
+                        
+                        console.log(`${data.length} işletme konumu yüklendi`);
 
                         if (mapStatus) {
                             mapStatus.classList.add('d-none');
@@ -1093,31 +1191,54 @@
                         const markers = [];
                         let processedCount = 0;
                         const totalItems = data.length;
+                        
+                        // Rate limiting için delay
+                        let geocodeDelay = 0;
+                        const geocodeDelayStep = 1200; // Her geocoding için 1.2 saniye bekle (OpenStreetMap rate limit)
 
                         // Tüm işletmeleri işle
                         data.forEach((item, index) => {
                             let position = null;
                             
                             if (item.hasCoordinates && item.latitude && item.longitude) {
+                                // Koordinat varsa direkt marker ekle
                                 position = [item.longitude, item.latitude];
                                 addTomTomMarker(item, position);
                             } else if (item.address) {
-                                // Geocoding için TomTom Search API kullan
-                                geocodeAddressTomTom(item.address, function(coords) {
-                                    processedCount++;
-                                    if (coords) {
-                                        addTomTomMarker(item, coords);
-                                    }
-                                    checkIfAllProcessed();
-                                });
+                                // Geocoding için TomTom/OpenStreetMap kullan (rate limiting ile)
+                                setTimeout(() => {
+                                    geocodeAddressTomTom(item.address, function(coords) {
+                                        if (coords) {
+                                            addTomTomMarker(item, coords);
+                                        } else {
+                                            // Geocoding başarısız
+                                            processedCount++;
+                                            console.warn(`Geocoding başarısız: ${item.name} - ${item.address}`);
+                                            checkIfAllProcessed();
+                                        }
+                                    });
+                                }, geocodeDelay);
+                                geocodeDelay += geocodeDelayStep; // Her geocoding için delay artır
                             } else {
+                                // Ne koordinat ne de adres var
                                 processedCount++;
+                                console.warn(`Koordinat veya adres yok: ${item.name}`);
                                 checkIfAllProcessed();
                             }
                         });
                         
                         function addTomTomMarker(item, position) {
                             if (!position || !Array.isArray(position) || position.length !== 2) {
+                                processedCount++;
+                                checkIfAllProcessed();
+                                return;
+                            }
+                            
+                            // Harita yoksa marker eklenemez
+                            if (!window.tomtomMap) {
+                                console.warn('Harita hazır değil, marker eklenemedi:', item.name);
+                                processedCount++;
+                                checkIfAllProcessed();
                                 return;
                             }
                             
@@ -1135,13 +1256,13 @@
                                     .setHTML(`
                                         <div class="map-popup">
                                             <div class="popup-header">
-                                                <h4 class="popup-title">${item.name ?? 'İşletme'}</h4>
-                                                ${item.category ? `<span class="popup-category">${item.category}</span>` : ''}
+                                                <h4 class="popup-title">${escapeHtml(item.name ?? 'İşletme')}</h4>
+                                                ${item.category ? `<span class="popup-category">${escapeHtml(item.category)}</span>` : ''}
                                             </div>
                                             ${item.address ? `
                                                 <div class="popup-address">
                                                     <i class="fas fa-map-marker-alt"></i>
-                                                    <span>${item.address}</span>
+                                                    <span>${escapeHtml(item.address)}</span>
                                                 </div>
                                             ` : ''}
                                             <div class="popup-stats">
@@ -1172,28 +1293,49 @@
                             }
                         }
                         
+                        // HTML escape fonksiyonu
+                        function escapeHtml(text) {
+                            if (!text) return '';
+                            const div = document.createElement('div');
+                            div.textContent = text;
+                            return div.innerHTML;
+                        }
+                        
                         function checkIfAllProcessed() {
-                            if (processedCount >= totalItems && bounds.length > 0) {
-                                // Tüm marker'lar eklendi, haritayı ayarla
-                                try {
-                                    const boundsObj = bounds.reduce(function(bounds, coord) {
-                                        return bounds.extend(coord);
-                                    }, new tt.LngLatBounds(bounds[0], bounds[0]));
-                                    
-                                    window.tomtomMap.fitBounds(boundsObj, {
-                                        padding: 50,
-                                        maxZoom: 15
-                                    });
-                                    
-                                    console.log(`${markers.length} marker haritaya eklendi`);
-                                } catch (error) {
-                                    console.error('Harita bounds ayarlanırken hata:', error);
-                                }
-                            } else if (processedCount >= totalItems && bounds.length === 0) {
-                                // Hiç marker eklenemedi
-                                if (mapStatus) {
-                                    mapStatus.classList.remove('d-none');
-                                    mapStatus.querySelector('p').textContent = 'İşletme konumları yüklenemedi.';
+                            console.log(`İşlenen: ${processedCount}/${totalItems}, Marker sayısı: ${markers.length}, Bounds: ${bounds.length}`);
+                            
+                            if (processedCount >= totalItems) {
+                                if (bounds.length > 0) {
+                                    // Tüm marker'lar eklendi, haritayı ayarla
+                                    try {
+                                        const boundsObj = bounds.reduce(function(bounds, coord) {
+                                            return bounds.extend(coord);
+                                        }, new tt.LngLatBounds(bounds[0], bounds[0]));
+                                        
+                                        window.tomtomMap.fitBounds(boundsObj, {
+                                            padding: 50,
+                                            maxZoom: 15
+                                        });
+                                        
+                                        console.log(`${markers.length} marker haritaya başarıyla eklendi`);
+                                        
+                                        if (mapStatus) {
+                                            mapStatus.classList.add('d-none');
+                                        }
+                                    } catch (error) {
+                                        console.error('Harita bounds ayarlanırken hata:', error);
+                                        if (mapStatus) {
+                                            mapStatus.classList.remove('d-none');
+                                            mapStatus.querySelector('p').textContent = 'Harita ayarlanırken bir hata oluştu.';
+                                        }
+                                    }
+                                } else {
+                                    // Hiç marker eklenemedi
+                                    console.warn('Hiç marker eklenemedi. Toplam işletme: ' + totalItems);
+                                    if (mapStatus) {
+                                        mapStatus.classList.remove('d-none');
+                                        mapStatus.querySelector('p').textContent = 'İşletme konumları yüklenemedi. Lütfen işletmelerin konum bilgilerinin (koordinat veya adres) doğru olduğundan emin olun.';
+                                    }
                                 }
                             }
                         }
@@ -1207,22 +1349,92 @@
                     });
             }
             
-            // TomTom Geocoding
+            // TomTom Geocoding - Fallback ile OpenStreetMap
             function geocodeAddressTomTom(address, callback) {
-                const apiKey = window.tomtomApiKey || '@tomTomApiKey';
-                const query = encodeURIComponent(address + ', Alanya, Antalya');
+                // TomTom API anahtarı kontrolü
+                const apiKey = window.tomtomApiKey;
                 
-                fetch(`https://api.tomtom.com/search/2/geocode/${query}.json?key=${apiKey}&limit=1`)
-                    .then(response => response.json())
+                // TomTom API anahtarı varsa ve geçerliyse kullan
+                var isValidKey = apiKey && 
+                                 apiKey.trim() !== '' && 
+                                 apiKey !== 'undefined' && 
+                                 typeof apiKey === 'string' &&
+                                 apiKey.indexOf('Html.Raw') === -1;
+                
+                if (isValidKey) {
+                    const query = encodeURIComponent(address + ', Alanya, Antalya');
+                    
+                    fetch(`https://api.tomtom.com/search/2/geocode/${query}.json?key=${apiKey}&limit=1`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.results && data.results.length > 0) {
+                                const result = data.results[0];
+                                console.log('TomTom geocoding başarılı:', address);
+                                callback([result.position.lon, result.position.lat]);
+                            } else {
+                                // TomTom başarısız, OpenStreetMap'e geç
+                                console.warn('TomTom geocoding sonuç bulamadı, OpenStreetMap deneniyor:', address);
+                                geocodeWithOpenStreetMap(address, callback);
+                            }
+                        })
+                        .catch(error => {
+                            console.warn('TomTom geocoding hatası, OpenStreetMap deneniyor:', error.message);
+                            geocodeWithOpenStreetMap(address, callback);
+                        });
+                } else {
+                    // TomTom API anahtarı yok veya geçersiz, direkt OpenStreetMap kullan
+                    console.log('TomTom API anahtarı bulunamadı veya geçersiz, OpenStreetMap kullanılıyor');
+                    geocodeWithOpenStreetMap(address, callback);
+                }
+            }
+            
+            // OpenStreetMap Nominatim Geocoding (Fallback)
+            function geocodeWithOpenStreetMap(address, callback) {
+                // Adresi temizle ve optimize et
+                let cleanAddress = address;
+                
+                // Türkiye ekle
+                if (!cleanAddress.toLowerCase().includes('türkiye') && !cleanAddress.toLowerCase().includes('turkey')) {
+                    cleanAddress = cleanAddress + ', Türkiye';
+                }
+                
+                // Alanya ekle
+                if (!cleanAddress.toLowerCase().includes('alanya')) {
+                    cleanAddress = cleanAddress + ', Alanya';
+                }
+                
+                const query = encodeURIComponent(cleanAddress);
+                
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1&addressdetails=1&countrycodes=tr`, {
+                    headers: {
+                        'User-Agent': 'Plafind/1.0 (Contact: info@plafind.com)'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        if (data.results && data.results.length > 0) {
-                            const result = data.results[0];
-                            callback([result.position.lon, result.position.lat]);
+                        if (data && data.length > 0) {
+                            const result = data[0];
+                            console.log('OpenStreetMap geocoding başarılı:', address, '->', [parseFloat(result.lon), parseFloat(result.lat)]);
+                            callback([parseFloat(result.lon), parseFloat(result.lat)]);
                         } else {
+                            console.warn('OpenStreetMap geocoding sonuç bulamadı:', address);
                             callback(null);
                         }
                     })
-                    .catch(() => callback(null));
+                    .catch(error => {
+                        console.error('OpenStreetMap geocoding hatası:', error, address);
+                        callback(null);
+                    });
             }
         </script>
     }

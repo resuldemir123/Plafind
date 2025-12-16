@@ -14,35 +14,49 @@
 
 <style>
     .user-dashboard {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--bg-body);
         min-height: 100vh;
         padding: 2rem 0;
     }
     .dashboard-header {
-        background: white;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
         border-radius: 15px;
         padding: 2rem;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        box-shadow: var(--shadow-lg);
+    }
+    .dashboard-header h1 {
+        color: var(--text-default);
+    }
+    .dashboard-header p {
+        color: var(--text-muted);
     }
     .stat-card {
-        background: white;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
         border-radius: 15px;
         padding: 1.5rem;
         height: 100%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        box-shadow: var(--shadow-md);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         border-left: 4px solid;
     }
     .stat-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        box-shadow: var(--shadow-xl);
     }
-    .stat-card.primary { border-left-color: #007bff; }
-    .stat-card.success { border-left-color: #28a745; }
-    .stat-card.warning { border-left-color: #ffc107; }
-    .stat-card.info { border-left-color: #17a2b8; }
-    .stat-card.danger { border-left-color: #dc3545; }
+    .stat-card.primary { border-left-color: var(--color-primary); }
+    .stat-card.success { border-left-color: var(--color-success); }
+    .stat-card.warning { border-left-color: var(--color-warning); }
+    .stat-card.info { border-left-color: var(--color-info); }
+    .stat-card.danger { border-left-color: var(--color-danger); }
+    .stat-card h3 {
+        color: var(--text-default);
+    }
+    .stat-card p {
+        color: var(--text-muted);
+    }
     .stat-icon {
         width: 60px;
         height: 60px;
@@ -53,61 +67,96 @@
         font-size: 1.5rem;
         margin-bottom: 1rem;
     }
-    .stat-icon.primary { background: rgba(0, 123, 255, 0.1); color: #007bff; }
-    .stat-icon.success { background: rgba(40, 167, 69, 0.1); color: #28a745; }
-    .stat-icon.warning { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
-    .stat-icon.info { background: rgba(23, 162, 184, 0.1); color: #17a2b8; }
-    .stat-icon.danger { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+    .stat-icon.primary { background: var(--color-primary-soft); color: var(--color-primary); }
+    .stat-icon.success { background: var(--color-success-soft); color: var(--color-success); }
+    .stat-icon.warning { background: var(--color-warning-soft); color: var(--color-warning); }
+    .stat-icon.info { background: var(--color-info-soft); color: var(--color-info); }
+    .stat-icon.danger { background: var(--color-danger-soft); color: var(--color-danger); }
     .content-card {
-        background: white;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
         border-radius: 15px;
         padding: 1.5rem;
         margin-bottom: 2rem;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        box-shadow: var(--shadow-md);
     }
     .content-card-header {
-        border-bottom: 2px solid #f0f0f0;
+        border-bottom: 2px solid var(--border-color);
         padding-bottom: 1rem;
         margin-bottom: 1.5rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+    .content-card-header h5 {
+        color: var(--text-default);
+    }
     .business-item {
         padding: 1rem;
         border-radius: 10px;
         margin-bottom: 1rem;
-        border: 1px solid #e9ecef;
+        border: 1px solid var(--border-color);
+        background: var(--bg-surface);
         transition: all 0.3s ease;
     }
     .business-item:hover {
-        background: #f8f9fa;
-        border-color: #007bff;
+        background: var(--color-divider-hover-bg);
+        border-color: var(--color-primary);
         transform: translateX(5px);
+    }
+    .business-item h6 a {
+        color: var(--text-default);
+    }
+    .business-item p {
+        color: var(--text-muted);
     }
     .review-item {
         padding: 1rem;
         border-radius: 10px;
         margin-bottom: 1rem;
-        border-left: 3px solid #ffc107;
-        background: #fffbf0;
+        border-left: 3px solid var(--color-warning);
+        background: var(--color-warning-soft);
+    }
+    .review-item h6 a {
+        color: var(--text-default);
+    }
+    .review-item p {
+        color: var(--text-body);
     }
     .reservation-item {
         padding: 1rem;
         border-radius: 10px;
         margin-bottom: 1rem;
-        border-left: 3px solid #17a2b8;
-        background: #f0f9ff;
+        border-left: 3px solid var(--color-info);
+        background: var(--color-info-soft);
     }
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
-        color: #6c757d;
+        color: var(--text-muted);
     }
     .empty-state i {
         font-size: 4rem;
         margin-bottom: 1rem;
         opacity: 0.3;
+        color: var(--text-muted);
+    }
+    .empty-state p {
+        color: var(--text-muted);
+    }
+    .table {
+        color: var(--text-default);
+    }
+    .table thead th {
+        color: var(--text-default);
+        border-color: var(--border-color);
+    }
+    .table tbody td {
+        color: var(--text-body);
+        border-color: var(--border-color);
+    }
+    .table-hover tbody tr:hover {
+        background-color: var(--color-divider-hover-bg);
     }
 </style>
 
@@ -117,10 +166,10 @@
         <div class="dashboard-header">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <h1 class="h3 mb-2 fw-bold text-dark">
-                        <i class="fas fa-tachometer-alt me-2 text-primary"></i>Hoş Geldiniz, @(Model.FullName ?? Model.UserName ?? "Kullanıcı")
+                    <h1 class="h3 mb-2 fw-bold">
+                        <i class="fas fa-tachometer-alt me-2" style="color: var(--color-primary);"></i>Hoş Geldiniz, @(Model.FullName ?? Model.UserName ?? "Kullanıcı")
                     </h1>
-                    <p class="text-muted mb-0">Dashboard'unuzdan tüm aktivitelerinizi takip edebilirsiniz</p>
+                    <p class="mb-0">Dashboard'unuzdan tüm aktivitelerinizi takip edebilirsiniz</p>
                 </div>
                 <a href="@Url.Action("Profile", "User")" class="btn btn-primary">
                     <i class="fas fa-user-edit me-2"></i>Profili Düzenle

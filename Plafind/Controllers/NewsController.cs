@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Plafind.Data;
 using Plafind.Models;
+using Plafind.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -13,12 +14,18 @@ namespace Plafind.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly IGoogleNewsService _googleNewsService;
 
-        public NewsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public NewsController(
+            ApplicationDbContext context, 
+            UserManager<ApplicationUser> userManager, 
+            IConfiguration configuration,
+            IGoogleNewsService googleNewsService)
         {
             _context = context;
             _userManager = userManager;
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _googleNewsService = googleNewsService ?? throw new ArgumentNullException(nameof(googleNewsService));
         }
 
         // GET: News
@@ -29,6 +36,51 @@ namespace Plafind.Controllers
                 .OrderByDescending(n => n.PublishDate)
                 .ToListAsync();
             return View(news);
+        }
+
+        // GET: News/SyncTourismNews
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> SyncTourismNews()
+        {
+            try
+            {
+                await _googleNewsService.SyncTourismNewsToDatabaseAsync(maxItems: 20);
+                TempData["SuccessMessage"] = "Turizm haberleri başarıyla senkronize edildi.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Haberler senkronize edilirken bir hata oluştu: {ex.Message}";
+            }
+            
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: News/PreviewTourismNews
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> PreviewTourismNews()
+        {
+            var news = await _googleNewsService.GetAlanyaTourismNewsAsync(maxItems: 20);
+            return View(news);
+        }
+
+        // GET: News/SyncStatus
+        [Authorize(Roles = "Admin")]
+        public IActionResult SyncStatus()
+        {
+            var syncStatus = GoogleNewsService.GetSyncStatus();
+            var (isRunning, startTime, totalRuns, lastRunTime) = TourismNewsBackgroundService.GetServiceStatus();
+            
+            syncStatus.IsBackgroundServiceRunning = isRunning;
+            syncStatus.ServiceStartTime = startTime != DateTime.MinValue ? startTime : null;
+            syncStatus.ServiceTotalRuns = totalRuns;
+            syncStatus.ServiceLastRunTime = lastRunTime != DateTime.MinValue ? lastRunTime : null;
+            
+            if (syncStatus.LastSyncTime != DateTime.MinValue)
+            {
+                syncStatus.TimeSinceLastSync = DateTime.Now - syncStatus.LastSyncTime;
+            }
+            
+            return View(syncStatus);
         }
 
         // GET: News/Details/5

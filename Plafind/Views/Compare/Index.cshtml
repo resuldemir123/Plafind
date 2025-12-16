@@ -1,4 +1,4 @@
-@model List<Plafind.Models.Business>
+@model Plafind.ViewModels.Compare.CompareIndexVM
 @Html.AntiForgeryToken()
 @{
     ViewData["Title"] = "İşletme Karşılaştırma";
@@ -24,33 +24,112 @@
                     <button class="btn btn-sm btn-outline-secondary" id="shareCompare" title="Paylaş">
                         <i class="fas fa-share-alt me-1"></i>Paylaş
                     </button>
-                    @if (Model.Count > 0)
+                    @if (Model.Items.Count > 0)
                     {
+                        <a href="@Url.Action("Index", "Compare")" class="btn btn-sm btn-success" title="İşletmeleri karşılaştır">
+                            <i class="fas fa-balance-scale me-1"></i>Karşılaştırmayı Görüntüle
+                        </a>
                         <button class="btn btn-sm btn-outline-danger" id="clearCompare">
                             <i class="fas fa-trash me-1"></i>Listeyi Temizle
                         </button>
                     }
                 </div>
             </div>
-            @if (Model.Count == 0)
+            @if (Model.Items.Count == 0)
             {
                 <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>@ViewBag.Message
+                    <i class="fas fa-info-circle me-2"></i>@(Model.EmptyMessage ?? "Karşılaştırma listeniz boş. İşletme detay sayfalarından işletmeleri karşılaştırmaya ekleyebilirsiniz.")
                     <a href="@Url.Action("Search", "Home")" class="alert-link ms-2">İşletme Ara</a>
                 </div>
             }
             else
             {
                 <div class="alert alert-success d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-check-circle me-2"></i><strong>@Model.Count işletme</strong> karşılaştırılıyor</span>
+                    <span><i class="fas fa-check-circle me-2"></i><strong>@Model.Items.Count işletme</strong> karşılaştırılıyor</span>
                     <span class="badge bg-warning text-dark">Maksimum: 4 işletme</span>
                 </div>
             }
         </div>
     </div>
 
-    @if (Model.Count > 0)
+    @if (Model.Items.Count > 0)
     {
+        <!-- Özet Analiz Kartları -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card shadow-sm border-success">
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i class="fas fa-star fa-2x text-warning"></i>
+                        </div>
+                        <h6 class="card-subtitle mb-2 text-muted">En İyi Puan</h6>
+                        <h5 class="card-title text-success">@Model.Summary.BestRatingValue.ToString("F1")</h5>
+                        <p class="card-text small">@Model.Summary.BestRatingBusinessName</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card shadow-sm border-primary">
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i class="fas fa-chart-line fa-2x text-primary"></i>
+                        </div>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            En İyi Değer
+                            <i class="fas fa-info-circle text-info" data-bs-toggle="tooltip" data-bs-placement="top" 
+                               title="Fiyat/Puan oranına göre en iyi değer sunan işletme. Düşük fiyat ve yüksek puan kombinasyonu."></i>
+                        </h6>
+                        <h5 class="card-title text-primary">@Model.Summary.BestValueScore.ToString("F2")</h5>
+                        <p class="card-text small">Fiyat/Puan Oranı</p>
+                        <p class="card-text small text-muted">@Model.Summary.BestValueBusinessName</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card shadow-sm border-info">
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i class="fas fa-calculator fa-2x text-info"></i>
+                        </div>
+                        <h6 class="card-subtitle mb-2 text-muted">Ortalama Puan</h6>
+                        <h5 class="card-title text-info">@Model.Summary.AverageRating.ToString("F1")</h5>
+                        <p class="card-text small">@Model.Items.Count işletme ortalaması</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card shadow-sm border-warning">
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i class="fas fa-dollar-sign fa-2x text-warning"></i>
+                        </div>
+                        <h6 class="card-subtitle mb-2 text-muted">Fiyat Dağılımı</h6>
+                        @foreach (var item in Model.Summary.PriceDistribution)
+                        {
+                            <p class="card-text small mb-1">
+                                <strong>@item.Key:</strong> @item.Value adet
+                            </p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.CategoryInfo.AllSameCategory && !string.IsNullOrEmpty(Model.CategoryInfo.CommonCategoryName))
+            {
+                <div class="col-12">
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="fas fa-info-circle fa-2x me-3"></i>
+                        <div>
+                            <strong>Tüm işletmeler aynı kategoride:</strong> @Model.CategoryInfo.CommonCategoryName
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
         <!-- Grafiksel Karşılaştırma -->
         <div class="row mb-4">
             <div class="col-12">
@@ -73,10 +152,16 @@
                         <thead class="table-dark">
                             <tr>
                                 <th style="width: 200px;" class="align-middle">Özellik</th>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <th class="text-center align-middle" style="min-width: 280px;">
-                                        <div class="d-flex flex-column align-items-center p-2">
+                                        <div class="d-flex flex-column align-items-center p-2 position-relative">
+                                            @if (business.IsRecommended)
+                                            {
+                                                <span class="badge bg-success position-absolute top-0 end-0" style="z-index: 10;">
+                                                    <i class="fas fa-check-circle me-1"></i>Önerilen
+                                                </span>
+                                            }
                                             @if (!string.IsNullOrEmpty(business.ImageUrl))
                                             {
                                                 <img src="@business.ImageUrl" alt="@business.Name" class="img-thumbnail mb-2 shadow-sm" style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px;">
@@ -88,18 +173,51 @@
                                                 </div>
                                             }
                                             <h5 class="mb-1 text-center">@business.Name</h5>
-                                            @if (business.Category != null)
+                                            @if (!string.IsNullOrEmpty(business.CategoryName))
                                             {
-                                                <span class="badge bg-info mb-2">@business.Category.Name</span>
+                                                var categoryBadgeClass = Model.CategoryInfo.AllSameCategory ? "bg-success" : "bg-info";
+                                                <span class="badge @categoryBadgeClass mb-2">
+                                                    @if (Model.CategoryInfo.AllSameCategory)
+                                                    {
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                    }
+                                                    @business.CategoryName
+                                                </span>
                                             }
                                             <div class="mb-2">
-                                                @for (int i = 1; i <= 5; i++)
-                                                {
-                                                    <i class="@(i <= Math.Round(business.AverageRating) ? "fas" : "far") fa-star text-warning"></i>
-                                                }
-                                                <strong class="ms-1">@business.AverageRating.ToString("F1")</strong>
+                                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        <i class="@(i <= Math.Round(business.AverageRating) ? "fas" : "far") fa-star text-warning"></i>
+                                                    }
+                                                    <strong class="ms-1">@business.AverageRating.ToString("F1")</strong>
+                                                    @if (business.RatingRank == 1 && Model.Items.Count > 1)
+                                                    {
+                                                        <span class="badge bg-warning text-dark" title="En yüksek puan">
+                                                            <i class="fas fa-trophy"></i> #1
+                                                        </span>
+                                                    }
+                                                </div>
                                                 <small class="text-muted d-block">@business.TotalReviews yorum</small>
                                             </div>
+                                            @if (!string.IsNullOrEmpty(business.PriceRange))
+                                            {
+                                                <div class="mb-2">
+                                                    <span class="badge bg-success">@business.PriceRange</span>
+                                                    @if (business.PriceRank == 1 && Model.Items.Count > 1)
+                                                    {
+                                                        <span class="badge bg-success ms-1" title="En uygun fiyat">
+                                                            <i class="fas fa-dollar-sign"></i> En Ucuz
+                                                        </span>
+                                                    }
+                                                    else if (business.PriceRank == Model.Items.Count && Model.Items.Count > 1)
+                                                    {
+                                                        <span class="badge bg-danger ms-1" title="En yüksek fiyat">
+                                                            <i class="fas fa-exclamation-triangle"></i> En Pahalı
+                                                        </span>
+                                                    }
+                                                </div>
+                                            }
                                             <div class="d-flex gap-2 flex-wrap justify-content-center">
                                                 <a href="@Url.Action("Details", "Businesses", new { id = business.Id })" class="btn btn-sm btn-primary">
                                                     <i class="fas fa-eye me-1"></i>Detaylar
@@ -116,16 +234,16 @@
                         <tbody>
                             <tr class="table-info">
                                 <td class="fw-bold"><i class="fas fa-tag me-2"></i>Kategori</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td class="text-center">
-                                        <span class="badge bg-primary">@(business.Category?.Name ?? "Belirtilmemiş")</span>
+                                        <span class="badge bg-primary">@(business.CategoryName ?? "Belirtilmemiş")</span>
                                     </td>
                                 }
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i>Adres</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td>
                                         @if (!string.IsNullOrEmpty(business.Address))
@@ -141,7 +259,7 @@
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-phone me-2"></i>Telefon</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td>
                                         @if (!string.IsNullOrEmpty(business.Phone))
@@ -159,7 +277,7 @@
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-envelope me-2"></i>E-posta</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td>
                                         @if (!string.IsNullOrEmpty(business.Email))
@@ -177,7 +295,7 @@
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-globe me-2"></i>Website</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td>
                                         @if (!string.IsNullOrEmpty(business.Website))
@@ -195,7 +313,7 @@
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-dollar-sign me-2"></i>Fiyat Aralığı</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td class="text-center">
                                         @if (!string.IsNullOrEmpty(business.PriceRange))
@@ -211,7 +329,7 @@
                             </tr>
                             <tr class="table-warning">
                                 <td class="fw-bold"><i class="fas fa-star me-2"></i>Ortalama Puan</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td class="text-center">
                                         <div class="d-flex flex-column align-items-center">
@@ -228,7 +346,7 @@
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-comments me-2"></i>Toplam Yorum</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td class="text-center">
                                         <span class="badge bg-info fs-6">@business.TotalReviews yorum</span>
@@ -237,16 +355,16 @@
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-check-circle me-2"></i>Aktif Yorumlar</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td class="text-center">
-                                        <span class="badge bg-success">@(business.Reviews?.Count(r => r.IsActive && r.IsApproved) ?? 0) aktif</span>
+                                        <span class="badge bg-success">@business.ActiveReviewsCount aktif</span>
                                     </td>
                                 }
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-clock me-2"></i>Çalışma Saatleri</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td>
                                         @if (!string.IsNullOrEmpty(business.WorkingHours))
@@ -262,7 +380,7 @@
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-star me-2"></i>Öne Çıkan</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td class="text-center">
                                         @if (business.IsFeatured)
@@ -280,24 +398,21 @@
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-images me-2"></i>Görsel Sayısı</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td class="text-center">
-                                        <span class="badge bg-secondary">@(business.Images?.Count(img => img.IsActive) ?? 0) görsel</span>
+                                        <span class="badge bg-secondary">@business.ActiveImagesCount görsel</span>
                                     </td>
                                 }
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-ticket-alt me-2"></i>Aktif Kampanyalar</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td class="text-center">
-                                        @{
-                                            var activeCampaigns = business.Campaigns?.Where(c => c.IsActive && c.IsApproved && c.EndDate >= DateTime.Now).Count() ?? 0;
-                                        }
-                                        @if (activeCampaigns > 0)
+                                        @if (business.ActiveCampaignsCount > 0)
                                         {
-                                            <span class="badge bg-danger">@activeCampaigns kampanya</span>
+                                            <span class="badge bg-danger">@business.ActiveCampaignsCount kampanya</span>
                                         }
                                         else
                                         {
@@ -308,15 +423,12 @@
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-calendar-alt me-2"></i>Yaklaşan Etkinlikler</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td class="text-center">
-                                        @{
-                                            var upcomingEvents = business.Events?.Where(e => e.IsActive && e.IsApproved && e.StartDate >= DateTime.Now).Count() ?? 0;
-                                        }
-                                        @if (upcomingEvents > 0)
+                                        @if (business.UpcomingEventsCount > 0)
                                         {
-                                            <span class="badge bg-primary">@upcomingEvents etkinlik</span>
+                                            <span class="badge bg-primary">@business.UpcomingEventsCount etkinlik</span>
                                         }
                                         else
                                         {
@@ -327,7 +439,7 @@
                             </tr>
                             <tr>
                                 <td class="fw-bold"><i class="fas fa-calendar me-2"></i>Oluşturulma Tarihi</td>
-                                @foreach (var business in Model)
+                                @foreach (var business in Model.Items)
                                 {
                                     <td class="text-center">
                                         <small class="text-muted">@business.CreatedDate.ToString("dd.MM.yyyy")</small>
@@ -342,7 +454,7 @@
 
         <!-- Kart Görünümü (Gizli) -->
         <div id="cardView" class="row" style="display: none;">
-            @foreach (var business in Model)
+            @foreach (var business in Model.Items)
             {
                 <div class="col-md-6 col-lg-3 mb-4">
                     <div class="card h-100 shadow-sm">
@@ -352,9 +464,9 @@
                         }
                         <div class="card-body">
                             <h5 class="card-title">@business.Name</h5>
-                            @if (business.Category != null)
+                            @if (!string.IsNullOrEmpty(business.CategoryName))
                             {
-                                <span class="badge bg-info mb-2">@business.Category.Name</span>
+                                <span class="badge bg-info mb-2">@business.CategoryName</span>
                             }
                             <div class="mb-2">
                                 @for (int i = 1; i <= 5; i++)
@@ -401,20 +513,21 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Grafik oluştur
-            @if (Model.Count > 0)
+            // Grafik dataları (ViewModel'den)
+            @if (Model.Items.Count > 0)
             {
                 <text>
-                const ctx = document.getElementById('compareChart');
-                if (ctx) {
-                    const businesses = @Html.Raw(Json.Serialize(Model.Select(b => b.Name)));
-                    const ratings = @Html.Raw(Json.Serialize(Model.Select(b => b.AverageRating)));
-                    const reviews = @Html.Raw(Json.Serialize(Model.Select(b => b.TotalReviews)));
+                const labels = @Html.Raw(Json.Serialize(Model.Labels));
+                const ratings = @Html.Raw(Json.Serialize(Model.Ratings));
+                const priceValues = @Html.Raw(Json.Serialize(Model.PriceValues));
+                const valueScores = @Html.Raw(Json.Serialize(Model.ValueScores));
 
+                const ctx = document.getElementById('compareChart');
+                if (ctx && labels && labels.length > 0) {
                     new Chart(ctx, {
                         type: 'bar',
                         data: {
-                            labels: businesses,
+                            labels: labels,
                             datasets: [
                                 {
                                     label: 'Ortalama Puan',
@@ -422,15 +535,17 @@
                                     backgroundColor: 'rgba(255, 193, 7, 0.8)',
                                     borderColor: 'rgba(255, 193, 7, 1)',
                                     borderWidth: 2,
-                                    yAxisID: 'y'
+                                    yAxisID: 'y',
+                                    order: 1
                                 },
                                 {
-                                    label: 'Toplam Yorum',
-                                    data: reviews,
-                                    backgroundColor: 'rgba(0, 123, 255, 0.8)',
-                                    borderColor: 'rgba(0, 123, 255, 1)',
+                                    label: 'Fiyat Aralığı',
+                                    data: priceValues,
+                                    backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                                    borderColor: 'rgba(40, 167, 69, 1)',
                                     borderWidth: 2,
-                                    yAxisID: 'y1'
+                                    yAxisID: 'y2',
+                                    order: 2
                                 }
                             ]
                         },
@@ -444,7 +559,26 @@
                                 },
                                 title: {
                                     display: true,
-                                    text: 'İşletme Karşılaştırması'
+                                    text: 'İşletme Karşılaştırması - Puan ve Fiyat Analizi'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.datasetIndex === 1) {
+                                                // Fiyat aralığı için özel format
+                                                const priceValue = context.parsed.y;
+                                                const priceLabels = ['Belirtilmemiş', '$', '$$', '$$$', '$$$$'];
+                                                label += priceLabels[priceValue] || priceValue;
+                                            } else {
+                                                label += context.parsed.y.toFixed(1);
+                                            }
+                                            return label;
+                                        }
+                                    }
                                 }
                             },
                             scales: {
@@ -454,22 +588,37 @@
                                     position: 'left',
                                     title: {
                                         display: true,
-                                        text: 'Puan (0-5)'
+                                        text: 'Puan (0-5)',
+                                        color: 'rgba(255, 193, 7, 1)'
                                     },
                                     min: 0,
-                                    max: 5
+                                    max: 5,
+                                    ticks: {
+                                        color: 'rgba(255, 193, 7, 1)'
+                                    }
                                 },
-                                y1: {
+                                y2: {
                                     type: 'linear',
                                     display: true,
                                     position: 'right',
                                     title: {
                                         display: true,
-                                        text: 'Yorum Sayısı'
+                                        text: 'Fiyat Aralığı ($, $$, $$$)',
+                                        color: 'rgba(40, 167, 69, 1)'
                                     },
                                     grid: {
                                         drawOnChartArea: false
-                                    }
+                                    },
+                                    ticks: {
+                                        color: 'rgba(40, 167, 69, 1)',
+                                        stepSize: 1,
+                                        callback: function(value) {
+                                            const priceLabels = ['', '$', '$$', '$$$', '$$$$'];
+                                            return priceLabels[value] || value;
+                                        }
+                                    },
+                                    max: 4,
+                                    min: 0
                                 }
                             }
                         }
@@ -528,13 +677,13 @@
 
             // Paylaş
             $('#shareCompare').on('click', function() {
-                const businessIds = @Html.Raw(Json.Serialize(Model.Select(b => b.Id)));
+                const businessIds = @Html.Raw(Json.Serialize(Model.Items.Select(b => b.Id)));
                 const shareUrl = window.location.origin + '/Compare/Index?ids=' + businessIds.join(',');
                 
                 if (navigator.share) {
                     navigator.share({
                         title: 'İşletme Karşılaştırması',
-                        text: '@Model.Count işletme karşılaştırması',
+                        text: '@Model.Items.Count işletme karşılaştırması',
                         url: shareUrl
                     }).catch(err => console.log('Paylaşım hatası:', err));
                 } else {

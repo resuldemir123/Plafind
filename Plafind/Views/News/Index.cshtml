@@ -52,10 +52,20 @@
                                     <i class="fas fa-newspaper"></i>
                                 </div>
                             }
-                            <div class="news-badge">
-                                <i class="fas fa-fire me-1"></i>
-                                <span>Yeni</span>
-                            </div>
+                            @if (item.PublishDate >= DateTime.Now.AddDays(-7))
+                            {
+                                <div class="news-badge">
+                                    <i class="fas fa-fire me-1"></i>
+                                    <span>Yeni</span>
+                                </div>
+                            }
+                            @if (item.IsExternal)
+                            {
+                                <div class="news-external-badge">
+                                    <i class="fas fa-rss me-1"></i>
+                                    <span>@(item.ExternalSource ?? "RSS")</span>
+                                </div>
+                            }
                         </div>
 
                         <!-- Content Section -->
@@ -79,9 +89,24 @@
 
                             <div class="news-excerpt">
                                 @{
-                                    var excerpt = item.Content?.Length > 180
-                                        ? item.Content.Substring(0, 180) + "..."
-                                        : item.Content ?? "";
+                                    // HTML etiketlerini temizle ve düz metin al
+                                    var plainText = System.Text.RegularExpressions.Regex.Replace(
+                                        item.Content ?? "", 
+                                        "<.*?>", 
+                                        string.Empty
+                                    );
+                                    plainText = System.Net.WebUtility.HtmlDecode(plainText);
+                                    
+                                    // Fazla boşlukları temizle
+                                    plainText = System.Text.RegularExpressions.Regex.Replace(
+                                        plainText, 
+                                        @"\s+", 
+                                        " "
+                                    ).Trim();
+                                    
+                                    var excerpt = plainText.Length > 150
+                                        ? plainText.Substring(0, 150) + "..."
+                                        : plainText;
                                 }
                                 <p>@excerpt</p>
                             </div>
@@ -92,10 +117,17 @@
                                         <i class="fas fa-user"></i>
                                     </div>
                                     <div class="author-info">
-                                        <span class="author-name">@(item.Author?.DisplayName ?? item.Author?.UserName ?? "Admin")</span>
-                                        <span class="author-role">Yazar</span>
+                                        <span class="author-name">@(item.Author?.DisplayName ?? item.Author?.UserName ?? (item.IsExternal ? item.ExternalSource ?? "Harici Kaynak" : "Admin"))</span>
+                                        <span class="author-role">@(item.IsExternal ? "Harici Kaynak" : "Yazar")</span>
                                     </div>
                                 </div>
+                                @if (item.IsExternal && !string.IsNullOrEmpty(item.SourceUrl))
+                                {
+                                    <div class="news-source-badge">
+                                        <i class="fas fa-external-link-alt me-1"></i>
+                                        <span>Harici</span>
+                                    </div>
+                                }
 
                                 <div class="news-actions">
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn-read-more">
@@ -329,6 +361,34 @@
         z-index: 2;
     }
 
+    .news-external-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        z-index: 2;
+    }
+
+    .news-source-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.375rem 0.75rem;
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
     /* Content Section */
     .news-card-content {
         padding: 1.75rem;
@@ -386,6 +446,11 @@
         font-size: 0.9375rem;
         line-height: 1.7;
         margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     /* Card Footer */
@@ -631,3 +696,4 @@
         }
     }
 </style>
+

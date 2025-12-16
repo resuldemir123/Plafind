@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,11 +92,32 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// MVC
-builder.Services.AddControllersWithViews();
+// LOCALIZATION (Çoklu Dil Desteği)
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+// MVC - View Localization desteği ile
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization();
 
 // RAZOR PAGES
 builder.Services.AddRazorPages();
+
+// Desteklenen dilleri tanımla
+const string defaultCulture = "tr-TR";
+var supportedCultures = new[]
+{
+    new CultureInfo("tr-TR"), // Türkçe
+    new CultureInfo("en-US"), // İngilizce
+};
+
+// Yerelleştirme Middleware'ini yapılandır
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture(defaultCulture);
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+    options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider()); // Çerezden okuma (Dil Seçimi için)
+});
 
 // EMAIL SERVICE
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -103,6 +127,22 @@ builder.Services.AddScoped<ISmsService, SmsService>();
 
 // NOTIFICATION SERVICE
 builder.Services.AddScoped<INotificationService, NotificationService>();
+
+// COMPARISON SERVICE
+builder.Services.AddScoped<IComparisonService, ComparisonService>();
+
+// COMPARE SERVICE (Session-based comparison)
+builder.Services.AddScoped<ICompareService, CompareService>();
+
+// GOOGLE NEWS SERVICE - Timeout ve retry ayarları ile
+builder.Services.AddHttpClient<IGoogleNewsService, GoogleNewsService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30); // 30 saniye timeout
+    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+});
+
+// BACKGROUND SERVICE - Turizm haberlerini otomatik senkronize et
+builder.Services.AddHostedService<TourismNewsBackgroundService>();
 
 builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("GoogleGemini"));
 builder.Services.AddHttpClient<IGeminiChatService, GeminiChatService>();
@@ -206,6 +246,11 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseSession();
+
+// LOCALIZATION MIDDLEWARE (Routing'den önce olmalı)
+var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
+app.UseRequestLocalization(localizationOptions);
+
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

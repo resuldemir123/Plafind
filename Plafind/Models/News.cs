@@ -23,5 +23,10 @@ namespace Plafind.Models
         // Yazar bilgisi
         public string? AuthorId { get; set; }
         public ApplicationUser? Author { get; set; }
+
+        // External News (RSS Feed) için ek alanlar
+        public string? SourceUrl { get; set; } // Haber kaynağı URL'si
+        public bool IsExternal { get; set; } = false; // Harici kaynaktan mı geldi?
+        public string? ExternalSource { get; set; } // Harici kaynak adı (örn: "Google News")
     }
 }

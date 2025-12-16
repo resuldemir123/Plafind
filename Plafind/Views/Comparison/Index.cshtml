@@ -1,0 +1,202 @@
+@model Plafind.Models.ComparisonViewModel
+@{
+    ViewData["Title"] = "İşletme Karşılaştırma";
+}
+
+<link rel="stylesheet" href="~/css/comparison.css" />
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header mb-4">
+                <h1><i class="fas fa-balance-scale me-2"></i>İşletme Karşılaştırma</h1>
+                <p class="text-muted">Seçtiğiniz işletmeleri özellikleriyle karşılaştırın</p>
+            </div>
+
+            @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage as string))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>@ViewBag.ErrorMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(ViewBag.WarningMessage as string))
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>@ViewBag.WarningMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (Model.Businesses == null || !Model.Businesses.Any())
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Karşılaştırma için işletme seçilmedi. 
+                    <a href="@Url.Action("Index", "Businesses")" class="alert-link">İşletmeler sayfasına</a> giderek karşılaştırmak istediğiniz işletmeleri seçebilirsiniz.
+                </div>
+            }
+            else
+            {
+                <!-- Seçili İşletmeler Özeti -->
+                <div class="comparison-summary mb-4">
+                    <div class="row g-3">
+                        @foreach (var business in Model.Businesses)
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="card comparison-business-card h-100">
+                                    @if (!string.IsNullOrEmpty(business.ImageUrl))
+                                    {
+                                        <img src="@business.ImageUrl" class="card-img-top" alt="@business.Name" onerror="this.src='/images/default.jpg';">
+                                    }
+                                    else
+                                    {
+                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
+                                            <i class="fas fa-building fa-3x text-muted"></i>
+                                        </div>
+                                    }
+                                    <div class="card-body">
+                                        <h5 class="card-title">@business.Name</h5>
+                                        <p class="card-text small text-muted">
+                                            <i class="fas fa-tag me-1"></i>@(business.Category?.Name ?? "Kategori Yok")
+                                        </p>
+                                        <p class="card-text small">
+                                            <i class="fas fa-star text-warning me-1"></i>@business.AverageRating.ToString("F1")
+                                            <span class="text-muted ms-2">(@business.TotalReviews yorum)</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Kontroller -->
+                <div class="comparison-controls mb-3">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary" id="toggle-differences-btn" onclick="toggleDifferences()">
+                            <i class="fas fa-filter me-2"></i>Sadece Farkları Göster
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" onclick="clearComparisonAndReload()">
+                            <i class="fas fa-trash me-2"></i>Karşılaştırmayı Temizle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Karşılaştırma Tablosu -->
+                <div class="comparison-table-wrapper">
+                    <table class="table comparison-table">
+                        <thead>
+                            <tr>
+                                <th class="feature-column">Özellik</th>
+                                @foreach (var business in Model.Businesses)
+                                {
+                                    <th class="business-column">@business.Name</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Kritik Özellikler -->
+                            @if (Model.CriticalFeatures != null && Model.CriticalFeatures.Any())
+                            {
+                                @foreach (var row in Model.CriticalFeatures)
+                                {
+                                    <tr class="@(row.IsDifferent ? "highlight-diff" : "")">
+                                        <td class="feature-name" data-title="@row.AttributeName">
+                                            <strong>@row.AttributeName</strong>
+                                        </td>
+                                        @for (int i = 0; i < row.Values.Count; i++)
+                                        {
+                                            <td class="feature-value" data-title="@row.AttributeName">
+                                                @row.Values[i]
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            }
+
+                            <!-- Dinamik Özellikler -->
+                            @if (Model.FeatureRows != null && Model.FeatureRows.Any())
+                            {
+                                @foreach (var row in Model.FeatureRows)
+                                {
+                                    <tr class="@(row.IsDifferent ? "highlight-diff" : "")">
+                                        <td class="feature-name" data-title="@row.AttributeName">
+                                            @row.AttributeName
+                                        </td>
+                                        @for (int i = 0; i < row.Values.Count; i++)
+                                        {
+                                            <td class="feature-value" data-title="@row.AttributeName">
+                                                @row.Values[i]
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="@(Model.Businesses.Count + 1)" class="text-center text-muted">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Bu işletmeler için dinamik özellik bulunmamaktadır.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script src="~/js/comparison.js"></script>
+<script>
+    let showOnlyDifferences = false;
+
+    function toggleDifferences() {
+        showOnlyDifferences = !showOnlyDifferences;
+        const btn = document.getElementById('toggle-differences-btn');
+        
+        if (showOnlyDifferences) {
+            btn.innerHTML = '<i class="fas fa-filter me-2"></i>Tümünü Göster';
+            btn.classList.remove('btn-outline-primary');
+            btn.classList.add('btn-primary');
+        } else {
+            btn.innerHTML = '<i class="fas fa-filter me-2"></i>Sadece Farkları Göster';
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-outline-primary');
+        }
+
+        if (window.ComparisonManager) {
+            window.ComparisonManager.toggleDifferencesOnly(showOnlyDifferences);
+        } else {
+            // Fallback
+            const rows = document.querySelectorAll('.comparison-table tbody tr');
+            rows.forEach(row => {
+                if (showOnlyDifferences) {
+                    if (!row.classList.contains('highlight-diff')) {
+                        row.style.display = 'none';
+                    } else {
+                        row.style.display = '';
+                    }
+                } else {
+                    row.style.display = '';
+                }
+            });
+        }
+    }
+
+    function clearComparisonAndReload() {
+        if (confirm('Karşılaştırmayı temizlemek istediğinize emin misiniz?')) {
+            if (window.ComparisonManager) {
+                window.ComparisonManager.clearComparison();
+            } else {
+                localStorage.removeItem('plafind_comparison_list');
+            }
+            window.location.href = '@Url.Action("Index", "Businesses")';
+        }
+    }
+</script>
+

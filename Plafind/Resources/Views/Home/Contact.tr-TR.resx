@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ContactTitle" xml:space="preserve">
+    <value>Bölgenin En Güçlü İşletme Ağına Ulaşın</value>
+  </data>
+  <data name="ContactSubtitle" xml:space="preserve">
+    <value>Sorularınız, talepleriniz veya iş birlikleri için ekibimizle her zaman iletişime geçebilirsiniz. İşletmeniz için doğru çözümleri birlikte planlayalım.</value>
+  </data>
+  <data name="Response48Hours" xml:space="preserve">
+    <value>48 saat içinde dönüş</value>
+  </data>
+  <data name="SmartMatching" xml:space="preserve">
+    <value>Akıllı eşleşme motoru</value>
+  </data>
+  <data name="KVKKCompliant" xml:space="preserve">
+    <value>KVKK uyumlu altyapı</value>
+  </data>
+  <data name="ActiveUsers" xml:space="preserve">
+    <value>Aktif kullanıcı</value>
+  </data>
+  <data name="BusinessProfiles" xml:space="preserve">
+    <value>İşletme profili</value>
+  </data>
+  <data name="SupportLine" xml:space="preserve">
+    <value>Destek hattı</value>
+  </data>
+  <data name="HeadOffice" xml:space="preserve">
+    <value>Merkez Ofis</value>
+  </data>
+  <data name="HeadOfficeSubtitle" xml:space="preserve">
+    <value>Alanya'nın kalbinde, işletmelerinizi geleceğe hazırlayan dijital üssümüz.</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Adres</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Telefon</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>E-posta</value>
+  </data>
+  <data name="WorkingHours" xml:space="preserve">
+    <value>Çalışma Saatleri</value>
+  </data>
+  <data name="LiveSupport" xml:space="preserve">
+    <value>Canlı Destek</value>
+  </data>
+  <data name="LiveSupportText" xml:space="preserve">
+    <value>WhatsApp hattımız üzerinden bize saniyeler içinde ulaşabilirsiniz.</value>
+  </data>
+  <data name="CallSupport" xml:space="preserve">
+    <value>Destek Hattını Ara</value>
+  </data>
+  <data name="FollowUs" xml:space="preserve">
+    <value>Bizi Takip Edin</value>
+  </data>
+  <data name="SendMessage" xml:space="preserve">
+    <value>Mesajınızı Gönderin</value>
+  </data>
+  <data name="SendMessageSubtitle" xml:space="preserve">
+    <value>Uzman ekibimiz en geç 24 saat içinde sizinle iletişime geçer.</value>
+  </data>
+  <data name="AverageResponse" xml:space="preserve">
+    <value>Ortalama Yanıt: 12 Saat</value>
+  </data>
+  <data name="FullName" xml:space="preserve">
+    <value>Ad Soyad</value>
+  </data>
+  <data name="EmailAddress" xml:space="preserve">
+    <value>E-posta</value>
+  </data>
+  <data name="PhoneOptional" xml:space="preserve">
+    <value>Telefon (Opsiyonel)</value>
+  </data>
+  <data name="Subject" xml:space="preserve">
+    <value>Konu</value>
+  </data>
+  <data name="SelectSubject" xml:space="preserve">
+    <value>Bir konu seçin</value>
+  </data>
+  <data name="GeneralInfo" xml:space="preserve">
+    <value>Genel Bilgi</value>
+  </data>
+  <data name="BusinessRegistration" xml:space="preserve">
+    <value>İşletme Kaydı</value>
+  </data>
+  <data name="ComplaintSupport" xml:space="preserve">
+    <value>Şikayet / Destek</value>
+  </data>
+  <data name="Suggestion" xml:space="preserve">
+    <value>Öneri</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Diğer</value>
+  </data>
+  <data name="YourMessage" xml:space="preserve">
+    <value>Mesajınız</value>
+  </data>
+  <data name="MessagePlaceholder" xml:space="preserve">
+    <value>Bize nasıl yardımcı olmamızı istersiniz?</value>
+  </data>
+  <data name="DataSecure" xml:space="preserve">
+    <value>Verileriniz güvende</value>
+  </data>
+  <data name="KVKKAccept" xml:space="preserve">
+    <value>Gönderim ile KVKK politikamızı kabul etmiş olursunuz.</value>
+  </data>
+  <data name="SendMessageButton" xml:space="preserve">
+    <value>Mesajı Gönder</value>
+  </data>
+  <data name="OurLocation" xml:space="preserve">
+    <value>Konumumuz</value>
+  </data>
+  <data name="OurLocationSubtitle" xml:space="preserve">
+    <value>Alanya merkezindeki ofisimize uğrayarak kahvemizi paylaşın, projenizi görüşelim.</value>
+  </data>
+  <data name="MapComingSoon" xml:space="preserve">
+    <value>Harita yakında burada</value>
+  </data>
+  <data name="MapComingSoonText" xml:space="preserve">
+    <value>Google Maps entegrasyonu hazırlanıyor. Bu sırada konum bilgisi aşağıdaki gibidir.</value>
+  </data>
+  <data name="ParkingAvailable" xml:space="preserve">
+    <value>Otopark mevcut</value>
+  </data>
+  <data name="PublicTransport" xml:space="preserve">
+    <value>Toplu taşıma ile ulaşım kolay</value>
+  </data>
+  <data name="OpenInGoogleMaps" xml:space="preserve">
+    <value>Google Maps'te aç</value>
+  </data>
+  <data name="FAQ" xml:space="preserve">
+    <value>Sıkça Sorulan Sorular</value>
+  </data>
+  <data name="FAQSubtitle" xml:space="preserve">
+    <value>Platformumuz, işletmeler ve kullanıcılar tarafından en çok merak edilen konuların yanıtları.</value>
+  </data>
+  <data name="FAQ1Question" xml:space="preserve">
+    <value>İşletmemi nasıl kaydedebilirim?</value>
+  </data>
+  <data name="FAQ1Answer" xml:space="preserve">
+    <value>İşletmenizi eklemek için önce üye olun, ardından "İşletme Ekle" adımlarını takip edin. Ekibimiz bilgilerinizi doğruladıktan sonra işletmeniz 1-2 iş günü içinde yayına alınır.</value>
+  </data>
+  <data name="FAQ2Question" xml:space="preserve">
+    <value>Yorumlar nasıl değerlendiriliyor?</value>
+  </data>
+  <data name="FAQ2Answer" xml:space="preserve">
+    <value>Tüm yorumlar otomatik içerik filtresi ve manuel moderasyon süreçlerinden geçer. Topluluk kurallarına aykırı, hakaret içeren veya spam nitelikli yorumlar yayına alınmaz.</value>
+  </data>
+  <data name="FAQ3Question" xml:space="preserve">
+    <value>Rezervasyon nasıl yapılır?</value>
+  </data>
+  <data name="FAQ3Answer" xml:space="preserve">
+    <value>İlgilendiğiniz işletmenin sayfasında "Rezervasyon Yap" butonuna basın, tarih ve saat seçin ve talebinizi gönderin. İşletme onayladığında hem e-posta hem de paneliniz üzerinden bilgilendirilirsiniz.</value>
+  </data>
+  <data name="FAQ4Question" xml:space="preserve">
+    <value>Favori işletmelerimi nasıl kaydederim?</value>
+  </data>
+  <data name="FAQ4Answer" xml:space="preserve">
+    <value>İşletme kartlarında yer alan kalp ikonuna tıklayarak favorilerinize ekleyebilirsiniz. Favorileriniz hesabınızdaki "Panelim" sayfasında düzenlenebilir.</value>
+  </data>
+  <data name="FAQ5Question" xml:space="preserve">
+    <value>Verilerim güvende mi?</value>
+  </data>
+  <data name="FAQ5Answer" xml:space="preserve">
+    <value>Tüm veri aktarımı SSL ile şifrelenir. KVKK ve GDPR standartlarına uyumlu altyapımız sayesinde bilgileriniz üçüncü kişilerle paylaşılmaz.</value>
+  </data>
+  <data name="Sending" xml:space="preserve">
+    <value>Gönderiliyor...</value>
+  </data>
+  <data name="Reach" xml:space="preserve">
+    <value>Ulaşın</value>
+  </data>
+  <data name="Weekdays" xml:space="preserve">
+    <value>Hafta içi</value>
+  </data>
+</root>
+

@@ -1,0 +1,300 @@
+/**
+ * İşletme Karşılaştırma Sistemi - Responsive CSS
+ * data-title tekniği ile mobil uyumlu tablo tasarımı
+ */
+
+/* Genel Stiller */
+.comparison-table-wrapper {
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: white;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    background: white;
+}
+
+.comparison-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.comparison-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.comparison-table th.feature-column {
+    min-width: 200px;
+    position: sticky;
+    left: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 10;
+}
+
+.comparison-table th.business-column {
+    min-width: 180px;
+    text-align: center;
+}
+
+.comparison-table tbody tr {
+    border-bottom: 1px solid #e2e8f0;
+    transition: background-color 0.2s ease;
+}
+
+.comparison-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.comparison-table tbody tr.highlight-diff {
+    background-color: #fff3cd;
+}
+
+.comparison-table tbody tr.highlight-diff:hover {
+    background-color: #ffe69c;
+}
+
+.comparison-table td {
+    padding: 0.875rem 1rem;
+    vertical-align: middle;
+}
+
+.comparison-table td.feature-name {
+    font-weight: 600;
+    color: #2d3748;
+    background-color: #f7fafc;
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    border-right: 2px solid #e2e8f0;
+}
+
+.comparison-table td.feature-value {
+    text-align: center;
+    color: #4a5568;
+}
+
+/* İşletme Kartları */
+.comparison-summary {
+    margin-bottom: 2rem;
+}
+
+.comparison-business-card {
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.comparison-business-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+}
+
+.comparison-business-card .card-img-top {
+    height: 150px;
+    object-fit: cover;
+}
+
+.comparison-business-card .card-body {
+    padding: 1rem;
+}
+
+.comparison-business-card .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #2d3748;
+}
+
+/* Kontroller */
+.comparison-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Page Header */
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: #718096;
+    margin-bottom: 0;
+}
+
+/* Mobil Cihazlar için Responsive Tasarım (data-title tekniği) */
+@media (max-width: 768px) {
+    .comparison-table-wrapper {
+        overflow-x: visible;
+    }
+
+    .comparison-table {
+        display: block;
+        width: 100%;
+    }
+
+    .comparison-table thead {
+        display: none; /* Başlıkları gizle */
+    }
+
+    .comparison-table tbody {
+        display: block;
+    }
+
+    .comparison-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .comparison-table tbody tr.highlight-diff {
+        border-color: #ffc107;
+        background-color: #fff3cd;
+    }
+
+    .comparison-table td {
+        display: block;
+        padding: 0.75rem 1rem;
+        text-align: left !important;
+        border: none;
+        border-bottom: 1px solid #e2e8f0;
+        position: relative;
+        padding-left: 40%;
+    }
+
+    .comparison-table td:last-child {
+        border-bottom: none;
+    }
+
+    /* data-title ile özellik adını göster */
+    .comparison-table td::before {
+        content: attr(data-title);
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: 600;
+        color: #2d3748;
+        width: 35%;
+        text-align: left;
+    }
+
+    .comparison-table td.feature-name {
+        background-color: #667eea;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        padding: 1rem;
+        border-radius: 0.5rem 0.5rem 0 0;
+        position: relative;
+        left: auto;
+        z-index: auto;
+        border-right: none;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .comparison-table td.feature-name::before {
+        display: none; /* Feature name için before kullanma */
+    }
+
+    .comparison-table td.feature-value {
+        padding-left: 40%;
+    }
+
+    /* İşletme kartları mobilde tam genişlik */
+    .comparison-summary .col-md-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    /* Kontroller mobilde tam genişlik */
+    .comparison-controls {
+        flex-direction: column;
+    }
+
+    .comparison-controls .btn-group {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .comparison-controls .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Tablet için Orta Boy Ekranlar */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .comparison-table th.feature-column,
+    .comparison-table td.feature-name {
+        min-width: 150px;
+    }
+
+    .comparison-table th.business-column {
+        min-width: 150px;
+    }
+}
+
+/* Farklılık Vurgulama Animasyonu */
+@keyframes highlightPulse {
+    0%, 100% {
+        background-color: #fff3cd;
+    }
+    50% {
+        background-color: #ffe69c;
+    }
+}
+
+.comparison-table tbody tr.highlight-diff.new-highlight {
+    animation: highlightPulse 1s ease-in-out;
+}
+
+/* Boş Durum */
+.comparison-table tbody tr td.text-center {
+    padding: 2rem;
+    font-style: italic;
+    color: #718096;
+}
+
+/* Loading State */
+.comparison-loading {
+    text-align: center;
+    padding: 3rem;
+    color: #718096;
+}
+
+.comparison-loading i {
+    font-size: 2rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+

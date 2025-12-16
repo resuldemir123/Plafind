@@ -369,6 +369,9 @@ namespace Plafind.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("FeaturesJson")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("ImageUrl")
                         .HasColumnType("longtext");
 
@@ -1023,11 +1026,20 @@ namespace Plafind.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("ExternalSource")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("ImageUrl")
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("IsExternal")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<DateTime>("PublishDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("SourceUrl")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Title")
                         .IsRequired()

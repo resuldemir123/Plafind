@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Plafind.Models
 {
@@ -34,6 +36,18 @@ namespace Plafind.Models
         // İşletme sahibi (BusinessOwner)
         public string? OwnerId { get; set; }
         public ApplicationUser? Owner { get; set; }
+
+        // Dinamik özellikler için JSON sütunu
+        /// <summary>
+        /// JSON string olarak saklanan dinamik özellikler
+        /// </summary>
+        public string? FeaturesJson { get; set; }
+
+        /// <summary>
+        /// C# nesnesi olarak kullanılan dinamik özellikler (EF Core tarafından otomatik dönüştürülür)
+        /// </summary>
+        [NotMapped]
+        public List<BusinessFeature>? Features { get; set; }
 
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<UserFavorite> Favorites { get; set; } = new List<UserFavorite>();

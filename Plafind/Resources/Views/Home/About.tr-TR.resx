@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>Hakkımızda</value>
+  </data>
+  <data name="AboutSubtitle" xml:space="preserve">
+    <value>Alanya'nın en kapsamlı işletme rehberi platformu</value>
+  </data>
+  <data name="OurMission" xml:space="preserve">
+    <value>Misyonumuz</value>
+  </data>
+  <data name="MissionText" xml:space="preserve">
+    <value>Alanya'daki tüm kaliteli işletmeleri tek bir platformda toplayarak, hem yerel halk hem de turistler için en iyi deneyimi sunmak. İşletmelerin dijital varlığını güçlendirirken, kullanıcıların doğru bilgilere kolayca ulaşmasını sağlamak.</value>
+  </data>
+  <data name="TransparentInfo" xml:space="preserve">
+    <value>Şeffaf ve güvenilir bilgi paylaşımı</value>
+  </data>
+  <data name="SupportLocal" xml:space="preserve">
+    <value>Yerel işletmeleri destekleme</value>
+  </data>
+  <data name="UserExperience" xml:space="preserve">
+    <value>Kullanıcı deneyimini ön planda tutma</value>
+  </data>
+  <data name="ContinuousImprovement" xml:space="preserve">
+    <value>Sürekli gelişim ve yenilik</value>
+  </data>
+  <data name="OurVision" xml:space="preserve">
+    <value>Vizyonumuz</value>
+  </data>
+  <data name="VisionText" xml:space="preserve">
+    <value>Alanya'nın dijital ekosisteminde lider konumda olmak ve bölgenin en güvenilir işletme rehberi haline gelmek. Teknolojik yeniliklerle sürekli gelişerek, kullanıcılarımıza ve işletmelere en iyi hizmeti sunmak.</value>
+  </data>
+  <data name="RegionalLeadership" xml:space="preserve">
+    <value>Bölgesel liderlik</value>
+  </data>
+  <data name="TechnologicalExcellence" xml:space="preserve">
+    <value>Teknolojik üstünlük</value>
+  </data>
+  <data name="SocialValue" xml:space="preserve">
+    <value>Toplumsal değer yaratma</value>
+  </data>
+  <data name="SustainableGrowth" xml:space="preserve">
+    <value>Sürdürülebilir büyüme</value>
+  </data>
+  <data name="OurValues" xml:space="preserve">
+    <value>Değerlerimiz</value>
+  </data>
+  <data name="Reliability" xml:space="preserve">
+    <value>Güvenilirlik</value>
+  </data>
+  <data name="ReliabilityText" xml:space="preserve">
+    <value>Doğru ve güncel bilgiler sunarak kullanıcılarımızın güvenini kazanmak</value>
+  </data>
+  <data name="CustomerFocus" xml:space="preserve">
+    <value>Müşteri Odaklılık</value>
+  </data>
+  <data name="CustomerFocusText" xml:space="preserve">
+    <value>Kullanıcı ihtiyaçlarını anlamak ve en iyi çözümleri sunmak</value>
+  </data>
+  <data name="Innovation" xml:space="preserve">
+    <value>Yenilikçilik</value>
+  </data>
+  <data name="InnovationText" xml:space="preserve">
+    <value>Teknolojik gelişmeleri takip ederek sürekli iyileştirme</value>
+  </data>
+  <data name="Collaboration" xml:space="preserve">
+    <value>İş Birliği</value>
+  </data>
+  <data name="CollaborationText" xml:space="preserve">
+    <value>Yerel işletmelerle güçlü ortaklıklar kurmak</value>
+  </data>
+  <data name="Transparency" xml:space="preserve">
+    <value>Şeffaflık</value>
+  </data>
+  <data name="TransparencyText" xml:space="preserve">
+    <value>Açık ve dürüst iletişim kurmak</value>
+  </data>
+  <data name="ContinuousDevelopment" xml:space="preserve">
+    <value>Sürekli Gelişim</value>
+  </data>
+  <data name="ContinuousDevelopmentText" xml:space="preserve">
+    <value>Her gün daha iyi olmak için çalışmak</value>
+  </data>
+  <data name="ByNumbers" xml:space="preserve">
+    <value>Rakamlarla Biz</value>
+  </data>
+  <data name="ByNumbersSubtitle" xml:space="preserve">
+    <value>Platformumuzun büyümesi ve etkisi</value>
+  </data>
+  <data name="Businesses" xml:space="preserve">
+    <value>İşletme</value>
+  </data>
+  <data name="ActiveUsers" xml:space="preserve">
+    <value>Aktif Kullanıcı</value>
+  </data>
+  <data name="Reviews" xml:space="preserve">
+    <value>Yorum</value>
+  </data>
+  <data name="Reservations" xml:space="preserve">
+    <value>Rezervasyon</value>
+  </data>
+  <data name="ContactCTA" xml:space="preserve">
+    <value>Bizimle İletişime Geçin</value>
+  </data>
+  <data name="ContactCTAText" xml:space="preserve">
+    <value>Sorularınız, önerileriniz veya iş birliği teklifleriniz için bizimle iletişime geçebilirsiniz.</value>
+  </data>
+  <data name="GoToContact" xml:space="preserve">
+    <value>İletişim Sayfasına Git</value>
+  </data>
+</root>
+

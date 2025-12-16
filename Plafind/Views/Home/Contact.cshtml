@@ -1,6 +1,8 @@
 @model ContactViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "İletişim - Alanya İşletme Rehberi";
+    ViewData["Title"] = Localizer["ContactTitle"].Value + " - Alanya İşletme Rehberi";
 }
 
 <!-- Hero Section -->
@@ -18,21 +20,20 @@
                     <i class="fas fa-location-dot me-2 text-warning"></i>Alanya İşletme Rehberi
                 </span>
                 <h1 class="display-4 fw-bold mb-3">
-                    Bölgenin En Güçlü İşletme Ağına <span class="text-gradient">Ulaşın</span>
+                    @Localizer["ContactTitle"] <span class="text-gradient">@Localizer["Reach"]</span>
                 </h1>
                 <p class="lead mb-4">
-                    Sorularınız, talepleriniz veya iş birlikleri için ekibimizle her zaman iletişime geçebilirsiniz. 
-                    İşletmeniz için doğru çözümleri birlikte planlayalım.
+                    @Localizer["ContactSubtitle"]
                 </p>
                 <div class="contact-hero__chips d-flex flex-wrap justify-content-center gap-3">
                     <span class="chip">
-                        <i class="fas fa-headset me-2"></i>48 saat içinde dönüş
+                        <i class="fas fa-headset me-2"></i>@Localizer["Response48Hours"]
                     </span>
                     <span class="chip">
-                        <i class="fas fa-robot me-2"></i>Akıllı eşleşme motoru
+                        <i class="fas fa-robot me-2"></i>@Localizer["SmartMatching"]
                     </span>
                     <span class="chip">
-                        <i class="fas fa-shield-alt me-2"></i>KVKK uyumlu altyapı
+                        <i class="fas fa-shield-alt me-2"></i>@Localizer["KVKKCompliant"]
                     </span>
                 </div>
             </div>
@@ -44,7 +45,7 @@
                     <i class="fas fa-users"></i>
                     <div>
                         <h5 class="mb-1">5000+</h5>
-                        <p class="mb-0">Aktif kullanıcı</p>
+                        <p class="mb-0">@Localizer["ActiveUsers"]</p>
                     </div>
                 </div>
             </div>
@@ -53,7 +54,7 @@
                     <i class="fas fa-building"></i>
                     <div>
                         <h5 class="mb-1">650+</h5>
-                        <p class="mb-0">İşletme profili</p>
+                        <p class="mb-0">@Localizer["BusinessProfiles"]</p>
                     </div>
                 </div>
             </div>
@@ -62,7 +63,7 @@
                     <i class="fas fa-clock"></i>
                     <div>
                         <h5 class="mb-1">7/24</h5>
-                        <p class="mb-0">Destek hattı</p>
+                        <p class="mb-0">@Localizer["SupportLine"]</p>
                     </div>
                 </div>
             </div>
@@ -77,9 +78,9 @@
             <div class="col-lg-5">
                 <div class="glass-card h-100">
                     <h3 class="section-title mb-2">
-                        <i class="fas fa-map-marked-alt me-2 text-warning"></i>Merkez Ofis
+                        <i class="fas fa-map-marked-alt me-2 text-warning"></i>@Localizer["HeadOffice"]
                     </h3>
-                    <p class="section-subtitle mb-4">Alanya'nın kalbinde, işletmelerinizi geleceğe hazırlayan dijital üssümüz.</p>
+                    <p class="section-subtitle mb-4">@Localizer["HeadOfficeSubtitle"]</p>
 
                     <div class="contact-info-list">
                         <div class="contact-info-item">
@@ -87,7 +88,7 @@
                                 <i class="fas fa-location-dot"></i>
                             </span>
                             <div>
-                                <span class="label">Adres</span>
+                                <span class="label">@Localizer["Address"]</span>
                                 <p class="mb-0">
                                     Atatürk Caddesi No: 123<br>
                                     Alanya Merkez Mahallesi<br>
@@ -101,9 +102,9 @@
                                 <i class="fas fa-phone-volume"></i>
                             </span>
                             <div>
-                                <span class="label">Telefon</span>
+                                <span class="label">@Localizer["Phone"]</span>
                                 <a href="tel:+902422123456" class="d-block">+90 242 212 34 56</a>
-                                <small class="text-muted">Hafta içi: 09:00 - 18:00</small>
+                                <small class="text-muted">@Localizer["Weekdays"]: 09:00 - 18:00</small>
                             </div>
                         </div>
 
@@ -112,7 +113,7 @@
                                 <i class="fas fa-envelope-open-text"></i>
                             </span>
                             <div>
-                                <span class="label">E-posta</span>
+                                <span class="label">@Localizer["Email"]</span>
                                 <a href="mailto:info@plafind.com" class="d-block">info@plafind.com</a>
                                 <a href="mailto:destek@plafind.com" class="d-block">destek@plafind.com</a>
                             </div>
@@ -123,7 +124,7 @@
                                 <i class="fas fa-clock"></i>
                             </span>
                             <div>
-                                <span class="label">Çalışma Saatleri</span>
+                                <span class="label">@Localizer["WorkingHours"]</span>
                                 <p class="mb-0">
                                     <strong>Pazartesi - Cuma:</strong> 09:00 - 18:00<br>
                                     <strong>Cumartesi:</strong> 10:00 - 16:00
@@ -133,11 +134,11 @@
                     </div>
 
                     <div class="contact-hotline mt-4">
-                        <span class="title"><i class="fas fa-comments me-2"></i>Canlı Destek</span>
-                        <p class="mb-3">WhatsApp hattımız üzerinden bize saniyeler içinde ulaşabilirsiniz.</p>
+                        <span class="title"><i class="fas fa-comments me-2"></i>@Localizer["LiveSupport"]</span>
+                        <p class="mb-3">@Localizer["LiveSupportText"]</p>
                         <div class="d-flex flex-wrap gap-2">
                             <a href="tel:+905511746672" class="btn btn-primary flex-fill">
-                                <i class="fas fa-phone me-2"></i>Destek Hattını Ara
+                                <i class="fas fa-phone me-2"></i>@Localizer["CallSupport"]
                             </a>
                             <a href="https://wa.me/905511746672" class="btn btn-outline-light flex-fill" target="_blank">
                                 <i class="fab fa-whatsapp me-2"></i>WhatsApp
@@ -146,7 +147,7 @@
                     </div>
 
                     <div class="contact-social mt-4">
-                        <span class="title">Bizi Takip Edin</span>
+                        <span class="title">@Localizer["FollowUs"]</span>
                         <div class="d-flex flex-wrap gap-3">
                             <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
                             <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
@@ -161,11 +162,11 @@
                 <div class="glass-card contact-form-card">
                     <div class="contact-form-header d-flex align-items-center justify-content-between flex-wrap gap-3">
                         <div>
-                            <h3 class="section-title mb-1"><i class="fas fa-paper-plane me-2 text-warning"></i>Mesajınızı Gönderin</h3>
-                            <p class="section-subtitle mb-0">Uzman ekibimiz en geç 24 saat içinde sizinle iletişime geçer.</p>
+                            <h3 class="section-title mb-1"><i class="fas fa-paper-plane me-2 text-warning"></i>@Localizer["SendMessage"]</h3>
+                            <p class="section-subtitle mb-0">@Localizer["SendMessageSubtitle"]</p>
                         </div>
                         <div class="response-badge">
-                            <i class="fas fa-bolt me-2"></i>Ortalama Yanıt: 12 Saat
+                            <i class="fas fa-bolt me-2"></i>@Localizer["AverageResponse"]
                         </div>
                     </div>
 
@@ -190,46 +191,46 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label asp-for="Name" class="form-label">Ad Soyad</label>
-                                <input asp-for="Name" type="text" class="form-control" placeholder="Adınız ve soyadınız">
+                                <label asp-for="Name" class="form-label">@Localizer["FullName"]</label>
+                                <input asp-for="Name" type="text" class="form-control" placeholder="@Localizer["FullName"]">
                                 <span asp-validation-for="Name" class="text-danger small"></span>
                             </div>
                             <div class="col-md-6">
-                                <label asp-for="Email" class="form-label">E-posta</label>
+                                <label asp-for="Email" class="form-label">@Localizer["EmailAddress"]</label>
                                 <input asp-for="Email" type="email" class="form-control" placeholder="ornek@email.com">
                                 <span asp-validation-for="Email" class="text-danger small"></span>
                             </div>
                             <div class="col-md-6">
-                                <label asp-for="Phone" class="form-label">Telefon <small class="text-muted">(Opsiyonel)</small></label>
+                                <label asp-for="Phone" class="form-label">@Localizer["PhoneOptional"]</label>
                                 <input asp-for="Phone" type="tel" class="form-control" placeholder="+90 5XX XXX XX XX">
                                 <span asp-validation-for="Phone" class="text-danger small"></span>
                             </div>
                             <div class="col-md-6">
-                                <label asp-for="Subject" class="form-label">Konu</label>
+                                <label asp-for="Subject" class="form-label">@Localizer["Subject"]</label>
                                 <select asp-for="Subject" class="form-select">
-                                    <option value="">Bir konu seçin</option>
-                                    <option value="Genel Bilgi">Genel Bilgi</option>
-                                    <option value="İşletme Kaydı">İşletme Kaydı</option>
-                                    <option value="Şikayet / Destek">Şikayet / Destek</option>
-                                    <option value="Öneri">Öneri</option>
-                                    <option value="Diğer">Diğer</option>
+                                    <option value="">@Localizer["SelectSubject"]</option>
+                                    <option value="Genel Bilgi">@Localizer["GeneralInfo"]</option>
+                                    <option value="İşletme Kaydı">@Localizer["BusinessRegistration"]</option>
+                                    <option value="Şikayet / Destek">@Localizer["ComplaintSupport"]</option>
+                                    <option value="Öneri">@Localizer["Suggestion"]</option>
+                                    <option value="Diğer">@Localizer["Other"]</option>
                                 </select>
                                 <span asp-validation-for="Subject" class="text-danger small"></span>
                             </div>
                             <div class="col-12">
-                                <label asp-for="Message" class="form-label">Mesajınız</label>
-                                <textarea asp-for="Message" class="form-control" rows="6" placeholder="Bize nasıl yardımcı olmamızı istersiniz?"></textarea>
+                                <label asp-for="Message" class="form-label">@Localizer["YourMessage"]</label>
+                                <textarea asp-for="Message" class="form-control" rows="6" placeholder="@Localizer["MessagePlaceholder"]"></textarea>
                                 <span asp-validation-for="Message" class="text-danger small"></span>
                             </div>
                         </div>
 
                         <div class="contact-form__footer mt-4 d-flex flex-column flex-md-row gap-3 align-items-md-center">
                             <div class="d-flex align-items-center gap-3">
-                                <span class="privacy-badge"><i class="fas fa-shield-check me-2"></i>Verileriniz güvende</span>
-                                <small class="text-muted">Gönderim ile KVKK politikamızı kabul etmiş olursunuz.</small>
+                                <span class="privacy-badge"><i class="fas fa-shield-check me-2"></i>@Localizer["DataSecure"]</span>
+                                <small class="text-muted">@Localizer["KVKKAccept"]</small>
                             </div>
                             <button type="submit" class="btn btn-primary btn-lg ms-md-auto" id="submitBtn">
-                                <i class="fas fa-paper-plane me-2"></i>Mesajı Gönder
+                                <i class="fas fa-paper-plane me-2"></i>@Localizer["SendMessageButton"]
                             </button>
                         </div>
                     </form>
@@ -245,9 +246,9 @@
         <div class="row justify-content-center text-center mb-5">
             <div class="col-xl-6 col-lg-7">
                 <h2 class="section-title mb-3">
-                    <i class="fas fa-map me-2 text-warning"></i>Konumumuz
+                    <i class="fas fa-map me-2 text-warning"></i>@Localizer["OurLocation"]
                 </h2>
-                <p class="section-subtitle mb-0">Alanya merkezindeki ofisimize uğrayarak kahvemizi paylaşın, projenizi görüşelim.</p>
+                <p class="section-subtitle mb-0">@Localizer["OurLocationSubtitle"]</p>
             </div>
         </div>
 
@@ -257,18 +258,18 @@
                     <div class="map-placeholder">
                         <div class="map-placeholder__content text-center">
                             <i class="fas fa-map-marked-alt fa-3x mb-3"></i>
-                            <h5 class="mb-1">Harita yakında burada</h5>
-                            <p class="mb-2 text-muted">Google Maps entegrasyonu hazırlanıyor. Bu sırada konum bilgisi aşağıdaki gibidir.</p>
+                            <h5 class="mb-1">@Localizer["MapComingSoon"]</h5>
+                            <p class="mb-2 text-muted">@Localizer["MapComingSoonText"]</p>
                             <small>Atatürk Caddesi No: 123, Alanya / Antalya</small>
                         </div>
                     </div>
                     <div class="map-card__footer d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
                         <div>
-                            <span class="badge rounded-pill bg-warning text-dark me-2"><i class="fas fa-car me-1"></i>Otopark mevcut</span>
-                            <span class="badge rounded-pill bg-info text-dark"><i class="fas fa-bus me-1"></i>Toplu taşıma ile ulaşım kolay</span>
+                            <span class="badge rounded-pill bg-warning text-dark me-2"><i class="fas fa-car me-1"></i>@Localizer["ParkingAvailable"]</span>
+                            <span class="badge rounded-pill bg-info text-dark"><i class="fas fa-bus me-1"></i>@Localizer["PublicTransport"]</span>
                         </div>
                         <a href="https://goo.gl/maps/" class="btn btn-outline-light" target="_blank">
-                            <i class="fas fa-location-arrow me-2"></i>Google Maps'te aç
+                            <i class="fas fa-location-arrow me-2"></i>@Localizer["OpenInGoogleMaps"]
                         </a>
                     </div>
                 </div>
@@ -283,9 +284,9 @@
         <div class="row justify-content-center text-center mb-5">
             <div class="col-xl-6 col-lg-8">
                 <h2 class="section-title mb-3">
-                    <i class="fas fa-question-circle me-2 text-warning"></i>Sıkça Sorulan Sorular
+                    <i class="fas fa-question-circle me-2 text-warning"></i>@Localizer["FAQ"]
                 </h2>
-                <p class="section-subtitle mb-0">Platformumuz, işletmeler ve kullanıcılar tarafından en çok merak edilen konuların yanıtları.</p>
+                <p class="section-subtitle mb-0">@Localizer["FAQSubtitle"]</p>
             </div>
         </div>
 
@@ -296,12 +297,12 @@
                         <h2 class="accordion-header" id="faqHeading1">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="true" aria-controls="faq1">
                                 <span class="accordion-icon"><i class="fas fa-building"></i></span>
-                                İşletmemi nasıl kaydedebilirim?
+                                @Localizer["FAQ1Question"]
                             </button>
                         </h2>
                         <div id="faq1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                İşletmenizi eklemek için önce üye olun, ardından "İşletme Ekle" adımlarını takip edin. Ekibimiz bilgilerinizi doğruladıktan sonra işletmeniz 1-2 iş günü içinde yayına alınır.
+                                @Localizer["FAQ1Answer"]
                             </div>
                         </div>
                     </div>
@@ -310,12 +311,12 @@
                         <h2 class="accordion-header" id="faqHeading2">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">
                                 <span class="accordion-icon"><i class="fas fa-star"></i></span>
-                                Yorumlar nasıl değerlendiriliyor?
+                                @Localizer["FAQ2Question"]
                             </button>
                         </h2>
                         <div id="faq2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                Tüm yorumlar otomatik içerik filtresi ve manuel moderasyon süreçlerinden geçer. Topluluk kurallarına aykırı, hakaret içeren veya spam nitelikli yorumlar yayına alınmaz.
+                                @Localizer["FAQ2Answer"]
                             </div>
                         </div>
                     </div>
@@ -324,12 +325,12 @@
                         <h2 class="accordion-header" id="faqHeading3">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">
                                 <span class="accordion-icon"><i class="fas fa-calendar-check"></i></span>
-                                Rezervasyon nasıl yapılır?
+                                @Localizer["FAQ3Question"]
                             </button>
                         </h2>
                         <div id="faq3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                İlgilendiğiniz işletmenin sayfasında "Rezervasyon Yap" butonuna basın, tarih ve saat seçin ve talebinizi gönderin. İşletme onayladığında hem e-posta hem de paneliniz üzerinden bilgilendirilirsiniz.
+                                @Localizer["FAQ3Answer"]
                             </div>
                         </div>
                     </div>
@@ -338,12 +339,12 @@
                         <h2 class="accordion-header" id="faqHeading4">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4" aria-expanded="false" aria-controls="faq4">
                                 <span class="accordion-icon"><i class="fas fa-heart"></i></span>
-                                Favori işletmelerimi nasıl kaydederim?
+                                @Localizer["FAQ4Question"]
                             </button>
                         </h2>
                         <div id="faq4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                İşletme kartlarında yer alan kalp ikonuna tıklayarak favorilerinize ekleyebilirsiniz. Favorileriniz hesabınızdaki "Panelim" sayfasında düzenlenebilir.
+                                @Localizer["FAQ4Answer"]
                             </div>
                         </div>
                     </div>
@@ -352,12 +353,12 @@
                         <h2 class="accordion-header" id="faqHeading5">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5" aria-expanded="false" aria-controls="faq5">
                                 <span class="accordion-icon"><i class="fas fa-shield-alt"></i></span>
-                                Verilerim güvende mi?
+                                @Localizer["FAQ5Question"]
                             </button>
                         </h2>
                         <div id="faq5" class="accordion-collapse collapse" aria-labelledby="faqHeading5" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                Tüm veri aktarımı SSL ile şifrelenir. KVKK ve GDPR standartlarına uyumlu altyapımız sayesinde bilgileriniz üçüncü kişilerle paylaşılmaz.
+                                @Localizer["FAQ5Answer"]
                             </div>
                         </div>
                     </div>
@@ -823,7 +824,7 @@
                 form.addEventListener('submit', function(e) {
                     if (form.checkValidity()) {
                         submitBtn.disabled = true;
-                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Gönderiliyor...';
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>@Localizer["Sending"]';
                     }
                 });
             }

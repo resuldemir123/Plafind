@@ -47,7 +47,17 @@
                 <!-- İçerik Bölümü -->
                 <div class="card-body p-5">
                     <div class="news-content">
-                        @Html.Raw(Model.Content.Replace("\n", "<br>"))
+                        @if (Model.IsExternal && !string.IsNullOrEmpty(Model.SourceUrl))
+                        {
+                            <div class="alert alert-info mb-4">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>Harici Kaynak:</strong> Bu haber 
+                                <a href="@Model.SourceUrl" target="_blank" rel="noopener noreferrer" class="alert-link">
+                                    @(Model.ExternalSource ?? "harici kaynaktan")
+                                </a> alınmıştır.
+                            </div>
+                        }
+                        @Html.Raw(Model.Content)
                     </div>
                 </div>
 
@@ -137,9 +147,32 @@
             color: #333;
         }
 
-            .news-content p {
-                margin-bottom: 1.5rem;
-            }
+        .news-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .news-external-content {
+            padding: 1rem 0;
+        }
+
+        .news-external-content p {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #495057;
+            margin-bottom: 1.5rem;
+        }
+
+        .news-external-content .btn {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .news-external-content .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
 
         .card {
             border-radius: 15px;

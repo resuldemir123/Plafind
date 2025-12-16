@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ContactTitle" xml:space="preserve">
+    <value>Reach the Region's Strongest Business Network</value>
+  </data>
+  <data name="ContactSubtitle" xml:space="preserve">
+    <value>You can always contact our team for your questions, requests or collaborations. Let's plan the right solutions for your business together.</value>
+  </data>
+  <data name="Response48Hours" xml:space="preserve">
+    <value>Response within 48 hours</value>
+  </data>
+  <data name="SmartMatching" xml:space="preserve">
+    <value>Smart matching engine</value>
+  </data>
+  <data name="KVKKCompliant" xml:space="preserve">
+    <value>GDPR compliant infrastructure</value>
+  </data>
+  <data name="ActiveUsers" xml:space="preserve">
+    <value>Active users</value>
+  </data>
+  <data name="BusinessProfiles" xml:space="preserve">
+    <value>Business profiles</value>
+  </data>
+  <data name="SupportLine" xml:space="preserve">
+    <value>Support line</value>
+  </data>
+  <data name="HeadOffice" xml:space="preserve">
+    <value>Head Office</value>
+  </data>
+  <data name="HeadOfficeSubtitle" xml:space="preserve">
+    <value>In the heart of Alanya, our digital base that prepares your businesses for the future.</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="WorkingHours" xml:space="preserve">
+    <value>Working Hours</value>
+  </data>
+  <data name="LiveSupport" xml:space="preserve">
+    <value>Live Support</value>
+  </data>
+  <data name="LiveSupportText" xml:space="preserve">
+    <value>You can reach us in seconds via our WhatsApp line.</value>
+  </data>
+  <data name="CallSupport" xml:space="preserve">
+    <value>Call Support Line</value>
+  </data>
+  <data name="FollowUs" xml:space="preserve">
+    <value>Follow Us</value>
+  </data>
+  <data name="SendMessage" xml:space="preserve">
+    <value>Send Your Message</value>
+  </data>
+  <data name="SendMessageSubtitle" xml:space="preserve">
+    <value>Our expert team will contact you within 24 hours at the latest.</value>
+  </data>
+  <data name="AverageResponse" xml:space="preserve">
+    <value>Average Response: 12 Hours</value>
+  </data>
+  <data name="FullName" xml:space="preserve">
+    <value>Full Name</value>
+  </data>
+  <data name="EmailAddress" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="PhoneOptional" xml:space="preserve">
+    <value>Phone (Optional)</value>
+  </data>
+  <data name="Subject" xml:space="preserve">
+    <value>Subject</value>
+  </data>
+  <data name="SelectSubject" xml:space="preserve">
+    <value>Select a subject</value>
+  </data>
+  <data name="GeneralInfo" xml:space="preserve">
+    <value>General Information</value>
+  </data>
+  <data name="BusinessRegistration" xml:space="preserve">
+    <value>Business Registration</value>
+  </data>
+  <data name="ComplaintSupport" xml:space="preserve">
+    <value>Complaint / Support</value>
+  </data>
+  <data name="Suggestion" xml:space="preserve">
+    <value>Suggestion</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="YourMessage" xml:space="preserve">
+    <value>Your Message</value>
+  </data>
+  <data name="MessagePlaceholder" xml:space="preserve">
+    <value>How would you like us to help you?</value>
+  </data>
+  <data name="DataSecure" xml:space="preserve">
+    <value>Your data is secure</value>
+  </data>
+  <data name="KVKKAccept" xml:space="preserve">
+    <value>By submitting, you accept our GDPR policy.</value>
+  </data>
+  <data name="SendMessageButton" xml:space="preserve">
+    <value>Send Message</value>
+  </data>
+  <data name="OurLocation" xml:space="preserve">
+    <value>Our Location</value>
+  </data>
+  <data name="OurLocationSubtitle" xml:space="preserve">
+    <value>Visit our office in Alanya city center, share a coffee with us, and discuss your project.</value>
+  </data>
+  <data name="MapComingSoon" xml:space="preserve">
+    <value>Map coming soon</value>
+  </data>
+  <data name="MapComingSoonText" xml:space="preserve">
+    <value>Google Maps integration is being prepared. In the meantime, the location information is as follows.</value>
+  </data>
+  <data name="ParkingAvailable" xml:space="preserve">
+    <value>Parking available</value>
+  </data>
+  <data name="PublicTransport" xml:space="preserve">
+    <value>Easy access by public transport</value>
+  </data>
+  <data name="OpenInGoogleMaps" xml:space="preserve">
+    <value>Open in Google Maps</value>
+  </data>
+  <data name="FAQ" xml:space="preserve">
+    <value>Frequently Asked Questions</value>
+  </data>
+  <data name="FAQSubtitle" xml:space="preserve">
+    <value>Answers to the most frequently asked questions about our platform by businesses and users.</value>
+  </data>
+  <data name="FAQ1Question" xml:space="preserve">
+    <value>How can I register my business?</value>
+  </data>
+  <data name="FAQ1Answer" xml:space="preserve">
+    <value>To add your business, first become a member, then follow the "Add Business" steps. After our team verifies your information, your business will be published within 1-2 business days.</value>
+  </data>
+  <data name="FAQ2Question" xml:space="preserve">
+    <value>How are reviews evaluated?</value>
+  </data>
+  <data name="FAQ2Answer" xml:space="preserve">
+    <value>All reviews go through automatic content filtering and manual moderation processes. Reviews that violate community rules, contain insults, or are spam are not published.</value>
+  </data>
+  <data name="FAQ3Question" xml:space="preserve">
+    <value>How do I make a reservation?</value>
+  </data>
+  <data name="FAQ3Answer" xml:space="preserve">
+    <value>Click the "Make Reservation" button on the page of the business you are interested in, select date and time, and submit your request. When the business approves, you will be notified both by email and through your panel.</value>
+  </data>
+  <data name="FAQ4Question" xml:space="preserve">
+    <value>How do I save my favorite businesses?</value>
+  </data>
+  <data name="FAQ4Answer" xml:space="preserve">
+    <value>You can add to your favorites by clicking the heart icon on business cards. Your favorites can be managed on the "My Panel" page in your account.</value>
+  </data>
+  <data name="FAQ5Question" xml:space="preserve">
+    <value>Is my data secure?</value>
+  </data>
+  <data name="FAQ5Answer" xml:space="preserve">
+    <value>All data transmission is encrypted with SSL. Thanks to our infrastructure compliant with GDPR standards, your information is not shared with third parties.</value>
+  </data>
+  <data name="Sending" xml:space="preserve">
+    <value>Sending...</value>
+  </data>
+  <data name="Reach" xml:space="preserve">
+    <value>Reach</value>
+  </data>
+  <data name="Weekdays" xml:space="preserve">
+    <value>Weekdays</value>
+  </data>
+</root>
+

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Plafind.Models;
+using System.Text.Json;
 
 namespace Plafind.Data
 {
@@ -141,6 +143,10 @@ namespace Plafind.Data
                       .WithMany(u => u.OwnedBusinesses)
                       .HasForeignKey(b => b.OwnerId)
                       .OnDelete(DeleteBehavior.Restrict);
+
+                // JSON sütunu için conversion (FeaturesJson string olarak saklanır)
+                // Features property'si NotMapped olduğu için veritabanına kaydedilmez
+                // Servis katmanında FeaturesJson'dan Features'a dönüştürme yapılacak
             });
 
             modelBuilder.Entity<BusinessImage>(entity =>

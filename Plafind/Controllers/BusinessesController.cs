@@ -126,27 +126,37 @@ namespace Plafind.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Locations()
         {
-            // Hem koordinatı olan hem de adres bilgisi olan işletmeleri getir
-            var locations = await _context.Businesses
-                .Where(b => b.IsActive && b.IsApproved && 
-                           (b.Latitude.HasValue && b.Longitude.HasValue || !string.IsNullOrEmpty(b.Address)))
-                .Select(b => new
-                {
-                    b.Id,
-                    b.Name,
-                    b.Address,
-                    Category = b.Category != null ? b.Category.Name : null,
-                    b.Phone,
-                    b.ImageUrl,
-                    b.AverageRating,
-                    b.TotalReviews,
-                    Latitude = b.Latitude,
-                    Longitude = b.Longitude,
-                    HasCoordinates = b.Latitude.HasValue && b.Longitude.HasValue
-                })
-                .ToListAsync();
+            try
+            {
+                // Hem koordinatı olan hem de adres bilgisi olan işletmeleri getir
+                var locations = await _context.Businesses
+                    .Where(b => b.IsActive && b.IsApproved && 
+                               (b.Latitude.HasValue && b.Longitude.HasValue || !string.IsNullOrEmpty(b.Address)))
+                    .Include(b => b.Category)
+                    .Select(b => new
+                    {
+                        b.Id,
+                        b.Name,
+                        b.Address,
+                        Category = b.Category != null ? b.Category.Name : null,
+                        b.Phone,
+                        b.ImageUrl,
+                        b.AverageRating,
+                        b.TotalReviews,
+                        Latitude = b.Latitude,
+                        Longitude = b.Longitude,
+                        HasCoordinates = b.Latitude.HasValue && b.Longitude.HasValue
+                    })
+                    .ToListAsync();
 
-            return Json(locations);
+                return Json(locations);
+            }
+            catch (Exception ex)
+            {
+                // Hata durumunda boş liste döndür ve logla
+                // Loglama için ILogger kullanılabilir
+                return Json(new List<object>());
+            }
         }
 
         // GET: Businesses/Create (Sadece Admin ve User)

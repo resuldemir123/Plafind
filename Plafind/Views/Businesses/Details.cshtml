@@ -95,17 +95,17 @@
                                 </button>
                             }
                         }
-                        <button class="hero-btn hero-btn--compare compare-btn" 
-                                data-business-id="@business.Id" 
-                                title="Karşılaştırmaya ekle">
-                            <i class="fas fa-balance-scale me-2"></i>Karşılaştır
-                        </button>
-                        else
+                        else if (User.Identity?.IsAuthenticated != true)
                         {
                             <a asp-controller="Reservations" asp-action="Create" asp-route-businessId="@business.Id" class="hero-btn hero-btn--reservation">
                                 <i class="fas fa-calendar-check me-2"></i>Rezervasyon Yap
                             </a>
                         }
+                        <button type="button" class="hero-btn hero-btn--compare compare-btn" 
+                                data-business-id="@business.Id" 
+                                title="Karşılaştırmaya ekle">
+                            <i class="fas fa-balance-scale me-2"></i>Karşılaştır
+                        </button>
                     </div>
                 </div>
 
@@ -445,6 +445,10 @@
         background-size: cover;
         background-position: center;
     }
+    
+    [data-theme="light"] .business-hero {
+        background: linear-gradient(135deg, rgba(248,249,250,0.98), rgba(241,245,249,0.95));
+    }
 
     .business-hero .hero-overlay {
         backdrop-filter: blur(8px);
@@ -620,16 +624,23 @@
     .meta-value {
         margin: 0;
         font-weight: 600;
-        color: #ffffff;
+        color: var(--text-default);
     }
     
     .meta-label {
-        color: rgba(255,255,255,.8) !important;
+        color: var(--text-muted) !important;
     }
 
     .business-content {
         background: linear-gradient(180deg, rgba(7,12,25,0.95) 0%, rgba(7,12,25,0.7) 100%);
         color: #ffffff;
+        background-color: var(--bg-body);
+        color: var(--text-default);
+    }
+    
+    [data-theme="light"] .business-content {
+        background: linear-gradient(180deg, rgba(249,250,251,0.98) 0%, rgba(243,244,246,0.95) 100%);
+        color: var(--text-default);
     }
 
     .section-card {
@@ -638,6 +649,15 @@
         border-radius: 1.25rem;
         padding: 2rem;
         box-shadow: 0 24px 60px rgba(7,12,24,0.35);
+        background-color: var(--bg-surface);
+        border-color: var(--border-color);
+        color: var(--text-default);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    [data-theme="light"] .section-card {
+        background: rgba(255,255,255,0.95);
+        border-color: var(--border-color);
     }
 
     .media-card {
@@ -695,6 +715,13 @@
         display: grid;
         gap: .35rem;
         transition: all .3s ease;
+        background-color: var(--bg-surface);
+        border-color: var(--border-color);
+        color: var(--text-default);
+    }
+    
+    [data-theme="light"] .info-card {
+        background: rgba(255,255,255,0.9);
     }
 
     .info-card:hover {
@@ -710,12 +737,12 @@
     .info-card h6 {
         margin: .3rem 0;
         font-weight: 700;
-        color: #ffffff;
+        color: var(--text-default);
     }
 
     .info-card p {
         margin: 0;
-        color: rgba(255,255,255,.9);
+        color: var(--text-default);
     }
 
     .section-header {
@@ -730,12 +757,16 @@
     .section-title {
         margin: 0;
         font-weight: 800;
-        color: #ffffff;
+        color: var(--text-default);
         text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    
+    [data-theme="light"] .section-title {
+        text-shadow: none;
     }
 
     .section-text {
-        color: #ffffff;
+        color: var(--text-default);
         font-size: 1.05rem;
         line-height: 1.9;
         opacity: 0.95;
@@ -752,6 +783,13 @@
         border-radius: 1rem;
         padding: 1.5rem;
         transition: all .3s ease;
+        background-color: var(--bg-surface);
+        border-color: var(--border-color);
+        color: var(--text-default);
+    }
+    
+    [data-theme="light"] .review-card {
+        background: rgba(255,255,255,0.9);
     }
 
     .review-card:hover {
@@ -775,7 +813,7 @@
     .review-user h6 {
         margin: 0 0 .35rem;
         font-weight: 700;
-        color: #ffffff;
+        color: var(--text-default);
     }
 
     .review-stars {
@@ -802,18 +840,18 @@
 
     .review-text {
         margin: 0;
-        color: rgba(255,255,255,.9);
+        color: var(--text-default);
         line-height: 1.75;
     }
     
     .review-date {
-        color: rgba(255,255,255,.7) !important;
+        color: var(--text-muted) !important;
     }
 
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
-        color: rgba(226,232,240,0.6);
+        color: var(--text-muted);
         display: grid;
         gap: .5rem;
     }
@@ -841,13 +879,14 @@
     .contact-label {
         margin: 0;
         font-weight: 600;
-        color: #ffffff;
+        color: var(--text-default);
     }
 
     .contact-value {
         margin: .2rem 0 0;
-        color: rgba(255,255,255,.85);
+        color: var(--text-default);
         line-height: 1.6;
+        opacity: 0.9;
     }
 
     .contact-link {
@@ -862,6 +901,56 @@
 
     .contact-action {
         margin-top: .5rem;
+    }
+
+    .hero-btn--compare {
+        background: rgba(13,110,253,0.2);
+        border-color: rgba(13,110,253,0.5);
+        color: #60a5fa;
+    }
+
+    .hero-btn--compare:hover {
+        background: rgba(13,110,253,0.35);
+        color: #ffffff;
+    }
+
+    .hero-btn--success {
+        background: rgba(25,135,84,0.2);
+        border-color: rgba(25,135,84,0.5);
+        color: #75d99f;
+    }
+
+    .hero-btn--success:hover {
+        background: rgba(25,135,84,0.35);
+        color: #ffffff;
+    }
+
+    .toast-notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        color: white;
+        z-index: 10000;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+        font-weight: 600;
+        animation: slideInRight 0.3s ease;
+    }
+
+    .toast-success { background: #198754; }
+    .toast-warning { background: #ffc107; color: #111; }
+    .toast-error { background: #dc3545; }
+
+    @@keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
     }
 
     .business-map {
@@ -923,6 +1012,13 @@
         display: flex;
         flex-direction: column;
         box-shadow: 0 20px 45px rgba(7,12,24,0.4);
+        background-color: var(--bg-surface);
+        border-color: var(--border-color);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    [data-theme="light"] .similar-card {
+        background: rgba(255,255,255,0.95);
     }
 
     .similar-media {
@@ -954,13 +1050,14 @@
         margin: 0;
         font-size: 1.1rem;
         font-weight: 700;
-        color: #ffffff;
+        color: var(--text-default);
     }
 
     .similar-meta {
         margin: 0;
-        color: rgba(255,255,255,.85);
+        color: var(--text-default);
         font-size: .95rem;
+        opacity: 0.85;
     }
 
     .similar-rating {
@@ -990,6 +1087,56 @@
     
     .map-note {
         color: rgba(255,255,255,.8) !important;
+    }
+
+    .hero-btn--compare {
+        background: rgba(13,110,253,0.2);
+        border-color: rgba(13,110,253,0.5);
+        color: #60a5fa;
+    }
+
+    .hero-btn--compare:hover {
+        background: rgba(13,110,253,0.35);
+        color: #ffffff;
+    }
+
+    .hero-btn--success {
+        background: rgba(25,135,84,0.2);
+        border-color: rgba(25,135,84,0.5);
+        color: #75d99f;
+    }
+
+    .hero-btn--success:hover {
+        background: rgba(25,135,84,0.35);
+        color: #ffffff;
+    }
+
+    .toast-notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        color: white;
+        z-index: 10000;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+        font-weight: 600;
+        animation: slideInRight 0.3s ease;
+    }
+
+    .toast-success { background: #198754; }
+    .toast-warning { background: #ffc107; color: #111; }
+    .toast-error { background: #dc3545; }
+
+    @@keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
     }
 
     @@media (max-width: 992px) {
@@ -1191,6 +1338,120 @@
                 });
                 </text>
             }
+
+            // Karşılaştırma butonu - her zaman çalışmalı
+            function setCompareButtonState($btn, isActive) {
+                if (isActive) {
+                    $btn.addClass('active')
+                        .removeClass('hero-btn--compare')
+                        .addClass('hero-btn--success');
+                    $btn.html('<i class="fas fa-check me-2"></i>Eklendi');
+                } else {
+                    $btn.removeClass('active hero-btn--success')
+                        .addClass('hero-btn--compare');
+                    $btn.html('<i class="fas fa-balance-scale me-2"></i>Karşılaştır');
+                }
+            }
+
+            function showCompareToast(message, type) {
+                const cls = type === 'success' ? 'toast-success' : type === 'warning' ? 'toast-warning' : 'toast-error';
+                const $toast = $('<div class="toast-notification ' + cls + '">' + message + '</div>');
+                $('body').append($toast);
+                setTimeout(() => $toast.fadeOut(250, () => $toast.remove()), 3000);
+            }
+
+            function updateCompareCount() {
+                $.get('/Compare/GetCount', function(response) {
+                    if (response && typeof response.count !== 'undefined') {
+                        $('#compareCount').text(response.count || 0);
+                    }
+                }).fail(function() {
+                    console.warn('Karşılaştırma sayısı alınamadı');
+                });
+            }
+
+            // Karşılaştırma butonu tıklama
+            $(document).on('click', '.compare-btn', function(e) {
+                e.preventDefault();
+                const $btn = $(this);
+                const businessId = $btn.data('business-id');
+                const isActive = $btn.hasClass('active');
+                
+                console.log('Karşılaştır butonu tıklandı:', {
+                    businessId: businessId,
+                    isActive: isActive
+                });
+
+                if (!businessId) {
+                    console.error('HATA: İşletme ID\'si bulunamadı');
+                    showCompareToast('Bir hata oluştu: İşletme ID\'si bulunamadı', 'error');
+                    return;
+                }
+
+                // Eğer zaten aktifse (listede varsa), direkt karşılaştırma sayfasına git
+                if (isActive) {
+                    console.log('İşletme zaten listede, karşılaştırma sayfasına yönlendiriliyor...');
+                    window.location.href = '/Compare/Index';
+                    return;
+                }
+
+                // İşletmeyi karşılaştırmaya ekle ve karşılaştırma sayfasına yönlendir
+                const token = getToken();
+                
+                // Butonu geçici olarak devre dışı bırak
+                $btn.prop('disabled', true);
+                $btn.html('<i class="fas fa-spinner fa-spin me-2"></i>Ekleniyor...');
+                
+                $.ajax({
+                    url: '/Compare/Add',
+                    type: 'POST',
+                    data: { businessId: businessId },
+                    headers: token ? {
+                        'RequestVerificationToken': token
+                    } : {},
+                    success: function(response) {
+                        console.log('AJAX başarılı:', response);
+                        
+                        if (response && response.success) {
+                            showCompareToast(response.message || 'İşletme eklendi, karşılaştırma sayfasına yönlendiriliyor...', 'success');
+                            updateCompareCount();
+                            
+                            setTimeout(function() {
+                                window.location.href = '/Compare/Index';
+                            }, 500);
+                        } else {
+                            $btn.prop('disabled', false);
+                            setCompareButtonState($btn, false);
+                            showCompareToast((response && response.message) || 'Bir hata oluştu', 'warning');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX hatası:', { xhr, status, error });
+                        $btn.prop('disabled', false);
+                        setCompareButtonState($btn, false);
+                        
+                        let errorMessage = 'Bir hata oluştu: ' + (error || 'Bilinmeyen hata');
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        showCompareToast(errorMessage, 'error');
+                    }
+                });
+            });
+
+            // Karşılaştırma durumunu kontrol et
+            const compareBusinessId = @business.Id;
+            if (compareBusinessId) {
+                $.get('/Compare/Check?businessId=' + compareBusinessId, function(response) {
+                    if (response && response.isInCompare) {
+                        setCompareButtonState($('.compare-btn'), true);
+                    }
+                }).fail(function() {
+                    console.warn('Karşılaştırma durumu kontrolü başarısız');
+                });
+            }
+
+            updateCompareCount();
         });
     </script>
     <script src="~/js/nearby-places.js" asp-append-version="true"></script>
@@ -1228,55 +1489,6 @@
                         }
                     }
                 }
-            });
-
-            // Karşılaştırma butonu
-            $(document).ready(function() {
-                $('.compare-btn').on('click', function() {
-                    const businessId = $(this).data('business-id');
-                    const btn = $(this);
-                    
-                    $.ajax({
-                        url: '/Compare/Add',
-                        type: 'POST',
-                        data: { businessId: businessId },
-                        headers: {
-                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                btn.addClass('active');
-                                btn.html('<i class="fas fa-check me-2"></i>Eklendi');
-                                updateCompareCount();
-                                alert(response.message);
-                            } else {
-                                alert(response.message);
-                            }
-                        },
-                        error: function() {
-                            alert('Bir hata oluştu.');
-                        }
-                    });
-                });
-
-                // Karşılaştırma durumunu kontrol et
-                const businessId = $('.compare-btn').data('business-id');
-                if (businessId) {
-                    $.get('/Compare/Check?businessId=' + businessId, function(response) {
-                        if (response.isInCompare) {
-                            $('.compare-btn').addClass('active').html('<i class="fas fa-check me-2"></i>Eklendi');
-                        }
-                    });
-                }
-
-                // Karşılaştırma sayısını güncelle
-                function updateCompareCount() {
-                    $.get('/Compare/GetCount', function(response) {
-                        $('#compareCount').text(response.count);
-                    });
-                }
-
-                updateCompareCount();
             });
         </script>
     }

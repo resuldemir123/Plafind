@@ -73,7 +73,7 @@
                     </select>
                 </div>
                 <div class="col-lg-1 d-grid">
-                    <button type="submit" class="btn btn-warning rounded-pill">Ara</button>
+                    <button type="submit" class="btn btn-primary rounded-pill">Ara</button>
                 </div>
             </form>
 
@@ -96,7 +96,7 @@
                     <p class="eyebrow">Öne Çıkan İşletmeler</p>
                     <h2>Seçtiğimiz favoriler</h2>
                 </div>
-                <span class="badge rounded-pill bg-warning text-dark">@featuredBusinesses.Count</span>
+                <span class="badge rounded-pill" style="background-color: #2563EB; color: #FFFFFF;">@featuredBusinesses.Count</span>
             </div>
             <div class="featured-carousel">
                 @foreach (var business in featuredBusinesses)
@@ -110,11 +110,11 @@
                             <h3>@business.Name</h3>
                             <p>@(business.Description?.Length > 80 ? business.Description[..80] + "..." : business.Description ?? "Açıklama eklenmemiş.")</p>
                             <div class="card-meta">
-                                <span><i class="fas fa-star text-warning"></i>@business.AverageRating.ToString("F1")</span>
+                                <span><i class="fas fa-star" style="color: #2563EB;"></i>@business.AverageRating.ToString("F1")</span>
                                 <span><i class="fas fa-comment"></i>@business.TotalReviews yorum</span>
                                 <span><i class="fas fa-tag"></i>@business.Category?.Name</span>
                             </div>
-                            <a asp-controller="Businesses" asp-action="Details" asp-route-id="@business.Id" class="btn btn-light btn-sm rounded-pill">İncele</a>
+                            <a asp-controller="Businesses" asp-action="Details" asp-route-id="@business.Id" class="btn btn-primary btn-sm rounded-pill">İncele</a>
                         </div>
                     </article>
                 }
@@ -128,7 +128,7 @@
                     <p class="eyebrow">Popüler Seçimler</p>
                     <h2>Topluluğun favorileri</h2>
                 </div>
-                <span class="badge rounded-pill bg-info text-dark">@trendingBusinesses.Count</span>
+                <span class="badge rounded-pill" style="background-color: #14B8A6; color: #FFFFFF;">@trendingBusinesses.Count</span>
             </div>
             <div class="trending-grid">
                 @foreach (var business in trendingBusinesses)
@@ -142,7 +142,7 @@
                             <strong>@business.AverageRating.ToString("F1")</strong>
                             <span>@business.TotalReviews yorum</span>
                         </div>
-                        <a asp-controller="Businesses" asp-action="Details" asp-route-id="@business.Id" class="btn btn-outline-light btn-sm rounded-pill">Detay</a>
+                        <a asp-controller="Businesses" asp-action="Details" asp-route-id="@business.Id" class="btn btn-outline-primary btn-sm rounded-pill">Detay</a>
                     </article>
                 }
             </div>
@@ -153,7 +153,7 @@
                 <p class="eyebrow">Tüm Sonuçlar</p>
                 <h2>Keşfedilecek diğer işletmeler</h2>
             </div>
-            <span class="badge rounded-pill bg-secondary">@businesses.Count</span>
+            <span class="badge rounded-pill" style="background-color: #334155; color: #FFFFFF;">@businesses.Count</span>
         </div>
 
         @if (businesses.Any())
@@ -188,7 +188,7 @@
                                         <i class="fas fa-phone"></i> Ara
                                     </a>
                                 }
-                                <a asp-controller="Businesses" asp-action="Details" asp-route-id="@business.Id" class="btn btn-warning btn-sm rounded-pill">Detay</a>
+                                <a asp-controller="Businesses" asp-action="Details" asp-route-id="@business.Id" class="btn btn-primary btn-sm rounded-pill">Detay</a>
                                 <button class="btn btn-sm btn-outline-primary rounded-pill compare-btn-search" 
                                         data-business-id="@business.Id" 
                                         title="Karşılaştırmaya ekle">
@@ -212,82 +212,74 @@
 </section>
 
 <style>
+    /* Dark Mode - İşletme Ara Sayfası */
     .search-hero {
-        background: radial-gradient(circle at top, rgba(255, 193, 7, 0.15), transparent 50%), #050c19;
-        color: #ffffff;
+        background: linear-gradient(135deg, #0B1220 0%, #1E293B 50%, #0B1220 100%);
+        background-image: radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+                          radial-gradient(circle at 80% 70%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
+        color: #FFFFFF;
         padding: 4rem 0 2rem;
+        position: relative;
     }
 
     .hero-overlay .eyebrow {
         text-transform: uppercase;
         letter-spacing: .25em;
         font-size: .85rem;
-        color: #ffffff;
+        color: #94A3B8 !important;
         font-weight: 600;
     }
 
     .hero-overlay h1 {
         font-weight: 800;
         margin-bottom: 1rem;
-        color: #ffffff;
-        text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        color: #FFFFFF !important;
     }
 
     .hero-overlay .lead {
-        color: #ffffff;
+        color: #94A3B8 !important;
         margin-bottom: 2rem;
         max-width: 600px;
         font-weight: 500;
-        text-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
 
     .search-bar .input-pill {
         display: flex;
         align-items: center;
         gap: .5rem;
-        background: rgba(255,255,255,.15);
+        background: rgba(255, 255, 255, 0.05);
         border-radius: 999px;
         padding: .75rem 1.2rem;
-        border: 1px solid rgba(255,255,255,.3);
-        color: #ffffff;
+        border: 2px solid #334155;
+        color: #FFFFFF;
         backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    .search-bar .input-pill:focus-within {
+        border-color: #2563EB;
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
 
     .search-bar input,
     .search-bar select {
         background: transparent;
         border: none;
-        color: #ffffff;
+        color: #FFFFFF !important;
         width: 100%;
         outline: none;
         font-weight: 500;
     }
     
     .search-bar input::placeholder {
-        color: rgba(255,255,255,.7);
-    }
-    
-    [data-theme="dark"] .search-hero {
-        background: radial-gradient(circle at top, rgba(255, 193, 7, 0.15), transparent 50%), #0a0f1a;
-    }
-    
-    [data-theme="dark"] .business-card {
-        background: var(--card-bg);
-        color: var(--text-primary);
-    }
-    
-    [data-theme="dark"] .section-header h2 {
-        color: var(--text-primary);
+        color: #94A3B8 !important;
+        opacity: 0.7;
     }
 
-    .search-bar option {
-        color: #000;
-        background: #fff;
-    }
-    
-    [data-theme="dark"] .search-bar option {
-        color: #fff;
-        background: #1e293b;
+    .search-bar select option {
+        color: #FFFFFF !important;
+        background: #1E293B !important;
     }
 
     .filter-chips {
@@ -300,27 +292,24 @@
     .filter-chips .chip {
         padding: .5rem 1rem;
         border-radius: 999px;
-        border: 1px solid rgba(255,255,255,.3);
+        border: 2px solid #334155;
         cursor: pointer;
-        color: rgba(255,255,255,.8);
+        color: #94A3B8 !important;
         transition: all .2s ease;
+        background: rgba(255, 255, 255, 0.05);
     }
 
     .filter-chips .chip.active,
     .filter-chips .chip:hover {
-        background: #ffc107;
-        color: #111;
-        border-color: #ffc107;
+        background: #2563EB;
+        color: #FFFFFF !important;
+        border-color: #2563EB;
     }
 
     .search-sections {
-        background: linear-gradient(180deg, #050c19 0%, #0d1424 50%, #050c19 100%);
-        color: #ffffff;
-    }
-    
-    [data-theme="dark"] .search-sections {
-        background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-        color: #ffffff;
+        background: linear-gradient(180deg, #0B1220 0%, #1E293B 50%, #0B1220 100%);
+        color: #FFFFFF;
+        padding: 3rem 0;
     }
 
     .section-header {
@@ -334,15 +323,13 @@
     .section-header h2 {
         margin: 0;
         font-weight: 800;
-        color: #ffffff;
-        text-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        color: #FFFFFF !important;
     }
 
     .section-header .eyebrow {
-        color: #ffffff;
+        color: #94A3B8 !important;
         margin-bottom: .35rem;
         font-weight: 600;
-        opacity: 0.9;
     }
 
     .featured-carousel {
@@ -352,25 +339,20 @@
     }
 
     .business-card {
-        background: rgba(13,18,32,.95);
+        background: #1E293B;
         border-radius: 1.25rem;
         overflow: hidden;
-        border: 1px solid rgba(255,255,255,.1);
+        border: 1px solid #334155;
         display: flex;
         flex-direction: column;
-        box-shadow: 0 20px 45px rgba(5,10,20,.6);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
         transition: all 0.3s ease;
     }
     
     .business-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 24px 50px rgba(5,10,20,.8);
-        border-color: rgba(255,193,7,.3);
-    }
-    
-    [data-theme="dark"] .business-card {
-        background: rgba(13,18,32,.95);
-        border-color: rgba(255,255,255,.1);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+        border-color: #2563EB;
     }
 
     .business-card.highlight {
@@ -381,6 +363,17 @@
         height: 150px;
         background-size: cover;
         background-position: center;
+        position: relative;
+    }
+
+    .business-card .card-cover::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 100%);
     }
 
     .business-card .card-body {
@@ -388,25 +381,27 @@
         display: flex;
         flex-direction: column;
         gap: .75rem;
-        color: #ffffff;
+        color: #FFFFFF;
     }
     
     .business-card h3 {
-        color: #ffffff;
+        color: #FFFFFF !important;
         font-weight: 700;
+        margin: 0;
     }
     
     .business-card p {
-        color: rgba(255,255,255,.85);
+        color: #94A3B8 !important;
+        margin: 0;
     }
 
     .card-badge {
         align-self: flex-start;
         padding: .35rem .85rem;
         border-radius: 999px;
-        background: rgba(255,193,7,.1);
-        border: 1px solid rgba(255,193,7,.3);
-        color: #ffc107;
+        background: rgba(37, 99, 235, 0.15);
+        border: 1px solid rgba(37, 99, 235, 0.3);
+        color: #2563EB !important;
         font-size: .85rem;
         font-weight: 600;
     }
@@ -416,13 +411,18 @@
         gap: 1rem;
         flex-wrap: wrap;
         font-size: .9rem;
-        color: rgba(255,255,255,.9);
+        color: #94A3B8 !important;
     }
 
     .card-meta span {
         display: inline-flex;
         align-items: center;
         gap: .35rem;
+        color: #94A3B8 !important;
+    }
+
+    .card-meta span i {
+        color: #2563EB;
     }
 
     .trending-grid {
@@ -441,19 +441,21 @@
     .business-card.compact h3 {
         margin: 0;
         font-size: 1.1rem;
+        color: #FFFFFF !important;
     }
 
     .business-card.compact p {
         margin: 0;
-        color: rgba(255,255,255,.8);
-    }
-    
-    .business-card.compact h3 {
-        color: #ffffff;
+        color: #94A3B8 !important;
     }
 
     .business-card.compact .rating {
         text-align: right;
+        color: #FFFFFF !important;
+    }
+
+    .business-card.compact .rating strong {
+        color: #2563EB !important;
     }
 
     .results-grid {
@@ -472,44 +474,73 @@
     .business-card.basic h3 {
         margin: 0;
         font-size: 1.1rem;
+        color: #FFFFFF !important;
     }
 
     .business-card.basic .muted {
-        color: rgba(255,255,255,.8);
+        color: #94A3B8 !important;
         margin: 0;
-    }
-    
-    .business-card.basic h3 {
-        color: #ffffff;
     }
 
     .business-card.basic .address {
         margin: .75rem 0;
-        color: rgba(255,255,255,.85);
+        color: #94A3B8 !important;
+    }
+
+    .business-card.basic .rating {
+        text-align: right;
+    }
+
+    .business-card.basic .rating strong {
+        color: #2563EB !important;
+        font-size: 1.1rem;
+    }
+
+    .business-card.basic .rating span {
+        color: #94A3B8 !important;
+        font-size: 0.9rem;
     }
 
     .card-actions {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 0.5rem;
     }
 
     .card-actions .link {
-        color: #60a5fa;
+        color: #2563EB !important;
         text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .card-actions .link:hover {
+        color: #3B82F6 !important;
     }
 
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
         border-radius: 1.5rem;
-        border: 1px dashed rgba(255,255,255,.2);
+        border: 2px dashed #334155;
+        background: rgba(255, 255, 255, 0.02);
+        color: #94A3B8;
     }
 
     .empty-state i {
         font-size: 3rem;
-        color: #ffc107;
+        color: #2563EB;
         margin-bottom: 1rem;
+    }
+    
+    .empty-state h3 {
+        color: #FFFFFF !important;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: #94A3B8 !important;
+        margin: 0;
     }
 
     @@media (max-width: 768px) {
@@ -528,72 +559,176 @@
 </style>
 
 <script>
-    document.querySelectorAll('.filter-chips .chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-            const sort = chip.dataset.sort;
-            const url = new URL(window.location.href);
-            url.searchParams.set('sortBy', sort);
-            window.location.href = url.toString();
+    // Filter chips - vanilla JS kullanıyoruz çünkü jQuery'den bağımsız
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.filter-chips .chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const sort = chip.dataset.sort;
+                const url = new URL(window.location.href);
+                url.searchParams.set('sortBy', sort);
+                window.location.href = url.toString();
+            });
         });
     });
 
-    // Karşılaştırma butonları
-    $(document).ready(function() {
-        $('.compare-btn-search').on('click', function() {
-            const businessId = $(this).data('business-id');
-            const btn = $(this);
-            
-            $.ajax({
-                url: '/Compare/Add',
-                type: 'POST',
-                data: { businessId: businessId },
-                headers: {
-                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                },
-                success: function(response) {
-                    if (response.success) {
-                        btn.addClass('active');
-                        btn.html('<i class="fas fa-check"></i>');
-                        btn.removeClass('btn-outline-primary').addClass('btn-success');
-                        updateCompareCount();
-                        showToast(response.message, 'success');
-                    } else {
-                        showToast(response.message, 'warning');
-                    }
-                },
-                error: function() {
-                    showToast('Bir hata oluştu.', 'error');
-                }
-            });
-        });
-
-        // Karşılaştırma durumunu kontrol et
-        $('.compare-btn-search').each(function() {
-            const businessId = $(this).data('business-id');
-            const btn = $(this);
-            $.get('/Compare/Check?businessId=' + businessId, function(response) {
-                if (response.isInCompare) {
-                    btn.addClass('active');
-                    btn.html('<i class="fas fa-check"></i>');
-                    btn.removeClass('btn-outline-primary').addClass('btn-success');
-                }
-            });
-        });
-
-        // Karşılaştırma sayısını güncelle
-        function updateCompareCount() {
-            $.get('/Compare/GetCount', function(response) {
-                $('#compareCount').text(response.count);
-            });
+    // jQuery yüklendikten sonra çalışacak şekilde düzenle
+    function initializeComparison() {
+        // jQuery'nin yüklendiğinden emin ol
+        if (typeof jQuery === 'undefined') {
+            console.warn('jQuery yüklenmemiş, tekrar deneniyor...');
+            setTimeout(initializeComparison, 100);
+            return;
         }
 
-        updateCompareCount();
-    });
+        // jQuery'nin hazır olduğundan emin ol
+        jQuery(document).ready(function($) {
+            console.log('Karşılaştırma butonları başlatılıyor...');
+
+            // Karşılaştırma butonu tıklama - karşılaştırma sayfasına yönlendirme ile
+            $(document).on('click', '.compare-btn-search', function(e) {
+                e.preventDefault();
+                const $btn = $(this);
+                const businessId = $btn.data('business-id');
+                const isActive = $btn.hasClass('active');
+                
+                console.log('Karşılaştır butonu tıklandı (Search):', {
+                    businessId: businessId,
+                    isActive: isActive,
+                    timestamp: new Date().toISOString()
+                });
+
+                if (!businessId) {
+                    console.error('HATA: İşletme ID\'si bulunamadı');
+                    showToast('Bir hata oluştu: İşletme ID\'si bulunamadı', 'error');
+                    return;
+                }
+
+                // Eğer zaten aktifse (listede varsa), direkt karşılaştırma sayfasına git
+                if (isActive) {
+                    console.log('İşletme zaten listede, karşılaştırma sayfasına yönlendiriliyor...');
+                    window.location.href = '/Compare/Index';
+                    return;
+                }
+
+                // İşletmeyi karşılaştırmaya ekle ve karşılaştırma sayfasına yönlendir
+                const token = $('input[name="__RequestVerificationToken"]').val();
+                
+                // Butonu geçici olarak devre dışı bırak
+                $btn.prop('disabled', true);
+                const originalHtml = $btn.html();
+                $btn.html('<i class="fas fa-spinner fa-spin"></i>');
+                
+                $.ajax({
+                    url: '/Compare/Add',
+                    type: 'POST',
+                    data: { businessId: businessId },
+                    headers: token ? {
+                        'RequestVerificationToken': token
+                    } : {},
+                    success: function(response) {
+                        console.log('AJAX başarılı:', response);
+                        
+                        if (response && response.success) {
+                            console.log('İşletme başarıyla eklendi, karşılaştırma sayfasına yönlendiriliyor...');
+                            showToast(response.message || 'İşletme eklendi, karşılaştırma sayfasına yönlendiriliyor...', 'success');
+                            
+                            // 500ms sonra karşılaştırma sayfasına yönlendir
+                            setTimeout(function() {
+                                window.location.href = '/Compare/Index';
+                            }, 500);
+                        } else {
+                            console.warn('AJAX uyarı:', response);
+                            $btn.prop('disabled', false);
+                            $btn.html(originalHtml);
+                            showToast((response && response.message) || 'Bir hata oluştu', 'warning');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX hatası:', {
+                            xhr: xhr,
+                            status: status,
+                            error: error,
+                            statusCode: xhr.status,
+                            responseText: xhr.responseText
+                        });
+                        
+                        // Butonu tekrar aktif et
+                        $btn.prop('disabled', false);
+                        $btn.html(originalHtml);
+                        
+                        let errorMessage = 'Bir hata oluştu: ' + (error || 'Bilinmeyen hata');
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        showToast(errorMessage, 'error');
+                    }
+                });
+            });
+
+            // Karşılaştırma durumunu kontrol et
+            $('.compare-btn-search').each(function() {
+                const businessId = $(this).data('business-id');
+                const $btn = $(this);
+                
+                if (businessId) {
+                    $.get('/Compare/Check?businessId=' + businessId, function(response) {
+                        if (response && response.isInCompare) {
+                            $btn.addClass('active');
+                            $btn.html('<i class="fas fa-check"></i>');
+                            $btn.removeClass('btn-outline-primary').addClass('btn-success');
+                        }
+                    }).fail(function(xhr, status, error) {
+                        console.error('Karşılaştırma durumu kontrolü başarısız:', {
+                            xhr: xhr,
+                            status: status,
+                            error: error
+                        });
+                    });
+                }
+            });
+
+            // Karşılaştırma sayısını güncelle
+            function updateCompareCount() {
+                $.get('/Compare/GetCount', function(response) {
+                    if ($('#compareCount').length) {
+                        $('#compareCount').text(response.count || 0);
+                    }
+                }).fail(function(xhr, status, error) {
+                    console.error('Karşılaştırma sayısı güncelleme başarısız:', {
+                        xhr: xhr,
+                        status: status,
+                        error: error
+                    });
+                });
+            }
+
+            updateCompareCount();
+            console.log('Karşılaştırma butonları başlatıldı');
+        });
+    }
+
+    // jQuery yüklendikten sonra başlat
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeComparison);
+    } else {
+        // DOM zaten yüklü, hemen başlat
+        initializeComparison();
+    }
 
     function showToast(message, type) {
-        const toast = $('<div class="toast-notification toast-' + type + '">' + message + '</div>');
-        $('body').append(toast);
-        setTimeout(() => toast.fadeOut(() => toast.remove()), 3000);
+        if (typeof jQuery !== 'undefined') {
+            const $ = jQuery;
+            const toast = $('<div class="toast-notification toast-' + type + '">' + message + '</div>');
+            $('body').append(toast);
+            setTimeout(() => toast.fadeOut(() => toast.remove()), 3000);
+        } else {
+            // Fallback: vanilla JS
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification toast-' + type;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
     }
 </script>
 

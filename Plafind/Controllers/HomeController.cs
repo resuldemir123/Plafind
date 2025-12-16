@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Plafind.Models;
 using Plafind.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Http;
 
 namespace Plafind.Controllers
 {
@@ -246,6 +248,26 @@ namespace Plafind.Controllers
         {
             ViewData["Title"] = "Hakkımızda - Alanya İşletme Rehberi";
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult SetLanguage(string culture, string returnUrl)
+        {
+            // Kullanıcının tercih ettiği dili çereze kaydet
+            Response.Cookies.Append(
+                CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+                new CookieOptions 
+                { 
+                    Expires = DateTimeOffset.UtcNow.AddYears(1),
+                    HttpOnly = true,
+                    Secure = Request.IsHttps,
+                    SameSite = SameSiteMode.Lax
+                }
+            );
+
+            // Kullanıcıyı geldiği sayfaya geri yönlendir
+            return LocalRedirect(returnUrl);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

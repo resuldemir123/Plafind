@@ -11,51 +11,90 @@
                 var displayName = currentUser?.DisplayName
                     ?? currentUser?.FullName
                     ?? currentUser?.UserName
-                    ?? currentUser?.Email
+                    ?? currentUser?.Email?.Split('@')[0]
                     ?? "Kullanıcı";
+                var userEmail = currentUser?.Email ?? "";
+                var userInitial = !string.IsNullOrEmpty(userEmail) ? userEmail[0].ToString().ToUpper() : "U";
+                var roleName = "";
+                var roleBadgeClass = "";
+                if (User?.IsInRole("Admin") ?? false)
+                {
+                    roleName = "Admin";
+                    roleBadgeClass = "profile-role-badge-admin";
+                }
+                else if (User?.IsInRole("BusinessOwner") ?? false)
+                {
+                    roleName = "İşletme Sahibi";
+                    roleBadgeClass = "profile-role-badge-business";
+                }
+                else if (User?.IsInRole("User") ?? false)
+                {
+                    roleName = "Kullanıcı";
+                    roleBadgeClass = "profile-role-badge-user";
+                }
             }
-            <a class="nav-link dropdown-toggle navbar-profile d-flex align-items-center gap-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-user-circle text-white-50"></i>
-                <div class="d-flex flex-column align-items-start">
-                    <span class="navbar-username">@(currentUser?.UserName ?? "Kullanıcı")</span>
-                    <small class="navbar-email">@(currentUser?.Email ?? "")</small>
+            <a class="nav-link profile-trigger d-flex align-items-center gap-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="profile-avatar-placeholder" data-initial="@userInitial">
+                    @if (!string.IsNullOrEmpty(currentUser?.AvatarUrl))
+                    {
+                        <img src="@currentUser.AvatarUrl" alt="@displayName" class="profile-avatar-img" />
+                    }
+                    else
+                    {
+                        <span class="profile-avatar-initial">@userInitial</span>
+                    }
                 </div>
-                @if (User?.IsInRole("Admin") ?? false)
+                <span class="profile-trigger-name">@displayName</span>
+                @if (!string.IsNullOrEmpty(roleName))
                 {
-                    <span class="badge bg-success ms-1">Admin</span>
+                    <span class="profile-role-badge @roleBadgeClass">@roleName</span>
                 }
-                else if (User?.IsInRole("BusinessOwner") ?? false)
-                {
-                    <span class="badge bg-warning text-dark ms-1">İşletme Sahibi</span>
-                }
-                else if (User?.IsInRole("User") ?? false)
-                {
-                    <span class="badge bg-primary ms-1">Kullanıcı</span>
-                }
+                <i class="fas fa-caret-down profile-trigger-icon"></i>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+            <ul class="dropdown-menu dropdown-menu-end profile-dropdown" aria-labelledby="navbarDropdown">
+                <!-- Profile Header -->
+                <li class="profile-menu-header">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="profile-avatar-placeholder profile-avatar-header" data-initial="@userInitial">
+                            @if (!string.IsNullOrEmpty(currentUser?.AvatarUrl))
+                            {
+                                <img src="@currentUser.AvatarUrl" alt="@displayName" class="profile-avatar-img" />
+                            }
+                            else
+                            {
+                                <span class="profile-avatar-initial">@userInitial</span>
+                            }
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="profile-header-name">@displayName</div>
+                            <div class="profile-header-email">@userEmail</div>
+                        </div>
+                    </div>
+                </li>
+                <li><div class="profile-menu-divider"></div></li>
+                
                 @if (User?.IsInRole("Admin") ?? false)
                 {
-                    <li><a class="dropdown-item" href="@Url.Action("Index", "Admin")"><i class="fas fa-tachometer-alt me-2"></i>Admin Panel</a></li>
-                    <li><a class="dropdown-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card me-2"></i>Profil Ayarları</a></li>
+                    <li><a class="dropdown-item profile-menu-item" href="@Url.Action("Index", "Admin")"><i class="fas fa-tachometer-alt"></i><span>Admin Panel</span></a></li>
+                    <li><a class="dropdown-item profile-menu-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card"></i><span>Profil Ayarları</span></a></li>
                 }
                 else if (User?.IsInRole("BusinessOwner") ?? false)
                 {
-                    <li><a class="dropdown-item" href="@Url.Action("Index", "BusinessOwner")"><i class="fas fa-store me-2"></i>İşletme Paneli</a></li>
-                    <li><a class="dropdown-item" href="@Url.Action("Create", "BusinessOwner")"><i class="fas fa-plus-circle me-2"></i>Yeni İşletme Ekle</a></li>
-                    <li><a class="dropdown-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card me-2"></i>Profil Ayarları</a></li>
+                    <li><a class="dropdown-item profile-menu-item" href="@Url.Action("Index", "BusinessOwner")"><i class="fas fa-store"></i><span>İşletme Paneli</span></a></li>
+                    <li><a class="dropdown-item profile-menu-item" href="@Url.Action("Create", "BusinessOwner")"><i class="fas fa-plus-circle"></i><span>Yeni İşletme Ekle</span></a></li>
+                    <li><a class="dropdown-item profile-menu-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card"></i><span>Profil Ayarları</span></a></li>
                 }
                 else if (User?.IsInRole("User") ?? false)
                 {
-                    <li><a class="dropdown-item" href="@Url.Action("Index", "User")"><i class="fas fa-user me-2"></i>Kullanıcı Panel</a></li>
-                    <li><a class="dropdown-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card me-2"></i>Profil Ayarları</a></li>
+                    <li><a class="dropdown-item profile-menu-item" href="@Url.Action("Index", "User")"><i class="fas fa-user"></i><span>Kullanıcı Panel</span></a></li>
+                    <li><a class="dropdown-item profile-menu-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card"></i><span>Profil Ayarları</span></a></li>
                 }
-                <li><hr class="dropdown-divider" /></li>
+                <li><div class="profile-menu-divider"></div></li>
                 <li>
-                    <form id="logoutForm" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                    <form id="logoutForm" asp-controller="Account" asp-action="Logout" method="post" class="d-inline w-100">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="dropdown-item" style="border: none; background: none; padding: 0; width: 100%; text-align: left; color: inherit;">
-                            <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+                        <button type="submit" class="dropdown-item profile-menu-item profile-menu-item-logout w-100" style="border: none; background: none; padding: 0;">
+                            <i class="fas fa-sign-out-alt"></i><span>Çıkış Yap</span>
                         </button>
                     </form>
                 </li>

@@ -54,7 +54,8 @@ namespace Plafind.Controllers
                 return View(model);
             }
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            // FindByEmailAsync birden fazla sonuç bulunca hata veriyor, Users.FirstOrDefaultAsync kullan
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
             if (user != null)
             {
                 var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
@@ -190,7 +191,7 @@ namespace Plafind.Controllers
                     return RedirectToAction("Login");
                 }
 
-                var user = await _userManager.FindByEmailAsync(email);
+                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
                 if (user != null)
                 {
                     // Rol bazlı yönlendirme
@@ -232,7 +233,7 @@ namespace Plafind.Controllers
                 return RedirectToAction("Login");
             }
 
-            var existingUser = await _userManager.FindByEmailAsync(emailForNewUser);
+            var existingUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == emailForNewUser);
             if (existingUser == null)
             {
                 var newUser = new ApplicationUser

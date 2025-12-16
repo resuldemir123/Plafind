@@ -1,0 +1,173 @@
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
+
+@inject IViewLocalizer Localizer
+@inject IOptions<RequestLocalizationOptions> LocOptions
+
+@{
+    // Mevcut RequestCulture bilgisini alıyoruz
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var currentCulture = requestCulture?.RequestCulture?.UICulture?.Name ?? "tr-TR";
+    // Desteklenen kültürleri listeliyoruz
+    var cultureItems = LocOptions.Value.SupportedUICultures
+        .Select(c => new 
+        { 
+            Value = c.Name, 
+            Text = c.Name == "tr-TR" ? "🇹🇷 Türkçe" : c.Name == "en-US" ? "🇬🇧 English" : c.DisplayName,
+            Flag = c.Name == "tr-TR" ? "🇹🇷" : c.Name == "en-US" ? "🇬🇧" : "🌐"
+        })
+        .ToList();
+    // Kullanıcının döndürüleceği URL'yi alıyoruz
+    var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path}{Context.Request.QueryString}";
+    var currentCultureItem = cultureItems.FirstOrDefault(c => c.Value == currentCulture);
+}
+
+<div class="language-selector-dropdown">
+    <form id="selectLanguageForm" asp-controller="Home" asp-action="SetLanguage" asp-route-returnUrl="@returnUrl" method="post">
+        <div class="dropdown">
+            <button class="btn btn-outline-light btn-sm language-btn" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-globe me-1"></i>
+                <span class="language-text">@(currentCultureItem?.Flag ?? "🌐") @(currentCultureItem?.Text?.Split(' ').LastOrDefault() ?? "TR")</span>
+                <i class="fas fa-chevron-down ms-1" style="font-size: 0.7rem;"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end language-dropdown-menu" aria-labelledby="languageDropdown">
+                @foreach (var culture in cultureItems)
+                {
+                    <li>
+                        <button type="submit" name="culture" value="@culture.Value" class="dropdown-item language-option @(culture.Value == currentCulture ? "active" : "")">
+                            <span class="language-flag">@culture.Flag</span>
+                            <span class="language-name">@culture.Text</span>
+                            @if (culture.Value == currentCulture)
+                            {
+                                <i class="fas fa-check ms-auto text-success"></i>
+                            }
+                        </button>
+                    </li>
+                }
+            </ul>
+        </div>
+    </form>
+</div>
+
+<style>
+    .language-selector-dropdown {
+        position: relative;
+    }
+
+    .language-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 0.875rem;
+        min-width: 100px;
+    }
+
+    .language-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
+    }
+
+    .language-btn:focus {
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
+    }
+
+    .language-text {
+        font-weight: 500;
+    }
+
+    .language-dropdown-menu {
+        min-width: 180px;
+        padding: 0.5rem;
+        background: rgba(30, 41, 59, 0.98);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        margin-top: 0.5rem;
+    }
+
+    .language-option {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        color: rgba(255, 255, 255, 0.9);
+        transition: all 0.2s ease;
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .language-option:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        transform: translateX(4px);
+    }
+
+    .language-option.active {
+        background: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+    }
+
+    .language-flag {
+        font-size: 1.2rem;
+        line-height: 1;
+    }
+
+    .language-name {
+        flex: 1;
+        font-weight: 500;
+    }
+
+    [data-theme="dark"] .language-dropdown-menu {
+        background: rgba(15, 23, 42, 0.98);
+    }
+
+    @@media (max-width: 768px) {
+        .language-btn {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.8rem;
+            min-width: 80px;
+        }
+
+        .language-text {
+            display: none;
+        }
+
+        .language-btn .language-text {
+            display: inline;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dropdown içindeki butonlara tıklandığında formu submit et
+        document.querySelectorAll('.language-option').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const form = document.getElementById('selectLanguageForm');
+                const cultureInput = document.createElement('input');
+                cultureInput.type = 'hidden';
+                cultureInput.name = 'culture';
+                cultureInput.value = this.getAttribute('value');
+                form.appendChild(cultureInput);
+                form.submit();
+            });
+        });
+    });
+</script>
+
+

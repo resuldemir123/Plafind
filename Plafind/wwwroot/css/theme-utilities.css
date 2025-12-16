@@ -1,0 +1,290 @@
+/**
+ * Theme Utilities CSS
+ * Tüm sayfalarda kullanılacak tema-aware utility class'ları
+ * Bu dosya site.css'den sonra yüklenmelidir
+ */
+
+/* ========================================
+   Genel Utility Sınıfları
+   ======================================== */
+
+/* Arka plan renkleri */
+.bg-theme-body {
+    background-color: var(--bg-body) !important;
+}
+
+.bg-theme-surface {
+    background-color: var(--bg-surface) !important;
+}
+
+/* Metin renkleri */
+.text-theme-default {
+    color: var(--text-default) !important;
+}
+
+.text-theme-muted {
+    color: var(--text-muted) !important;
+}
+
+/* Border renkleri */
+.border-theme {
+    border-color: var(--border-color) !important;
+}
+
+/* Kartlar */
+.card-theme {
+    background-color: var(--bg-surface);
+    color: var(--text-default);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow-md);
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Bölümler */
+.section-theme {
+    background-color: var(--bg-body);
+    color: var(--text-default);
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Input alanları */
+.input-theme {
+    background-color: var(--input-bg);
+    color: var(--text-default);
+    border-color: var(--border-color);
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+.input-theme:focus {
+    background-color: var(--input-bg);
+    color: var(--text-default);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+/* Linkler */
+.link-theme {
+    color: var(--color-primary);
+    transition: color 0.3s ease;
+}
+
+.link-theme:hover {
+    color: var(--color-primary-hover);
+}
+
+/* Badge'ler - tema-aware */
+.badge-theme {
+    background-color: var(--bg-surface);
+    color: var(--text-default);
+    border: 1px solid var(--border-color);
+}
+
+/* Divider'lar */
+.divider-theme {
+    border-color: var(--border-color);
+}
+
+/* Overlay'ler */
+.overlay-theme {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .overlay-theme {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="light"] .overlay-theme {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   Özel Bileşenler İçin Tema Desteği
+   ======================================== */
+
+/* Hero section tema desteği */
+.hero-section {
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Kart hover efektleri */
+.card-hover-effect {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease, color 0.4s ease;
+}
+
+.card-hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Form grupları */
+.form-group-theme label {
+    color: var(--text-default);
+}
+
+.form-group-theme .form-control,
+.form-group-theme .form-select {
+    background-color: var(--input-bg);
+    color: var(--text-default);
+    border-color: var(--border-color);
+}
+
+/* Tablolar */
+.table-theme {
+    color: var(--text-default);
+    background-color: var(--bg-surface);
+}
+
+.table-theme thead {
+    background-color: var(--bg-surface);
+    color: var(--text-default);
+    border-bottom-color: var(--border-color);
+}
+
+.table-theme tbody tr {
+    border-bottom-color: var(--border-color);
+}
+
+.table-theme tbody tr:hover {
+    background-color: var(--bg-surface);
+}
+
+/* Modal'lar */
+.modal-theme .modal-content {
+    background-color: var(--bg-surface);
+    color: var(--text-default);
+    border-color: var(--border-color);
+}
+
+.modal-theme .modal-header {
+    border-bottom-color: var(--border-color);
+    background-color: var(--bg-surface);
+    color: var(--text-default);
+}
+
+.modal-theme .modal-footer {
+    border-top-color: var(--border-color);
+    background-color: var(--bg-surface);
+}
+
+/* Alert'ler */
+.alert-theme {
+    background-color: var(--bg-surface);
+    color: var(--text-default);
+    border-color: var(--border-color);
+}
+
+/* Dropdown menüler */
+.dropdown-theme .dropdown-menu {
+    background-color: var(--bg-surface);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow-lg);
+}
+
+.dropdown-theme .dropdown-item {
+    color: var(--text-default);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dropdown-theme .dropdown-item:hover {
+    background-color: var(--bg-body);
+    color: var(--text-default);
+}
+
+/* List group'lar */
+.list-group-theme .list-group-item {
+    background-color: var(--bg-surface);
+    color: var(--text-default);
+    border-color: var(--border-color);
+}
+
+.list-group-theme .list-group-item:hover {
+    background-color: var(--bg-body);
+}
+
+/* Breadcrumb */
+.breadcrumb-theme {
+    background-color: transparent;
+}
+
+.breadcrumb-theme .breadcrumb-item a {
+    color: var(--text-muted);
+}
+
+.breadcrumb-theme .breadcrumb-item.active {
+    color: var(--text-default);
+}
+
+/* Pagination */
+.pagination-theme .page-link {
+    background-color: var(--bg-surface);
+    color: var(--text-default);
+    border-color: var(--border-color);
+}
+
+.pagination-theme .page-link:hover {
+    background-color: var(--bg-body);
+    color: var(--text-default);
+    border-color: var(--border-color);
+}
+
+.pagination-theme .page-item.active .page-link {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #FFFFFF;
+}
+
+/* Progress bar'lar */
+.progress-theme {
+    background-color: var(--bg-body);
+}
+
+.progress-theme .progress-bar {
+    background-color: var(--color-primary);
+}
+
+/* Tooltip'ler */
+.tooltip-theme .tooltip-inner {
+    background-color: var(--bg-surface);
+    color: var(--text-default);
+    border: 1px solid var(--border-color);
+}
+
+/* ========================================
+   Image Hover Effects
+   ======================================== */
+
+img {
+    transition: opacity 0.3s ease;
+}
+
+img:hover {
+    opacity: 0.9;
+}
+
+/* ========================================
+   Geçiş Animasyonları (Global)
+   ======================================== */
+
+/* Tüm tema-aware elementler için smooth geçiş */
+*[class*="theme"],
+.card,
+.button,
+input,
+select,
+textarea,
+button,
+a,
+span,
+div[class*="card"],
+div[class*="section"],
+div[class*="hero"] {
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+/* Önemli: Yüksek performans için transform ve opacity kullan */
+.card-hover-effect,
+.btn-hover-effect,
+.link-hover-effect {
+    transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.4s ease, color 0.4s ease;
+}
+

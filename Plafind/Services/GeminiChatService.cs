@@ -181,10 +181,10 @@ namespace Plafind.Services
                 try
                 {
                     var testRequest = new HttpRequestMessage(HttpMethod.Post, testUrl)
-                    {
-                        Content = new StringContent(json, Encoding.UTF8, "application/json")
-                    };
-                    
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
+
                     var testResponse = await _httpClient.SendAsync(testRequest);
                     var testError = await testResponse.Content.ReadAsStringAsync();
                     
@@ -194,20 +194,20 @@ namespace Plafind.Services
                     if (testResponse.IsSuccessStatusCode)
                     {
                         using var document = JsonDocument.Parse(testError);
-                        var text = document.RootElement
-                            .GetProperty("candidates")[0]
-                            .GetProperty("content")
-                            .GetProperty("parts")[0]
-                            .GetProperty("text")
-                            .GetString();
-                        
-                        return string.IsNullOrWhiteSpace(text)
-                            ? "Şu anda yanıt üretemiyorum, lütfen tekrar deneyin."
-                            : text.Trim();
+                var text = document.RootElement
+                    .GetProperty("candidates")[0]
+                    .GetProperty("content")
+                    .GetProperty("parts")[0]
+                    .GetProperty("text")
+                    .GetString();
+
+                return string.IsNullOrWhiteSpace(text)
+                    ? "Şu anda yanıt üretemiyorum, lütfen tekrar deneyin."
+                    : text.Trim();
                     }
-                }
-                catch (Exception ex)
-                {
+            }
+            catch (Exception ex)
+            {
                     _logger.LogError(ex, "Hard-code URL testi başarısız");
                 }
             }
@@ -317,7 +317,7 @@ namespace Plafind.Services
                 lastError, lastException?.Message);
 
             // Tüm modeller başarısız olduysa kullanıcıya bilgi ver
-            return "Şu anda yapay zekâ servisine bağlanamıyorum. Lütfen daha sonra tekrar deneyin.";
+                return "Şu anda yapay zekâ servisine bağlanamıyorum. Lütfen daha sonra tekrar deneyin.";
         }
     }
 }
