@@ -54,8 +54,9 @@ namespace Plafind.Controllers
                 return View(model);
             }
 
-            // FindByEmailAsync birden fazla sonuç bulunca hata veriyor, Users.FirstOrDefaultAsync kullan
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+            // Email normalizasyonu ile kullanıcıyı bul (FindByEmailAsync birden fazla sonuç bulunca hata veriyor)
+            var normalizedEmail = _userManager.NormalizeEmail(model.Email);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail);
             if (user != null)
             {
                 var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
@@ -191,7 +192,9 @@ namespace Plafind.Controllers
                     return RedirectToAction("Login");
                 }
 
-                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
+                // Email normalizasyonu ile kullanıcıyı bul
+                var normalizedEmail = _userManager.NormalizeEmail(email);
+                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail);
                 if (user != null)
                 {
                     // Rol bazlı yönlendirme
@@ -233,7 +236,9 @@ namespace Plafind.Controllers
                 return RedirectToAction("Login");
             }
 
-            var existingUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == emailForNewUser);
+            // Email normalizasyonu ile kullanıcıyı bul
+            var normalizedEmailForNewUser = _userManager.NormalizeEmail(emailForNewUser);
+            var existingUser = await _userManager.Users.FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmailForNewUser);
             if (existingUser == null)
             {
                 var newUser = new ApplicationUser

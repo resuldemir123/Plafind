@@ -109,12 +109,22 @@ namespace Plafind.Controllers
                 {
                     existingCategoryId = existingBusiness.Value;
 
+                    // Önce işletmenin var olup olmadığını kontrol et
+                    var businessExists = await _context.Businesses
+                        .AnyAsync(b => b.Id == businessId && b.IsActive && b.IsApproved);
+                    
+                    if (!businessExists)
+                    {
+                        return Json(new { success = false, message = "İşletme bulunamadı veya aktif değil." });
+                    }
+
                     var newBusinessCategory = await _context.Businesses
                         .Where(b => b.Id == businessId && b.IsActive && b.IsApproved)
                         .Select(b => b.CategoryId)
                         .FirstOrDefaultAsync();
 
-                    if (newBusinessCategory != existingCategoryId)
+                    // newBusinessCategory null olamaz çünkü yukarıda varlığını kontrol ettik
+                    if (newBusinessCategory.HasValue && newBusinessCategory.Value != existingCategoryId)
                     {
                         return Json(new { success = false, message = "Farklı kategorideki işletmeleri karşılaştıramazsınız. Lütfen aynı kategorideki işletmeleri seçin." });
                     }

@@ -266,8 +266,14 @@ namespace Plafind.Controllers
                 }
             );
 
-            // Kullanıcıyı geldiği sayfaya geri yönlendir
-            return LocalRedirect(returnUrl);
+            // Güvenlik: returnUrl'in local olduğunu doğrula
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return LocalRedirect(returnUrl);
+            }
+            
+            // Geçersiz veya boş returnUrl durumunda ana sayfaya yönlendir
+            return RedirectToAction("Index", "Home");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
