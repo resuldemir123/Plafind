@@ -31,8 +31,10 @@ namespace Plafind.Controllers
         // GET: News
         public async Task<IActionResult> Index()
         {
+            // Sadece turizm haberlerini göster (IsExternal = true olanlar turizm haberleridir)
             var news = await _context.News
                 .Include(n => n.Author)
+                .Where(n => n.IsExternal == true) // Sadece turizm haberleri
                 .OrderByDescending(n => n.PublishDate)
                 .ToListAsync();
             return View(news);

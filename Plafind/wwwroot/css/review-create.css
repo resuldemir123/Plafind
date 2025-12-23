@@ -1,0 +1,215 @@
+/* ========================================
+   Review Create Page Styles
+   ======================================== */
+
+.review-create-page {
+    padding: var(--spacing-xl) 0;
+    min-height: 100vh;
+}
+
+.breadcrumb-nav {
+    margin-bottom: var(--spacing-lg);
+}
+
+.review-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.review-header h1 {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-title);
+    margin-bottom: var(--spacing-sm);
+}
+
+.review-form-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+.form-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-title);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-lg);
+}
+
+.section-label i {
+    color: var(--color-primary);
+}
+
+/* Rating Input */
+.rating-input-group {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.rating-option {
+    flex: 1;
+    min-width: 120px;
+    cursor: pointer;
+}
+
+.rating-option input[type="radio"] {
+    display: none;
+}
+
+.rating-display {
+    padding: var(--spacing-md);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    text-align: center;
+    transition: all var(--transition-base);
+    background: var(--bg-body);
+}
+
+.rating-option input[type="radio"]:checked + .rating-display {
+    border-color: var(--color-primary);
+    background: var(--color-primary-soft);
+    box-shadow: var(--shadow-sm);
+}
+
+.rating-option:hover .rating-display {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+}
+
+.rating-display .stars {
+    color: #FFC107;
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-xs);
+}
+
+.rating-text {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Comment Input */
+.review-comment-input {
+    min-height: 150px;
+    resize: vertical;
+}
+
+/* Image Upload */
+.image-upload-area {
+    position: relative;
+}
+
+.upload-placeholder {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-3xl) var(--spacing-lg);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    background: var(--bg-body);
+}
+
+.upload-placeholder:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-soft);
+}
+
+.upload-placeholder i {
+    font-size: var(--font-size-5xl);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-md);
+    display: block;
+}
+
+.upload-placeholder p {
+    font-weight: var(--font-weight-medium);
+    color: var(--text-title);
+    margin-bottom: var(--spacing-xs);
+}
+
+.upload-placeholder small {
+    color: var(--text-muted);
+}
+
+.image-preview-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.image-preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: var(--bg-body);
+}
+
+.image-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-preview-item .remove-btn {
+    position: absolute;
+    top: var(--spacing-xs);
+    right: var(--spacing-xs);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: rgba(220, 38, 38, 0.9);
+    color: #FFFFFF;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+    font-size: var(--font-size-sm);
+}
+
+.image-preview-item .remove-btn:hover {
+    background: var(--color-danger);
+    transform: scale(1.1);
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+    margin-top: var(--spacing-xl);
+}
+
+@media (max-width: 768px) {
+    .rating-input-group {
+        flex-direction: column;
+    }
+    
+    .rating-option {
+        width: 100%;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+

@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Collections.Generic;
+using System.Text.Json;
+using Plafind.Attributes;
+using Plafind.Services;
 
 namespace Plafind.Controllers
 {
@@ -36,9 +39,10 @@ namespace Plafind.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var totalBusinesses = await _context.Businesses.CountAsync();
-            var activeBusinesses = await _context.Businesses.CountAsync(b => b.IsActive);
-            var pendingApprovals = await _context.Businesses.CountAsync(b => !b.IsApproved);
+            // Soft delete filtresi ekle
+            var totalBusinesses = await _context.Businesses.CountAsync(b => !b.IsDeleted);
+            var activeBusinesses = await _context.Businesses.CountAsync(b => b.IsActive && !b.IsDeleted);
+            var pendingApprovals = await _context.Businesses.CountAsync(b => !b.IsApproved && !b.IsDeleted && b.Status == BusinessStatus.Pending);
             var totalUsers = await _context.Users.CountAsync();
             var totalReviews = await _context.Reviews.CountAsync();
             var pendingReviews = await _context.Reviews.CountAsync(r => !r.IsApproved);
@@ -48,9 +52,36 @@ namespace Plafind.Controllers
 
             // Son 7 günün istatistikleri
             var sevenDaysAgo = DateTime.Now.AddDays(-7);
-            var newBusinessesThisWeek = await _context.Businesses.CountAsync(b => b.CreatedDate >= sevenDaysAgo);
+            var newBusinessesThisWeek = await _context.Businesses.CountAsync(b => b.CreatedDate >= sevenDaysAgo && !b.IsDeleted);
             var newUsersThisWeek = await _context.Users.CountAsync(u => u.CreatedDate >= sevenDaysAgo);
             var newReviewsThisWeek = await _context.Reviews.CountAsync(r => r.CreatedDate >= sevenDaysAgo);
+            var newReservationsThisWeek = await _context.Reservations.CountAsync(r => r.CreatedDate >= sevenDaysAgo);
+            
+            // En çok görüntülenen işletmeler
+            var mostViewedBusinesses = await _context.Businesses
+                .Where(b => !b.IsDeleted && b.IsActive)
+                .OrderByDescending(b => b.ViewCount ?? 0)
+                .Take(5)
+                .Select(b => new { b.Id, b.Name, ViewCount = b.ViewCount ?? 0 })
+                .ToListAsync();
+            
+            // En çok favorilenen işletmeler
+            var mostFavoritedBusinesses = await _context.Businesses
+                .Where(b => !b.IsDeleted && b.IsActive)
+                .Select(b => new 
+                { 
+                    b.Id, 
+                    b.Name, 
+                    FavoriteCount = b.Favorites.Count 
+                })
+                .OrderByDescending(b => b.FavoriteCount)
+                .Take(5)
+                .ToListAsync();
+            
+            // Şikayet/flag sayıları
+            var pendingReports = await _context.ReviewReports
+                .Where(rr => rr.Status == ReviewReportStatus.Pending)
+                .CountAsync();
 
             // Kategori bazında işletme sayıları
             var businessesByCategory = await _context.Businesses
@@ -74,6 +105,10 @@ namespace Plafind.Controllers
                 NewBusinessesThisWeek = newBusinessesThisWeek,
                 NewUsersThisWeek = newUsersThisWeek,
                 NewReviewsThisWeek = newReviewsThisWeek,
+                NewReservationsThisWeek = newReservationsThisWeek,
+                MostViewedBusinesses = mostViewedBusinesses,
+                MostFavoritedBusinesses = mostFavoritedBusinesses,
+                PendingReports = pendingReports,
                 BusinessesByCategory = businessesByCategory
             };
 
@@ -97,17 +132,35 @@ namespace Plafind.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Businesses()
+        public async Task<IActionResult> Businesses(string status = "all")
         {
-            var businesses = await _context.Businesses
+            var query = _context.Businesses
                 .Include(b => b.Reviews)
                 .Include(b => b.Owner)
+                .Include(b => b.Category)
+                .AsQueryable();
+
+            // Soft delete filtresi - silinenleri gösterme
+            query = query.Where(b => !b.IsDeleted);
+
+            // Status filtresi
+            if (status != "all")
+            {
+                if (Enum.TryParse<BusinessStatus>(status, true, out var statusEnum))
+                {
+                    query = query.Where(b => b.Status == statusEnum);
+                }
+            }
+
+            var businesses = await query
                 .OrderByDescending(b => b.CreatedDate)
                 .ToListAsync();
             
             // İşletme sahipleri listesi (atama için)
             var businessOwners = await _userManager.GetUsersInRoleAsync("BusinessOwner");
             ViewBag.BusinessOwners = businessOwners;
+            ViewBag.Status = status;
+            ViewBag.Categories = await _context.Categories.ToListAsync();
             
             return View(businesses);
         }
@@ -179,42 +232,6 @@ namespace Plafind.Controllers
 
                 await LogAdminAction("Delete", "Business", id.ToString(), $"İşletme silindi: {business.Name}");
             }
-            return RedirectToAction(nameof(Businesses));
-        }
-
-        // İşletme Onaylama
-        [HttpPost]
-        public async Task<IActionResult> ApproveBusiness(int id)
-        {
-            var business = await _context.Businesses.FindAsync(id);
-            if (business == null) return NotFound();
-
-            business.IsApproved = true;
-            business.IsActive = true;
-            _context.Businesses.Update(business);
-            await _context.SaveChangesAsync();
-
-            await LogAdminAction("Approve", "Business", id.ToString(), $"İşletme onaylandı: {business.Name}");
-
-            TempData["Success"] = "İşletme başarıyla onaylandı ve yayınlandı.";
-            return RedirectToAction(nameof(Businesses));
-        }
-
-        // İşletme Reddetme
-        [HttpPost]
-        public async Task<IActionResult> RejectBusiness(int id)
-        {
-            var business = await _context.Businesses.FindAsync(id);
-            if (business == null) return NotFound();
-
-            business.IsApproved = false;
-            business.IsActive = false;
-            _context.Businesses.Update(business);
-            await _context.SaveChangesAsync();
-
-            await LogAdminAction("Reject", "Business", id.ToString(), $"İşletme reddedildi: {business.Name}");
-
-            TempData["Success"] = "İşletme reddedildi.";
             return RedirectToAction(nameof(Businesses));
         }
 
@@ -769,18 +786,328 @@ namespace Plafind.Controllers
             return View();
         }
 
+        // ==================== BUSINESS APPROVAL WORKFLOW ====================
+        [HttpPost]
+        [RequirePermission(Models.Permissions.Businesses_Approve)]
+        public async Task<IActionResult> ApproveBusiness(int id)
+        {
+            var business = await _context.Businesses.FindAsync(id);
+            if (business == null) return NotFound();
+
+            var oldStatus = business.Status;
+            business.Status = BusinessStatus.Published;
+            business.IsApproved = true;
+            business.ApprovedDate = DateTime.Now;
+            business.ApprovedBy = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync();
+
+            await LogAdminAction("Approve", "Business", id.ToString(), 
+                $"İşletme onaylandı: {business.Name}", 
+                oldValues: JsonSerializer.Serialize(new { Status = oldStatus }),
+                newValues: JsonSerializer.Serialize(new { Status = business.Status }));
+
+            TempData["Success"] = "İşletme başarıyla onaylandı.";
+            return RedirectToAction(nameof(Businesses));
+        }
+
+        [HttpPost]
+        [RequirePermission(Models.Permissions.Businesses_Approve)]
+        public async Task<IActionResult> RejectBusiness(int id, string reason)
+        {
+            var business = await _context.Businesses.FindAsync(id);
+            if (business == null) return NotFound();
+
+            var oldStatus = business.Status;
+            business.Status = BusinessStatus.Rejected;
+            business.IsApproved = false;
+            business.RejectionReason = reason;
+
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync();
+
+            await LogAdminAction("Reject", "Business", id.ToString(), 
+                $"İşletme reddedildi: {business.Name}. Sebep: {reason}",
+                oldValues: JsonSerializer.Serialize(new { Status = oldStatus }),
+                newValues: JsonSerializer.Serialize(new { Status = business.Status, RejectionReason = reason }));
+
+            TempData["Success"] = "İşletme reddedildi.";
+            return RedirectToAction(nameof(Businesses));
+        }
+
+        // ==================== SOFT DELETE & RESTORE ====================
+        [HttpPost]
+        public async Task<IActionResult> SoftDeleteBusiness(int id)
+        {
+            var business = await _context.Businesses.FindAsync(id);
+            if (business == null) return NotFound();
+
+            business.IsDeleted = true;
+            business.DeletedDate = DateTime.Now;
+            business.DeletedBy = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            business.IsActive = false;
+
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync();
+
+            await LogAdminAction("SoftDelete", "Business", id.ToString(), 
+                $"İşletme soft delete yapıldı: {business.Name}");
+
+            TempData["Success"] = "İşletme başarıyla silindi.";
+            return RedirectToAction(nameof(Businesses));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RestoreBusiness(int id)
+        {
+            var business = await _context.Businesses.FindAsync(id);
+            if (business == null) return NotFound();
+
+            business.IsDeleted = false;
+            business.DeletedDate = null;
+            business.DeletedBy = null;
+            business.IsActive = true;
+
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync();
+
+            await LogAdminAction("Restore", "Business", id.ToString(), 
+                $"İşletme geri yüklendi: {business.Name}");
+
+            TempData["Success"] = "İşletme başarıyla geri yüklendi.";
+            return RedirectToAction(nameof(DeletedBusinesses));
+        }
+
+        public async Task<IActionResult> DeletedBusinesses()
+        {
+            var deletedBusinesses = await _context.Businesses
+                .Where(b => b.IsDeleted)
+                .Include(b => b.Category)
+                .Include(b => b.Owner)
+                .OrderByDescending(b => b.DeletedDate)
+                .ToListAsync();
+            
+            return View(deletedBusinesses);
+        }
+
+        // ==================== BULK ACTIONS ====================
+        [HttpPost]
+        [RequirePermission(Models.Permissions.Businesses_BulkAction)]
+        public async Task<IActionResult> BulkAction(string action, List<int> businessIds)
+        {
+            if (businessIds == null || !businessIds.Any())
+            {
+                TempData["Error"] = "Lütfen en az bir işletme seçin.";
+                return RedirectToAction(nameof(Businesses));
+            }
+
+            var businesses = await _context.Businesses
+                .Where(b => businessIds.Contains(b.Id))
+                .ToListAsync();
+
+            int affectedCount = 0;
+
+            switch (action)
+            {
+                case "approve":
+                    foreach (var business in businesses)
+                    {
+                        business.Status = BusinessStatus.Published;
+                        business.IsApproved = true;
+                        business.ApprovedDate = DateTime.Now;
+                        business.ApprovedBy = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        affectedCount++;
+                    }
+                    await LogAdminAction("BulkApprove", "Business", string.Join(",", businessIds), 
+                        $"{affectedCount} işletme toplu onaylandı");
+                    TempData["Success"] = $"{affectedCount} işletme onaylandı.";
+                    break;
+
+                case "delete":
+                    foreach (var business in businesses)
+                    {
+                        business.IsDeleted = true;
+                        business.DeletedDate = DateTime.Now;
+                        business.DeletedBy = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        business.IsActive = false;
+                        affectedCount++;
+                    }
+                    await LogAdminAction("BulkDelete", "Business", string.Join(",", businessIds), 
+                        $"{affectedCount} işletme toplu silindi");
+                    TempData["Success"] = $"{affectedCount} işletme silindi.";
+                    break;
+
+                case "archive":
+                    foreach (var business in businesses)
+                    {
+                        business.Status = BusinessStatus.Archived;
+                        business.IsActive = false;
+                        affectedCount++;
+                    }
+                    await LogAdminAction("BulkArchive", "Business", string.Join(",", businessIds), 
+                        $"{affectedCount} işletme arşivlendi");
+                    TempData["Success"] = $"{affectedCount} işletme arşivlendi.";
+                    break;
+
+                case "changeCategory":
+                    var categoryId = Request.Form["categoryId"].ToString();
+                    if (int.TryParse(categoryId, out int catId))
+                    {
+                        foreach (var business in businesses)
+                        {
+                            business.CategoryId = catId;
+                            affectedCount++;
+                        }
+                        await LogAdminAction("BulkChangeCategory", "Business", string.Join(",", businessIds), 
+                            $"{affectedCount} işletmenin kategorisi değiştirildi");
+                        TempData["Success"] = $"{affectedCount} işletmenin kategorisi değiştirildi.";
+                    }
+                    break;
+            }
+
+            if (affectedCount > 0)
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Businesses));
+        }
+
+        // ==================== REVIEW MODERATION ====================
+        public async Task<IActionResult> ReviewReports()
+        {
+            var reports = await _context.ReviewReports
+                .Include(rr => rr.Review)
+                    .ThenInclude(r => r!.Business)
+                .Include(rr => rr.Review)
+                    .ThenInclude(r => r!.User)
+                .Include(rr => rr.ReporterUser)
+                .Where(rr => rr.Status == ReviewReportStatus.Pending || rr.Status == ReviewReportStatus.UnderReview)
+                .OrderByDescending(rr => rr.CreatedDate)
+                .ToListAsync();
+            
+            return View(reports);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResolveReviewReport(int reportId, string resolution, string note)
+        {
+            var report = await _context.ReviewReports
+                .Include(rr => rr.Review)
+                .FirstOrDefaultAsync(rr => rr.Id == reportId);
+            
+            if (report == null) return NotFound();
+
+            report.Status = resolution == "approve" ? ReviewReportStatus.Resolved : ReviewReportStatus.Dismissed;
+            report.ResolvedDate = DateTime.Now;
+            report.ResolvedBy = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            report.ResolutionNote = note;
+
+            if (resolution == "approve" && report.Review != null)
+            {
+                // Yorumu sil veya pasif yap
+                report.Review.IsActive = false;
+                report.Review.IsApproved = false;
+                _context.Reviews.Update(report.Review);
+            }
+
+            _context.ReviewReports.Update(report);
+            await _context.SaveChangesAsync();
+
+            await LogAdminAction("ResolveReviewReport", "ReviewReport", reportId.ToString(), 
+                $"Yorum raporu çözüldü. Karar: {resolution}");
+
+            TempData["Success"] = "Rapor başarıyla çözüldü.";
+            return RedirectToAction(nameof(ReviewReports));
+        }
+
+        // ==================== ENHANCED DASHBOARD METRICS ====================
+        public async Task<IActionResult> DashboardMetrics()
+        {
+            var sevenDaysAgo = DateTime.Now.AddDays(-7);
+            var thirtyDaysAgo = DateTime.Now.AddDays(-30);
+
+            // Son 7 gün metrikleri
+            var newBusinesses7Days = await _context.Businesses
+                .Where(b => b.CreatedDate >= sevenDaysAgo && !b.IsDeleted)
+                .CountAsync();
+            
+            var newReviews7Days = await _context.Reviews
+                .Where(r => r.CreatedDate >= sevenDaysAgo)
+                .CountAsync();
+            
+            var newReservations7Days = await _context.Reservations
+                .Where(r => r.CreatedDate >= sevenDaysAgo)
+                .CountAsync();
+
+            // En çok görüntülenen işletmeler (ViewCount varsa)
+            var mostViewedBusinesses = await _context.Businesses
+                .Where(b => !b.IsDeleted && b.IsActive)
+                .OrderByDescending(b => b.ViewCount ?? 0)
+                .Take(10)
+                .Select(b => new { b.Id, b.Name, ViewCount = b.ViewCount ?? 0 })
+                .ToListAsync();
+
+            // En çok favorilenen işletmeler
+            var mostFavoritedBusinesses = await _context.Businesses
+                .Where(b => !b.IsDeleted && b.IsActive)
+                .Select(b => new 
+                { 
+                    b.Id, 
+                    b.Name, 
+                    FavoriteCount = b.Favorites.Count 
+                })
+                .OrderByDescending(b => b.FavoriteCount)
+                .Take(10)
+                .ToListAsync();
+
+            // Şikayet/flag sayıları
+            var pendingReports = await _context.ReviewReports
+                .Where(rr => rr.Status == ReviewReportStatus.Pending)
+                .CountAsync();
+            
+            var totalReports = await _context.ReviewReports.CountAsync();
+
+            var metrics = new
+            {
+                Last7Days = new
+                {
+                    NewBusinesses = newBusinesses7Days,
+                    NewReviews = newReviews7Days,
+                    NewReservations = newReservations7Days
+                },
+                MostViewedBusinesses = mostViewedBusinesses,
+                MostFavoritedBusinesses = mostFavoritedBusinesses,
+                Reports = new
+                {
+                    Pending = pendingReports,
+                    Total = totalReports
+                }
+            };
+
+            return Json(metrics);
+        }
+
         // ==================== HELPER METHODS ====================
-        private async Task LogAdminAction(string action, string entityType, object entityId, string description)
+        private async Task LogAdminAction(string action, string entityType, object? entityId, string description, 
+            string? oldValues = null, string? newValues = null)
         {
             try
             {
+                var adminUser = await _userManager.GetUserAsync(User);
                 var log = new AdminLog
                 {
                     AdminUserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                    AdminUserName = adminUser?.UserName ?? adminUser?.Email,
                     Action = action,
                     EntityType = entityType,
                     EntityId = entityId?.ToString(),
                     Description = description,
+                    OldValues = oldValues,
+                    NewValues = newValues,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    UserAgent = Request.Headers["User-Agent"].ToString(),
                     CreatedDate = DateTime.Now
                 };
 

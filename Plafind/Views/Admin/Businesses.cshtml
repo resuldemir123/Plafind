@@ -2,114 +2,70 @@
 
 @{
     ViewData["Title"] = "İşletme Yönetimi";
-    var categories = Model.Select(b => b.Category?.Name).Where(c => c != null).Distinct().ToList();
-    var statuses = new[] { "Tümü", "Aktif", "Pasif", "Onay Bekliyor" };
+    var status = ViewBag.Status as string ?? "all";
+    var categories = ViewBag.Categories as List<Plafind.Models.Category> ?? new List<Plafind.Models.Category>();
+    var statusOptions = new[] { 
+        new { Value = "all", Text = "Tümü" },
+        new { Value = "Draft", Text = "Taslak" },
+        new { Value = "Pending", Text = "Onay Bekliyor" },
+        new { Value = "Published", Text = "Yayında" },
+        new { Value = "Archived", Text = "Arşivlendi" },
+        new { Value = "Rejected", Text = "Reddedildi" }
+    };
 }
 
-<style>
-    .admin-businesses-page {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        padding: 2rem 0;
-    }
-    .page-header-admin {
-        background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-    .filter-section {
-        background: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    }
-    .business-table-card {
-        background: white;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-    .table-header-custom {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 1.5rem;
-        border: none;
-    }
-    .table-custom {
-        margin: 0;
-    }
-    .table-custom thead th {
-        background: #f8f9fa;
-        color: #495057;
-        font-weight: 600;
-        border-bottom: 2px solid #dee2e6;
-        padding: 1rem;
-    }
-    .table-custom tbody tr {
-        transition: all 0.2s ease;
-    }
-    .table-custom tbody tr:hover {
-        background: #f8f9fa;
-        transform: translateX(5px);
-    }
-    .badge-custom {
-        padding: 0.5rem 0.75rem;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-    .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-    .btn-action {
-        padding: 0.4rem 0.8rem;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-    }
-    .btn-action:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-</style>
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin-businesses.css" asp-append-version="true" />
+}
 
 <div class="admin-businesses-page">
     <div class="container-fluid">
+        <!-- Page Header -->
         <div class="page-header-admin">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div>
                     <h1 class="h3 mb-2 fw-bold text-dark">
                         <i class="fas fa-building me-2 text-primary"></i>İşletme Yönetimi
                     </h1>
                     <p class="text-muted mb-0">Tüm işletmeleri görüntüleyin, düzenleyin ve yönetin</p>
                 </div>
-                <a href="@Url.Action("CreateBusiness")" class="btn btn-primary btn-lg shadow-sm">
-                    <i class="fas fa-plus me-2"></i>Yeni İşletme Ekle
-                </a>
+                <div class="d-flex gap-2">
+                    <a href="@Url.Action("DeletedBusinesses")" class="btn btn-outline-secondary">
+                        <i class="fas fa-trash-restore me-2"></i>Silinen İşletmeler
+                    </a>
+                    <a href="@Url.Action("CreateBusiness")" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Yeni İşletme Ekle
+                    </a>
+                </div>
             </div>
         </div>
 
+        <!-- Filters & Bulk Actions -->
         <div class="filter-section">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold">Kategori Filtresi</label>
+            <form method="get" id="filterForm" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Durum Filtresi</label>
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        @foreach (var opt in statusOptions)
+                        {
+                            @if (status == opt.Value)
+                            {
+                                <option value="@opt.Value" selected>@opt.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@opt.Value">@opt.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Kategori</label>
                     <select id="categoryFilter" class="form-select">
                         <option value="">Tüm Kategoriler</option>
                         @foreach (var cat in categories)
                         {
-                            <option value="@cat">@cat</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold">Durum Filtresi</label>
-                    <select id="statusFilter" class="form-select">
-                        @foreach (var status in statuses)
-                        {
-                            <option value="@status">@status</option>
+                            <option value="@cat.Id">@cat.Name</option>
                         }
                     </select>
                 </div>
@@ -117,84 +73,144 @@
                     <label class="form-label fw-semibold">Arama</label>
                     <input type="text" id="searchInput" class="form-control" placeholder="İşletme adı, adres veya telefon ara...">
                 </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                        <i class="fas fa-times me-2"></i>Temizle
+                    </button>
+                </div>
+            </form>
+
+            <!-- Bulk Actions -->
+            <div class="bulk-actions-panel mt-3" id="bulkActionsPanel" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                    <div>
+                        <span class="fw-semibold" id="selectedCount">0</span> işletme seçildi
+                    </div>
+                    <div class="d-flex gap-2">
+                        <select id="bulkActionSelect" class="form-select form-select-sm" style="width: auto;">
+                            <option value="">Toplu İşlem Seçin</option>
+                            <option value="approve">Onayla</option>
+                            <option value="archive">Arşivle</option>
+                            <option value="delete">Sil</option>
+                            <option value="changeCategory">Kategori Değiştir</option>
+                        </select>
+                        <select id="bulkCategorySelect" class="form-select form-select-sm" style="width: auto; display: none;">
+                            <option value="">Kategori Seçin</option>
+                            @foreach (var cat in categories)
+                            {
+                                <option value="@cat.Id">@cat.Name</option>
+                            }
+                        </select>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="executeBulkAction()">
+                            <i class="fas fa-check me-1"></i>Uygula
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearSelection()">
+                            <i class="fas fa-times me-1"></i>İptal
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- Business Table -->
         <div class="business-table-card">
             <div class="table-header-custom">
-                <h5 class="mb-0 fw-bold">
-                    <i class="fas fa-list me-2"></i>İşletme Listesi
-                    <span class="badge bg-light text-dark ms-2" id="businessCount">@Model.Count()</span>
-                </h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-list me-2"></i>İşletme Listesi
+                        <span class="badge bg-light text-dark ms-2" id="businessCount">@Model.Count()</span>
+                    </h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                        <label class="form-check-label text-white" for="selectAll">
+                            Tümünü Seç
+                        </label>
+                    </div>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-custom" id="businessTable">
                     <thead>
                         <tr>
+                            <th width="40">
+                                <input type="checkbox" id="selectAllHeader" onchange="toggleSelectAll()">
+                            </th>
                             <th>İşletme Adı</th>
+                            <th>Durum</th>
                             <th>Kategori</th>
                             <th>İşletme Sahibi</th>
-                            <th>Adres</th>
-                            <th>Telefon</th>
-                            <th>Durum</th>
                             <th>Puan</th>
                             <th>Yorum</th>
+                            <th>Görüntülenme</th>
                             <th>İşlemler</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var business in Model)
                         {
-                            <tr data-category="@(business.Category?.Name ?? "")" 
-                                data-status="@(business.IsActive ? (business.IsApproved ? "Aktif" : "Onay Bekliyor") : "Pasif")"
+                            <tr data-category-id="@(business.CategoryId ?? 0)" 
+                                data-status="@business.Status.ToString()"
                                 data-search="@($"{business.Name} {business.Address} {business.Phone}".ToLower())">
-                                <td class="fw-semibold">@business.Name</td>
+                                <td>
+                                    <input type="checkbox" class="business-checkbox" value="@business.Id" onchange="updateBulkActions()">
+                                </td>
+                                <td class="fw-semibold">
+                                    <a href="@Url.Action("Details", "Businesses", new { id = business.Id })" class="text-decoration-none">
+                                        @business.Name
+                                    </a>
+                                </td>
+                                <td>
+                                    @switch (business.Status)
+                                    {
+                                        case BusinessStatus.Draft:
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-file-alt me-1"></i>Taslak
+                                            </span>
+                                            break;
+                                        case BusinessStatus.Pending:
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>Onay Bekliyor
+                                            </span>
+                                            break;
+                                        case BusinessStatus.Published:
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>Yayında
+                                            </span>
+                                            break;
+                                        case BusinessStatus.Archived:
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-archive me-1"></i>Arşivlendi
+                                            </span>
+                                            break;
+                                        case BusinessStatus.Rejected:
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times-circle me-1"></i>Reddedildi
+                                            </span>
+                                            break;
+                                    }
+                                </td>
                                 <td>
                                     @if (business.Category != null)
                                     {
-                                        <span class="badge bg-info badge-custom">
+                                        <span class="badge bg-info">
                                             <i class="fas fa-tag me-1"></i>@business.Category.Name
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary badge-custom">
-                                            <i class="fas fa-tag me-1"></i>Kategori Atanmamış
-                                        </span>
+                                        <span class="badge bg-secondary">Kategori Yok</span>
                                     }
                                 </td>
                                 <td>
                                     @if (business.Owner != null)
                                     {
-                                        <span class="badge bg-primary badge-custom">
+                                        <span class="badge bg-primary">
                                             <i class="fas fa-user me-1"></i>@(business.Owner.FullName ?? business.Owner.Email ?? business.Owner.UserName)
                                         </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary badge-custom">Sahip Atanmamış</span>
-                                    }
-                                </td>
-                                <td class="text-muted">@(string.IsNullOrEmpty(business.Address) ? "-" : business.Address)</td>
-                                <td>@(string.IsNullOrEmpty(business.Phone) ? "-" : business.Phone)</td>
-                                <td>
-                                    @if (business.IsActive && business.IsApproved)
-                                    {
-                                        <span class="badge bg-success badge-custom">
-                                            <i class="fas fa-check-circle me-1"></i>Aktif
-                                        </span>
-                                    }
-                                    else if (!business.IsApproved)
-                                    {
-                                        <span class="badge bg-warning badge-custom">
-                                            <i class="fas fa-clock me-1"></i>Onay Bekliyor
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger badge-custom">
-                                            <i class="fas fa-times-circle me-1"></i>Pasif
-                                        </span>
+                                        <span class="badge bg-secondary">Sahip Yok</span>
                                     }
                                 </td>
                                 <td>
@@ -220,41 +236,45 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-secondary badge-custom">
+                                    <span class="badge bg-secondary">
                                         <i class="fas fa-comments me-1"></i>@business.TotalReviews
                                     </span>
                                 </td>
                                 <td>
+                                    <span class="badge bg-info">
+                                        <i class="fas fa-eye me-1"></i>@(business.ViewCount ?? 0)
+                                    </span>
+                                </td>
+                                <td>
                                     <div class="action-buttons">
-                                        @if (!business.IsApproved)
+                                        @if (business.Status == BusinessStatus.Pending)
                                         {
                                             <form asp-action="ApproveBusiness" method="post" style="display: inline;">
                                                 <input type="hidden" name="id" value="@business.Id" />
-                                                <button type="submit" class="btn btn-success btn-action" 
+                                                <button type="submit" class="btn btn-success btn-sm" 
                                                         onclick="return confirm('Bu işletmeyi onaylamak istediğinizden emin misiniz?')"
                                                         title="Onayla">
                                                     <i class="fas fa-check"></i>
                                                 </button>
                                             </form>
-                                            <form asp-action="RejectBusiness" method="post" style="display: inline;">
-                                                <input type="hidden" name="id" value="@business.Id" />
-                                                <button type="submit" class="btn btn-warning btn-action"
-                                                        onclick="return confirm('Bu işletmeyi reddetmek istediğinizden emin misiniz?')"
-                                                        title="Reddet">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-warning btn-sm" 
+                                                    onclick="showRejectModal(@business.Id, '@business.Name')"
+                                                    title="Reddet">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         }
                                         <a href="@Url.Action("EditBusiness", new { id = business.Id })" 
-                                           class="btn btn-primary btn-action" title="Düzenle">
+                                           class="btn btn-primary btn-sm" title="Düzenle">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="@Url.Action("DeleteBusiness", new { id = business.Id })" 
-                                           class="btn btn-danger btn-action"
-                                           onclick="return confirm('Bu işletmeyi silmek istediğinizden emin misiniz?')"
-                                           title="Sil">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
+                                        <form asp-action="SoftDeleteBusiness" method="post" style="display: inline;">
+                                            <input type="hidden" name="id" value="@business.Id" />
+                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('Bu işletmeyi silmek istediğinizden emin misiniz?')"
+                                                    title="Sil">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -266,44 +286,32 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const categoryFilter = document.getElementById('categoryFilter');
-        const statusFilter = document.getElementById('statusFilter');
-        const searchInput = document.getElementById('searchInput');
-        const businessTable = document.getElementById('businessTable');
-        const businessCount = document.getElementById('businessCount');
+<!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">İşletmeyi Reddet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="RejectBusiness" method="post">
+                <input type="hidden" name="id" id="rejectBusinessId" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Red Nedeni <span class="text-danger">*</span></label>
+                        <textarea name="reason" class="form-control" rows="3" required 
+                                  placeholder="İşletmenin neden reddedildiğini açıklayın..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-danger">Reddet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-        function filterTable() {
-            const category = categoryFilter.value.toLowerCase();
-            const status = statusFilter.value;
-            const search = searchInput.value.toLowerCase();
-
-            const rows = businessTable.querySelectorAll('tbody tr');
-            let visibleCount = 0;
-
-            rows.forEach(row => {
-                const rowCategory = (row.dataset.category || '').toLowerCase();
-                const rowStatus = row.dataset.status || '';
-                const rowSearch = row.dataset.search || '';
-
-                const matchCategory = !category || rowCategory.includes(category);
-                const matchStatus = status === 'Tümü' || rowStatus === status;
-                const matchSearch = !search || rowSearch.includes(search);
-
-                if (matchCategory && matchStatus && matchSearch) {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            businessCount.textContent = visibleCount;
-        }
-
-        categoryFilter.addEventListener('change', filterTable);
-        statusFilter.addEventListener('change', filterTable);
-        searchInput.addEventListener('input', filterTable);
-    });
-</script>
+@section Scripts {
+    <script src="~/js/admin-businesses.js" asp-append-version="true"></script>
+}

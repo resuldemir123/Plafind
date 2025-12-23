@@ -2,6 +2,9 @@ using Plafind.Data;
 using Plafind.Models;
 using Plafind.Options;
 using Plafind.Services;
+using Plafind.Features.Businesses.Services;
+using Plafind.Features.Reservations.Services;
+using Plafind.Features.Reviews.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +16,8 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using System.Globalization;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -95,9 +100,14 @@ builder.Services.AddSession(options =>
 // LOCALIZATION (Çoklu Dil Desteği)
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-// MVC - View Localization desteği ile
+// MVC - View Localization desteği ile + FluentValidation
 builder.Services.AddControllersWithViews()
     .AddViewLocalization();
+
+// FluentValidation (yeni API)
+builder.Services.AddFluentValidationAutoValidation()
+    .AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // RAZOR PAGES
 builder.Services.AddRazorPages();
@@ -119,6 +129,9 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider()); // Çerezden okuma (Dil Seçimi için)
 });
 
+// AUTO MAPPER
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
 // EMAIL SERVICE
 builder.Services.AddScoped<IEmailService, EmailService>();
 
@@ -133,6 +146,14 @@ builder.Services.AddScoped<IComparisonService, ComparisonService>();
 
 // COMPARE SERVICE (Session-based comparison)
 builder.Services.AddScoped<ICompareService, CompareService>();
+
+// FEATURE SERVICES
+builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<IBusinessService, BusinessService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddHttpContextAccessor();
 
 // GOOGLE NEWS SERVICE - Timeout ve retry ayarları ile
 builder.Services.AddHttpClient<IGoogleNewsService, GoogleNewsService>(client =>
@@ -189,6 +210,16 @@ if (app.Environment.IsDevelopment() ||
             await Plafind.Data.DbSeeder.SeedDataAsync(context);
             await Plafind.Data.IdentitySeeder.SeedAdminAsync(userManager, roleManager);
             await Plafind.Data.BusinessOwnerSeeder.SeedBusinessOwnerAsync(context, userManager, roleManager);
+            
+            // Permission seed data
+            await Plafind.Data.PermissionSeeder.SeedPermissionsAsync(context);
+            
+            // Admin rolüne tüm izinleri ata
+            var adminRole = await roleManager.FindByNameAsync("Admin");
+            if (adminRole != null)
+            {
+                await Plafind.Data.PermissionSeeder.AssignPermissionsToAdminRoleAsync(context, adminRole.Id);
+            }
         }
         catch (Exception ex)
         {

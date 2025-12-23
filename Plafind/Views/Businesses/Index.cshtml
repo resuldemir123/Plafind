@@ -1,43 +1,447 @@
-﻿@model IEnumerable<Plafind.Models.Business>
-
+﻿@model Plafind.Features.Businesses.ViewModels.BusinessListViewModel
 @{
-    ViewData["Title"] = "İşletmeler";
+    ViewData["Title"] = "İşletmeler - Alanya İşletme Rehberi";
 }
 
-<h2>İşletme Listesi</h2>
+@section Styles {
+    <link rel="stylesheet" href="~/css/design-system.css" />
+    <link rel="stylesheet" href="~/css/business-list.css" />
+}
 
-<table class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>Resim</th>
-            <th>Ad</th>
-            <th>Açıklama</th>
-            <th>Durum</th>
-            <th>İşlemler</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @if (!string.IsNullOrEmpty(item.ImageUrl))
-                    {
-                        <img src="@item.ImageUrl" alt="@item.Name - İşletme Resmi" style="width: 100px; height: 100px; object-fit: cover;" class="img-fluid" onerror="this.src='/images/default.jpg'; this.alt='Varsayılan Resim';" />
+<div class="business-list-page">
+    <!-- Search and Filter Header -->
+    <section class="search-filter-section">
+        <div class="container">
+            <div class="search-header">
+                <h1 class="page-title">Alanya İşletmeleri</h1>
+                <p class="page-subtitle">@Model.TotalCount işletme bulundu</p>
+            </div>
+
+            <!-- Search Bar -->
+            <form method="get" class="search-form" id="searchForm">
+                <div class="search-input-group">
+                    <label for="search" class="sr-only">İşletme ara</label>
+                    <input type="text" 
+                           id="search" 
+                           name="search" 
+                           class="form-control search-input" 
+                           placeholder="İşletme, kategori veya konum ara..." 
+                           value="@Model.SearchQuery"
+                           aria-label="İşletme arama">
+                    <button type="submit" class="btn btn-primary search-btn" aria-label="Ara">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+
+                <!-- Filter Toggle (Mobile) -->
+                <button type="button" 
+                        class="btn btn-outline-primary filter-toggle d-md-none" 
+                        data-bs-toggle="offcanvas" 
+                        data-bs-target="#filterSidebar"
+                        aria-label="Filtreleri göster">
+                    <i class="fas fa-filter me-2"></i>Filtreler
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="row">
+            <!-- Filter Sidebar -->
+            <aside class="col-lg-3 filter-sidebar d-none d-md-block" id="filterSidebarDesktop">
+                <div class="filter-card">
+                    <div class="filter-header">
+                        <h3>Filtreler</h3>
+                        <button type="button" class="btn btn-sm btn-link clear-filters" onclick="clearFilters()">
+                            Temizle
+                        </button>
+                    </div>
+
+                    <form method="get" id="filterForm">
+                        <input type="hidden" name="search" value="@Model.SearchQuery" />
+                        <input type="hidden" name="page" value="1" />
+
+                        <!-- Category Filter -->
+                        <div class="filter-group">
+                            <label for="categoryId" class="filter-label">Kategori</label>
+                            <select id="categoryId" name="categoryId" class="form-select" onchange="submitFilters()">
+                                <option value="">Tüm Kategoriler</option>
+                                @foreach (var category in Model.Categories)
+                                {
+                                    @if (Model.CategoryId == category.Id)
+                                    {
+                                        <option value="@category.Id" selected>@category.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@category.Id">@category.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Rating Filter -->
+                        <div class="filter-group">
+                            <label class="filter-label">Puan</label>
+                            <div class="rating-filter">
+                                <input type="number" 
+                                       id="minRating" 
+                                       name="minRating" 
+                                       class="form-control" 
+                                       placeholder="Min" 
+                                       min="0" 
+                                       max="5" 
+                                       step="0.5"
+                                       value="@Model.MinRating"
+                                       onchange="submitFilters()">
+                                <span>-</span>
+                                <input type="number" 
+                                       id="maxRating" 
+                                       name="maxRating" 
+                                       class="form-control" 
+                                       placeholder="Max" 
+                                       min="0" 
+                                       max="5" 
+                                       step="0.5"
+                                       value="@Model.MaxRating"
+                                       onchange="submitFilters()">
+                            </div>
+                        </div>
+
+                        <!-- Price Range Filter -->
+                        <div class="filter-group">
+                            <label for="priceRange" class="filter-label">Fiyat Aralığı</label>
+                            <select id="priceRange" name="priceRange" class="form-select" onchange="submitFilters()">
+                                <option value="">Tümü</option>
+                                @foreach (var price in Model.PriceRanges)
+                                {
+                                    @if (Model.PriceRange == price)
+                                    {
+                                        <option value="@price" selected>@price</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@price">@price</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Features Filter -->
+                        <div class="filter-group">
+                            <label class="filter-label">Özellikler</label>
+                            <div class="features-filter">
+                                @foreach (var feature in Model.AvailableFeatures)
+                                {
+                                    <label class="feature-checkbox">
+                                        <input type="checkbox" 
+                                               name="features" 
+                                               value="@feature"
+                                               @(Model.Features.Contains(feature) ? "checked" : "")
+                                               onchange="submitFilters()">
+                                        <span>@feature</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Near Me Filter -->
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <input type="checkbox" 
+                                       name="nearMe" 
+                                       value="true"
+                                       @(Model.NearMe == true ? "checked" : "")
+                                       onchange="requestLocation()">
+                                Yakınımdaki İşletmeler
+                            </label>
+                            <small class="text-muted d-block mt-1">Konumunuzu paylaşın</small>
+                        </div>
+
+                        <!-- Sort -->
+                        <div class="filter-group">
+                            <label for="sortBy" class="filter-label">Sıralama</label>
+                            <select id="sortBy" name="sortBy" class="form-select" onchange="submitFilters()">
+                                @if (Model.SortBy == "featured")
+                                {
+                                    <option value="featured" selected>Öne Çıkanlar</option>
+                                }
+                                else
+                                {
+                                    <option value="featured">Öne Çıkanlar</option>
+                                }
+                                @if (Model.SortBy == "rating")
+                                {
+                                    <option value="rating" selected>En Yüksek Puan</option>
+                                }
+                                else
+                                {
+                                    <option value="rating">En Yüksek Puan</option>
+                                }
+                                @if (Model.SortBy == "reviews")
+                                {
+                                    <option value="reviews" selected>En Çok Yorum</option>
+                                }
+                                else
+                                {
+                                    <option value="reviews">En Çok Yorum</option>
+                                }
+                                @if (Model.SortBy == "newest")
+                                {
+                                    <option value="newest" selected>En Yeni</option>
+                                }
+                                else
+                                {
+                                    <option value="newest">En Yeni</option>
+                                }
+                                @if (Model.NearMe == true)
+                                {
+                                    @if (Model.SortBy == "distance")
+                                    {
+                                        <option value="distance" selected>En Yakın</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="distance">En Yakın</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Filtrele</button>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Business List -->
+            <main class="col-lg-9 business-list-main">
+                @if (Model.Businesses.Any())
+                {
+                    <div class="business-grid">
+                        @foreach (var business in Model.Businesses)
+                        {
+                            <div class="business-card">
+                                <a asp-action="Details" asp-route-id="@business.Id" class="business-card-link">
+                                    <div class="business-card-image">
+                                        @if (!string.IsNullOrEmpty(business.ImageUrl))
+                                        {
+                                            <img src="@business.ImageUrl" 
+                                                 alt="@business.Name" 
+                                                 loading="lazy"
+                                                 onerror="this.src='/images/default.jpg'">
                     }
                     else
+                                        {
+                                            <img src="/images/default.jpg" alt="@business.Name" loading="lazy">
+                                        }
+                                        @if (business.IsFeatured)
+                                        {
+                                            <span class="badge badge-primary featured-badge">
+                                                <i class="fas fa-star"></i> Öne Çıkan
+                                            </span>
+                                        }
+                                    </div>
+                                    <div class="business-card-body">
+                                        <h3 class="business-card-title">@business.Name</h3>
+                                        @if (business.Category != null)
+                                        {
+                                            <p class="business-card-category">
+                                                <i class="fas fa-tag"></i> @business.Category.Name
+                                            </p>
+                                        }
+                                        @if (!string.IsNullOrEmpty(business.Description))
+                                        {
+                                            <p class="business-card-description">
+                                                @(business.Description.Length > 100 ? business.Description.Substring(0, 100) + "..." : business.Description)
+                                            </p>
+                                        }
+                                        <div class="business-card-footer">
+                                            <div class="business-rating">
+                                                <div class="stars">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        <i class="@(i <= Math.Round(business.AverageRating) ? "fas" : "far") fa-star"></i>
+                                                    }
+                                                </div>
+                                                <span class="rating-value">@business.AverageRating.ToString("F1")</span>
+                                                <span class="review-count">(@business.TotalReviews)</span>
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(business.PriceRange))
+                                            {
+                                                <span class="price-range">@business.PriceRange</span>
+                                            }
+                                            @if (Model.BusinessDistances.ContainsKey(business.Id))
+                                            {
+                                                <span class="distance-badge">
+                                                    <i class="fas fa-map-marker-alt"></i>
+                                                    @{
+                                                        var distance = Model.BusinessDistances[business.Id];
+                                                        var formattedDistance = distance < 1 ? $"{(int)(distance * 1000)} m" : $"{distance:F1} km";
+                                                    }
+                                                    @formattedDistance
+                                                </span>
+                                            }
+                                        </div>
+                                        @if (business.Features != null && business.Features.Any())
+                                        {
+                                            <div class="business-features">
+                                                @foreach (var feature in business.Features.Take(3))
+                                                {
+                                                    <span class="feature-badge">@feature.Name</span>
+                                                }
+                                                @if (business.Features.Count > 3)
+                                                {
+                                                    <span class="feature-badge feature-more">+@(business.Features.Count - 3)</span>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Pagination -->
+                    @if (Model.TotalPages > 1)
                     {
-                        <img src="/images/default.jpg" alt="@item.Name - Varsayılan Resim" style="width: 100px; height: 100px; object-fit: cover;" class="img-fluid" />
+                        <nav aria-label="Sayfa navigasyonu" class="pagination-wrapper">
+                            <ul class="pagination">
+                                @if (Model.Page > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="@Url.Action("Index", new { page = Model.Page - 1, search = Model.SearchQuery, categoryId = Model.CategoryId, sortBy = Model.SortBy })" aria-label="Önceki sayfa">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                }
+
+                                @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                                {
+                                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { page = i, search = Model.SearchQuery, categoryId = Model.CategoryId, sortBy = Model.SortBy })">
+                                            @i
+                                        </a>
+                                    </li>
+                                }
+
+                                @if (Model.Page < Model.TotalPages)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="@Url.Action("Index", new { page = Model.Page + 1, search = Model.SearchQuery, categoryId = Model.CategoryId, sortBy = Model.SortBy })" aria-label="Sonraki sayfa">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
                     }
-                </td>
-                <td>@item.Name</td>
-                <td>@(string.IsNullOrEmpty(item.Description) ? "Açıklama Yok" : item.Description)</td>
-                <td>@(item.IsActive ? "Aktif" : "Pasif") @(item.IsFeatured ? " - Öne Çıkarılmış" : "")</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Düzenle</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm ms-1">Sil</a>
-                </td>
-            </tr>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-search empty-icon"></i>
+                        <h3>Sonuç bulunamadı</h3>
+                        <p>Aradığınız kriterlere uygun işletme bulunamadı. Filtreleri değiştirerek tekrar deneyin.</p>
+                        <button type="button" class="btn btn-primary" onclick="clearFilters()">Filtreleri Temizle</button>
+                    </div>
+                }
+            </main>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Filter Sidebar -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="filterSidebar" aria-labelledby="filterSidebarLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="filterSidebarLabel">Filtreler</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Kapat"></button>
+    </div>
+    <div class="offcanvas-body">
+        <!-- Same filter form as desktop -->
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let userLocation = null;
+
+        function submitFilters() {
+            // Features checkbox'larını topla
+            const features = Array.from(document.querySelectorAll('input[name="features"]:checked'))
+                .map(cb => cb.value);
+            
+            // Features'ı hidden input olarak ekle
+            const form = document.getElementById('filterForm');
+            const existingFeaturesInputs = form.querySelectorAll('input[name="features"]');
+            existingFeaturesInputs.forEach(input => {
+                if (input.type === 'hidden') input.remove();
+            });
+            
+            features.forEach(feature => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'features';
+                input.value = feature;
+                form.appendChild(input);
+            });
+
+            form.submit();
         }
-    </tbody>
-</table>
+
+        function clearFilters() {
+            window.location.href = '@Url.Action("Index")';
+        }
+
+        function requestLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        // Hidden input'ları ekle
+                        const form = document.getElementById('filterForm');
+                        let latInput = form.querySelector('input[name="userLatitude"]');
+                        let lngInput = form.querySelector('input[name="userLongitude"]');
+                        
+                        if (!latInput) {
+                            latInput = document.createElement('input');
+                            latInput.type = 'hidden';
+                            latInput.name = 'userLatitude';
+                            form.appendChild(latInput);
+                        }
+                        
+                        if (!lngInput) {
+                            lngInput = document.createElement('input');
+                            lngInput.type = 'hidden';
+                            lngInput.name = 'userLongitude';
+                            form.appendChild(lngInput);
+                        }
+                        
+                        latInput.value = userLocation.lat;
+                        lngInput.value = userLocation.lng;
+                        
+                        // NearMe checkbox'ını işaretle
+                        const nearMeInput = form.querySelector('input[name="nearMe"]');
+                        if (nearMeInput) {
+                            nearMeInput.value = 'true';
+                        }
+                        
+                        // Formu submit et
+                        submitFilters();
+                    },
+                    function(error) {
+                        alert('Konum alınamadı. Lütfen tarayıcı ayarlarınızdan konum iznini açın.');
+                        // Checkbox'ı kaldır
+                        const nearMeCheckbox = document.querySelector('input[name="nearMe"]');
+                        if (nearMeCheckbox) nearMeCheckbox.checked = false;
+                    }
+                );
+            } else {
+                alert('Tarayıcınız konum özelliğini desteklemiyor.');
+            }
+        }
+    </script>
+}

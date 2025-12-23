@@ -1,0 +1,162 @@
+@model IEnumerable<Plafind.Models.ReviewReport>
+
+@{
+    ViewData["Title"] = "Yorum Raporları";
+}
+
+<div class="admin-businesses-page">
+    <div class="container-fluid">
+        <div class="page-header-admin">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-2 fw-bold text-dark">
+                        <i class="fas fa-flag me-2 text-danger"></i>Yorum Raporları
+                    </h1>
+                    <p class="text-muted mb-0">Kullanıcılar tarafından raporlanan yorumları inceleyin ve yönetin</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="business-table-card">
+            <div class="table-header-custom">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-list me-2"></i>Rapor Listesi
+                    <span class="badge bg-light text-dark ms-2">@Model.Count()</span>
+                </h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Yorum</th>
+                            <th>Raporlayan</th>
+                            <th>Neden</th>
+                            <th>Durum</th>
+                            <th>Tarih</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            @foreach (var report in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (report.Review != null)
+                                        {
+                                            <div>
+                                                <strong>@report.Review.Business?.Name</strong>
+                                                <br>
+                                                <small class="text-muted">@(report.Review.Comment?.Length > 50 ? report.Review.Comment.Substring(0, 50) + "..." : report.Review.Comment)</small>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (report.ReporterUser != null)
+                                        {
+                                            <span class="badge bg-primary">@(report.ReporterUser.FullName ?? report.ReporterUser.Email)</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">@report.Reason</span>
+                                        @if (!string.IsNullOrEmpty(report.Description))
+                                        {
+                                            <br>
+                                            <small class="text-muted">@report.Description</small>
+                                        }
+                                    </td>
+                                    <td>
+                                        @switch (report.Status)
+                                        {
+                                            case ReviewReportStatus.Pending:
+                                                <span class="badge bg-warning">Beklemede</span>
+                                                break;
+                                            case ReviewReportStatus.UnderReview:
+                                                <span class="badge bg-info">İnceleniyor</span>
+                                                break;
+                                            case ReviewReportStatus.Resolved:
+                                                <span class="badge bg-success">Çözüldü</span>
+                                                break;
+                                            case ReviewReportStatus.Dismissed:
+                                                <span class="badge bg-secondary">Reddedildi</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        <small>@report.CreatedDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm" 
+                                                onclick="showResolveModal(@report.Id, '@report.Reason', '@report.Description')"
+                                                title="Çöz">
+                                            <i class="fas fa-check me-1"></i>Çöz
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Bekleyen rapor bulunmamaktadır.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resolve Modal -->
+<div class="modal fade" id="resolveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Raporu Çöz</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="ResolveReviewReport" method="post">
+                <input type="hidden" name="reportId" id="resolveReportId" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Karar <span class="text-danger">*</span></label>
+                        <select name="resolution" class="form-select" required>
+                            <option value="">Seçin</option>
+                            <option value="approve">Yorumu Sil/Devre Dışı Bırak</option>
+                            <option value="dismiss">Raporu Reddet</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Not</label>
+                        <textarea name="note" class="form-control" rows="3" 
+                                  placeholder="Çözüm notu (opsiyonel)..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin-businesses.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script>
+        function showResolveModal(reportId, reason, description) {
+            document.getElementById('resolveReportId').value = reportId;
+            const modal = new bootstrap.Modal(document.getElementById('resolveModal'));
+            modal.show();
+        }
+    </script>
+}
+

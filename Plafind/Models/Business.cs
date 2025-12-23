@@ -29,9 +29,23 @@ namespace Plafind.Models
         public DateTime? UpdatedDate { get; set; }
         public string? CreatedBy { get; set; }
         public bool IsApproved { get; set; } = false;
+        
+        // Onay akışı için durum
+        public BusinessStatus Status { get; set; } = BusinessStatus.Draft;
+        
+        // Soft delete için
+        public bool IsDeleted { get; set; } = false;
+        public DateTime? DeletedDate { get; set; }
+        public string? DeletedBy { get; set; }
+        
+        // Onay/Red için
+        public DateTime? ApprovedDate { get; set; }
+        public string? ApprovedBy { get; set; }
+        public string? RejectionReason { get; set; }
 
         public double AverageRating { get; set; } = 0;
         public int TotalReviews { get; set; } = 0;
+        public int? ViewCount { get; set; } = 0; // Görüntülenme sayısı
 
         // İşletme sahibi (BusinessOwner)
         public string? OwnerId { get; set; }

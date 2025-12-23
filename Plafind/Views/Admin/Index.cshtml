@@ -137,6 +137,129 @@
         </div>
     </div>
 
+    <!-- Son 7 Gün Metrikleri -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-card-header">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-chart-line me-2"></i>Son 7 Gün İstatistikleri</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <div class="display-4 fw-bold text-primary">@stats.NewBusinessesThisWeek</div>
+                                <p class="text-muted mb-0">Yeni İşletme</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <div class="display-4 fw-bold text-success">@stats.NewReviewsThisWeek</div>
+                                <p class="text-muted mb-0">Yeni Yorum</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <div class="display-4 fw-bold text-info">@stats.NewReservationsThisWeek</div>
+                                <p class="text-muted mb-0">Yeni Rezervasyon</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <div class="display-4 fw-bold text-warning">@stats.NewUsersThisWeek</div>
+                                <p class="text-muted mb-0">Yeni Kullanıcı</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- En Çok Görüntülenen ve Favorilenen -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-card-header">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-eye me-2"></i>En Çok Görüntülenen İşletmeler</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (stats.MostViewedBusinesses != null && ((dynamic)stats.MostViewedBusinesses).Count > 0)
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var business in (dynamic)stats.MostViewedBusinesses)
+                            {
+                                <div class="list-group-item border-0 px-0 py-2">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <a href="@Url.Action("Details", "Businesses", new { id = business.Id })" class="text-decoration-none fw-semibold">
+                                                @business.Name
+                                            </a>
+                                        </div>
+                                        <span class="badge bg-info">@business.ViewCount görüntülenme</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Henüz veri yok</p>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header dashboard-card-header">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-heart me-2"></i>En Çok Favorilenen İşletmeler</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (stats.MostFavoritedBusinesses != null && ((dynamic)stats.MostFavoritedBusinesses).Count > 0)
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var business in (dynamic)stats.MostFavoritedBusinesses)
+                            {
+                                <div class="list-group-item border-0 px-0 py-2">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <a href="@Url.Action("Details", "Businesses", new { id = business.Id })" class="text-decoration-none fw-semibold">
+                                                @business.Name
+                                            </a>
+                                        </div>
+                                        <span class="badge bg-danger">@business.FavoriteCount favori</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Henüz veri yok</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Şikayet/Flag Sayıları -->
+    @if (stats.PendingReports > 0)
+    {
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="alert alert-warning d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>@stats.PendingReports</strong> bekleyen yorum raporu var
+                    </div>
+                    <a href="@Url.Action("ReviewReports")" class="btn btn-warning">
+                        <i class="fas fa-eye me-2"></i>Raporları İncele
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
     <!-- Modüler Hızlı Erişim -->
     <div class="row g-4 mb-4">
         <div class="col-lg-4 col-md-6">

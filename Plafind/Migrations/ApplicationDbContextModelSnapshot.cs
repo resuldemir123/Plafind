@@ -166,6 +166,9 @@ namespace Plafind.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("AdminUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("AdminUserName")
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedDate")
@@ -177,10 +180,31 @@ namespace Plafind.Migrations
                     b.Property<string>("EntityId")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("EntityName")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("EntityType")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("NewValues")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("OldValues")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserAgent")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AdminUserId");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("EntityType");
 
                     b.ToTable("AdminLogs");
                 });
@@ -351,6 +375,12 @@ namespace Plafind.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("ApprovedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("ApprovedDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<double>("AverageRating")
                         .HasColumnType("double");
 
@@ -361,6 +391,12 @@ namespace Plafind.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
@@ -379,6 +415,9 @@ namespace Plafind.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsApproved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsFeatured")
@@ -402,11 +441,20 @@ namespace Plafind.Migrations
                     b.Property<string>("PriceRange")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int>("TotalReviews")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("ViewCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("Website")
                         .HasColumnType("longtext");
@@ -1246,6 +1294,37 @@ namespace Plafind.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("Plafind.Models.Permission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Permissions");
+                });
+
             modelBuilder.Entity("Plafind.Models.Reservation", b =>
                 {
                     b.Property<int>("Id")
@@ -1354,6 +1433,40 @@ namespace Plafind.Migrations
                     b.ToTable("Reviews");
                 });
 
+            modelBuilder.Entity("Plafind.Models.ReviewImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Caption")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("ReviewId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewId");
+
+                    b.ToTable("ReviewImages");
+                });
+
             modelBuilder.Entity("Plafind.Models.ReviewLike", b =>
                 {
                     b.Property<int>("Id")
@@ -1423,6 +1536,77 @@ namespace Plafind.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ReviewReplies");
+                });
+
+            modelBuilder.Entity("Plafind.Models.ReviewReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ReporterUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("ResolutionNote")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ResolvedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("ResolvedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("ReviewId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReporterUserId");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("ReviewReports");
+                });
+
+            modelBuilder.Entity("Plafind.Models.RolePermission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("RoleId", "PermissionId")
+                        .IsUnique();
+
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("Plafind.Models.Subscription", b =>
@@ -1613,6 +1797,16 @@ namespace Plafind.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Plafind.Models.AdminLog", b =>
+                {
+                    b.HasOne("Plafind.Models.ApplicationUser", "AdminUser")
+                        .WithMany()
+                        .HasForeignKey("AdminUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AdminUser");
                 });
 
             modelBuilder.Entity("Plafind.Models.Branch", b =>
@@ -1923,6 +2117,17 @@ namespace Plafind.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Plafind.Models.ReviewImage", b =>
+                {
+                    b.HasOne("Plafind.Models.Review", "Review")
+                        .WithMany("Images")
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Review");
+                });
+
             modelBuilder.Entity("Plafind.Models.ReviewLike", b =>
                 {
                     b.HasOne("Plafind.Models.Review", "Review")
@@ -1959,6 +2164,43 @@ namespace Plafind.Migrations
                     b.Navigation("Review");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Plafind.Models.ReviewReport", b =>
+                {
+                    b.HasOne("Plafind.Models.ApplicationUser", "ReporterUser")
+                        .WithMany()
+                        .HasForeignKey("ReporterUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Plafind.Models.Review", "Review")
+                        .WithMany()
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReporterUser");
+
+                    b.Navigation("Review");
+                });
+
+            modelBuilder.Entity("Plafind.Models.RolePermission", b =>
+                {
+                    b.HasOne("Plafind.Models.Permission", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Plafind.Models.Subscription", b =>
@@ -2068,6 +2310,8 @@ namespace Plafind.Migrations
 
             modelBuilder.Entity("Plafind.Models.Review", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("Likes");
 
                     b.Navigation("Replies");

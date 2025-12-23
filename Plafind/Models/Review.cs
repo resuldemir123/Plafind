@@ -21,6 +21,7 @@ namespace Plafind.Models
         public Branch? Branch { get; set; }
         public ICollection<ReviewReply> Replies { get; set; } = new List<ReviewReply>();
         public ICollection<ReviewLike> Likes { get; set; } = new List<ReviewLike>();
+        public ICollection<ReviewImage> Images { get; set; } = new List<ReviewImage>();
         
         // Computed properties (not stored in DB)
         [NotMapped]
@@ -28,5 +29,8 @@ namespace Plafind.Models
         
         [NotMapped]
         public int DislikeCount { get; set; } = 0;
+        
+        [NotMapped]
+        public int HelpfulCount { get; set; } = 0; // Yararlı bulma sayısı
     }
 }

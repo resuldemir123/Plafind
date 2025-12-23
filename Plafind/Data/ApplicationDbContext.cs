@@ -36,9 +36,13 @@ namespace Plafind.Data
         public DbSet<Campaign> Campaigns { get; set; }
         public DbSet<CampaignUsage> CampaignUsages { get; set; }
         public DbSet<ReviewLike> ReviewLikes { get; set; }
+        public DbSet<ReviewImage> ReviewImages { get; set; }
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<CustomerInteraction> CustomerInteractions { get; set; }
+        public DbSet<ReviewReport> ReviewReports { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -70,6 +74,7 @@ namespace Plafind.Data
                 // Ignore computed properties
                 entity.Ignore(r => r.LikeCount);
                 entity.Ignore(r => r.DislikeCount);
+                entity.Ignore(r => r.HelpfulCount);
             });
 
             modelBuilder.Entity<ReviewReply>(entity =>
@@ -382,6 +387,73 @@ namespace Plafind.Data
             {
                 entity.Property(p => p.Amount)
                       .HasPrecision(18, 2);
+            });
+
+            // ReviewReport configuration
+            modelBuilder.Entity<ReviewReport>(entity =>
+            {
+                entity.HasOne(rr => rr.Review)
+                      .WithMany()
+                      .HasForeignKey(rr => rr.ReviewId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(rr => rr.ReporterUser)
+                      .WithMany()
+                      .HasForeignKey(rr => rr.ReporterUserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.HasIndex(rr => rr.ReviewId);
+                entity.HasIndex(rr => rr.Status);
+            });
+
+            // Permission configuration
+            modelBuilder.Entity<Permission>(entity =>
+            {
+                entity.HasIndex(p => p.Name).IsUnique();
+            });
+
+            // RolePermission configuration
+            modelBuilder.Entity<RolePermission>(entity =>
+            {
+                entity.HasKey(rp => rp.Id);
+                entity.HasIndex(rp => new { rp.RoleId, rp.PermissionId }).IsUnique();
+                
+                entity.HasOne(rp => rp.Role)
+                      .WithMany()
+                      .HasForeignKey(rp => rp.RoleId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(rp => rp.Permission)
+                      .WithMany()
+                      .HasForeignKey(rp => rp.PermissionId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Business Status enum conversion
+            modelBuilder.Entity<Business>(entity =>
+            {
+                entity.Property(b => b.Status)
+                      .HasConversion<int>();
+            });
+
+            // ReviewReport Status enum conversion
+            modelBuilder.Entity<ReviewReport>(entity =>
+            {
+                entity.Property(rr => rr.Status)
+                      .HasConversion<int>();
+            });
+
+            // AdminLog configuration
+            modelBuilder.Entity<AdminLog>(entity =>
+            {
+                entity.HasIndex(al => al.AdminUserId);
+                entity.HasIndex(al => al.EntityType);
+                entity.HasIndex(al => al.CreatedDate);
+                
+                entity.HasOne(al => al.AdminUser)
+                      .WithMany()
+                      .HasForeignKey(al => al.AdminUserId)
+                      .OnDelete(DeleteBehavior.SetNull);
             });
         }
     }
