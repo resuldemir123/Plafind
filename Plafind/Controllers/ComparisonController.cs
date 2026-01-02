@@ -13,7 +13,7 @@ namespace Plafind.Controllers
     /// <summary>
     /// İşletme karşılaştırma controller'ı
     /// </summary>
-    [AllowAnonymous]
+    [Authorize]
     public class ComparisonController : Controller
     {
         private readonly IComparisonService _comparisonService;

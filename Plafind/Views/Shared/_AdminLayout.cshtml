@@ -9,6 +9,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     
+    @await RenderSectionAsync("Styles", required: false)
+    
     <style>
         :root {
             --sidebar-width: 260px;
@@ -348,12 +350,6 @@
                     <a href="@Url.Action("Categories", "Admin")" class="nav-link-admin">
                         <i class="fas fa-tags"></i>
                         <span>Kategoriler</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="@Url.Action("News", "Admin")" class="nav-link-admin">
-                        <i class="fas fa-newspaper"></i>
-                        <span>Haberler</span>
                     </a>
                 </div>
                 <div class="nav-item">

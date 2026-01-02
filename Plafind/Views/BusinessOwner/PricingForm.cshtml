@@ -1,0 +1,170 @@
+@model Plafind.Models.Pricing
+
+@{
+    var business = ViewBag.Business as Plafind.Models.Business;
+    var pricingTypes = ViewBag.PricingTypes as string[] ?? new string[0];
+    var isEdit = Model.Id > 0;
+    ViewData["Title"] = (isEdit ? "Fiyatlandırma Düzenle" : "Yeni Fiyatlandırma") + " - " + (business?.Name ?? "");
+}
+
+<section class="py-4">
+    <div class="container-fluid px-3 px-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold">@(isEdit ? "Fiyatlandırma Düzenle" : "Yeni Fiyatlandırma")</h2>
+                <p class="text-muted mb-0">@business?.Name</p>
+            </div>
+            <a asp-action="Pricings" asp-route-businessId="@business?.Id" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Fiyatlandırma Listesine Dön
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Fiyatlandırma Bilgileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="PricingForm" method="post">
+                            <input type="hidden" asp-for="Id" />
+                            <input type="hidden" asp-for="BusinessId" value="@business?.Id" />
+                            
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label">Ad <span class="text-danger">*</span></label>
+                                <input asp-for="Name" class="form-control" required />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label">Açıklama</label>
+                                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="StartDate" class="form-label">Başlangıç Tarihi <span class="text-danger">*</span></label>
+                                    <input asp-for="StartDate" type="date" class="form-control" required />
+                                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="EndDate" class="form-label">Bitiş Tarihi <span class="text-danger">*</span></label>
+                                    <input asp-for="EndDate" type="date" class="form-control" required />
+                                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="PricingType" class="form-label">Fiyat Türü <span class="text-danger">*</span></label>
+                                <select asp-for="PricingType" class="form-select" required onchange="updatePricingFields()">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var type in pricingTypes)
+                                    {
+                                        if (Model.PricingType == type)
+                                        {
+                                            <option value="@type" selected>@type</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@type">@type</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="PricingType" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="BasePrice" class="form-label">Temel Fiyat <span class="text-danger">*</span></label>
+                                <input asp-for="BasePrice" type="number" step="0.01" class="form-control" required />
+                                <span asp-validation-for="BasePrice" class="text-danger"></span>
+                            </div>
+
+                            <div id="perPersonFields" style="display: none;">
+                                <div class="mb-3">
+                                    <label asp-for="PricePerPerson" class="form-label">Kişi Başı Fiyat</label>
+                                    <input asp-for="PricePerPerson" type="number" step="0.01" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div id="perNightFields" style="display: none;">
+                                <div class="mb-3">
+                                    <label asp-for="PricePerNight" class="form-label">Gece Başı Fiyat</label>
+                                    <input asp-for="PricePerNight" type="number" step="0.01" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div id="perHourFields" style="display: none;">
+                                <div class="mb-3">
+                                    <label asp-for="PricePerHour" class="form-label">Saat Başı Fiyat</label>
+                                    <input asp-for="PricePerHour" type="number" step="0.01" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="MinPeople" class="form-label">Minimum Kişi Sayısı</label>
+                                    <input asp-for="MinPeople" type="number" class="form-control" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="MaxPeople" class="form-label">Maksimum Kişi Sayısı</label>
+                                    <input asp-for="MaxPeople" type="number" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="WeekendPrice" class="form-label">Hafta Sonu Fiyatı</label>
+                                    <input asp-for="WeekendPrice" type="number" step="0.01" class="form-control" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="HolidayPrice" class="form-label">Tatil Günü Fiyatı</label>
+                                    <input asp-for="HolidayPrice" type="number" step="0.01" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                                <label asp-for="IsActive" class="form-check-label">Aktif</label>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Kaydet
+                                </button>
+                                <a asp-action="Pricings" asp-route-businessId="@business?.Id" class="btn btn-outline-secondary">
+                                    İptal
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    function updatePricingFields() {
+        const pricingType = document.getElementById('PricingType').value;
+        
+        document.getElementById('perPersonFields').style.display = 'none';
+        document.getElementById('perNightFields').style.display = 'none';
+        document.getElementById('perHourFields').style.display = 'none';
+        
+        if (pricingType === 'PerPerson') {
+            document.getElementById('perPersonFields').style.display = 'block';
+        } else if (pricingType === 'PerNight') {
+            document.getElementById('perNightFields').style.display = 'block';
+        } else if (pricingType === 'PerHour') {
+            document.getElementById('perHourFields').style.display = 'block';
+        }
+    }
+    
+    // Sayfa yüklendiğinde
+    document.addEventListener('DOMContentLoaded', function() {
+        updatePricingFields();
+    });
+</script>
+}
+

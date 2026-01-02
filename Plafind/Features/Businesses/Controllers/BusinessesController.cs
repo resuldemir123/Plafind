@@ -6,6 +6,8 @@ using Plafind.Features.Businesses.Services;
 using Plafind.Features.Businesses.ViewModels;
 using Plafind.Features.Businesses.Mappings;
 using Plafind.Options;
+using Plafind.Data;
+using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using System.Security.Claims;
 
@@ -18,23 +20,26 @@ namespace Plafind.Features.Businesses.Controllers
         private readonly TomTomOptions _tomTomOptions;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
+        private readonly ApplicationDbContext _context;
 
         public BusinessesController(
             IBusinessService businessService,
             IOptions<GoogleMapsOptions> mapsOptions,
             IOptions<TomTomOptions> tomTomOptions,
             IConfiguration configuration,
-            IMapper mapper)
+            IMapper mapper,
+            ApplicationDbContext context)
         {
             _businessService = businessService;
             _mapsOptions = mapsOptions?.Value ?? new GoogleMapsOptions();
             _tomTomOptions = tomTomOptions?.Value ?? new TomTomOptions();
             _configuration = configuration;
             _mapper = mapper;
+            _context = context;
         }
 
-        // GET: Businesses (Herkes görebilir)
-        [AllowAnonymous]
+        // GET: Businesses (Giriş gerekli)
+        [Authorize]
         public async Task<IActionResult> Index(
             string? search, 
             int? categoryId, 
@@ -69,8 +74,8 @@ namespace Plafind.Features.Businesses.Controllers
             return View(result);
         }
 
-        // GET: Businesses/Details/5 (Herkes görebilir)
-        [AllowAnonymous]
+        // GET: Businesses/Details/5 (Giriş gerekli)
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -105,13 +110,27 @@ namespace Plafind.Features.Businesses.Controllers
             var activeApprovedReviewsCount = business.Reviews?.Count(r => r.IsActive && r.IsApproved) ?? 0;
             ViewBag.ActiveApprovedReviewsCount = activeApprovedReviewsCount;
 
+            // Aktif ve müşterilere görünür kampanyaları yükle
+            var now = DateTime.Now;
+            var activeCampaigns = await _context.Campaigns
+                .Where(c => c.BusinessId == business.Id 
+                    && c.IsActive 
+                    && c.IsVisibleToCustomers // Müşterilere görünür olmalı
+                    && c.StartDate <= now 
+                    && c.EndDate >= now)
+                .OrderByDescending(c => c.IsFeatured)
+                .ThenByDescending(c => c.CreatedDate)
+                .ToListAsync();
+            
+            ViewBag.Campaigns = activeCampaigns;
+
             ViewBag.GoogleMapsApiKey = _mapsOptions.ApiKey;
             ViewBag.TomTomApiKey = _tomTomOptions.ApiKey;
 
             return View(viewModel);
         }
 
-        [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> Map()
         {
             var businesses = await _businessService.GetActiveBusinessesAsync();
@@ -123,7 +142,7 @@ namespace Plafind.Features.Businesses.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> Locations()
         {
             try

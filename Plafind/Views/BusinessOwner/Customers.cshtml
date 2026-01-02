@@ -1,0 +1,211 @@
+@model IEnumerable<Plafind.Models.Customer>
+
+@{
+    var business = ViewBag.Business as Plafind.Models.Business;
+    ViewData["Title"] = "Müşteri Yönetimi - " + (business?.Name ?? "");
+    var segment = ViewBag.Segment as string;
+    var tag = ViewBag.Tag as string;
+    var search = ViewBag.Search as string;
+    var page = ViewBag.Page as int? ?? 1;
+    var totalCount = ViewBag.TotalCount as int? ?? 0;
+    var totalPages = ViewBag.TotalPages as int? ?? 1;
+    var segments = ViewBag.Segments as string[] ?? new string[0];
+    var tags = ViewBag.Tags as string[] ?? new string[0];
+}
+
+<section class="py-4">
+    <div class="container-fluid px-3 px-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold">Müşteri Yönetimi (CRM)</h2>
+                <p class="text-muted mb-0">@business?.Name - Müşteri listesi ve segmentasyon</p>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>İşletmelerime Dön
+            </a>
+        </div>
+
+        <!-- Filtreler -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtreler</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" asp-action="Customers" asp-route-businessId="@business?.Id">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Segment</label>
+                            <select name="segment" class="form-select">
+                                <option value="">Tümü</option>
+                                @foreach (var s in segments)
+                                {
+                                    if (segment == s)
+                                    {
+                                        <option value="@s" selected>@s</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@s">@s</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Etiket</label>
+                            <select name="tag" class="form-select">
+                                <option value="">Tümü</option>
+                                @foreach (var t in tags)
+                                {
+                                    if (tag == t)
+                                    {
+                                        <option value="@t" selected>@t</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@t">@t</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Arama</label>
+                            <input type="text" name="search" class="form-control" value="@search" placeholder="Ad, email, telefon...">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Filtrele
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Müşteri Listesi -->
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>Filtre kriterlerinize uygun müşteri bulunamadı.
+            </div>
+        }
+        else
+        {
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Müşteriler (@totalCount adet)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Müşteri</th>
+                                    <th>İletişim</th>
+                                    <th>Segment</th>
+                                    <th>Toplam Rezervasyon</th>
+                                    <th>Toplam Harcama</th>
+                                    <th>Son Ziyaret</th>
+                                    <th>Etiketler</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var customer in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@customer.FullName</strong>
+                                            @if (customer.IsVIP)
+                                            {
+                                                <span class="badge bg-warning ms-1">VIP</span>
+                                            }
+                                            @if (customer.IsReturning)
+                                            {
+                                                <span class="badge bg-info ms-1">Tekrar Gelen</span>
+                                            }
+                                            @if (customer.HasIssues)
+                                            {
+                                                <span class="badge bg-danger ms-1">Sorunlu</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(customer.Email))
+                                            {
+                                                <div><i class="fas fa-envelope me-1 text-primary"></i><a href="mailto:@customer.Email">@customer.Email</a></div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(customer.Phone))
+                                            {
+                                                <div><i class="fas fa-phone me-1 text-success"></i><a href="tel:@customer.Phone">@customer.Phone</a></div>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(customer.Segment))
+                                            {
+                                                <span class="badge bg-secondary">@customer.Segment</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">@customer.TotalReservations</span>
+                                        </td>
+                                        <td>
+                                            <strong>@customer.TotalSpent.ToString("C")</strong>
+                                        </td>
+                                        <td>
+                                            @if (customer.LastVisitDate.HasValue)
+                                            {
+                                                @customer.LastVisitDate.Value.ToString("dd.MM.yyyy")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(customer.Tags))
+                                            {
+                                                var customerTags = customer.Tags.Split(',');
+                                                @foreach (var t in customerTags)
+                                                {
+                                                    <span class="badge bg-primary me-1">@t.Trim()</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <a asp-action="CustomerDetails" asp-route-id="@customer.Id" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> Detay
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                @if (totalPages > 1)
+                {
+                    <div class="card-footer">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                @for (int i = 1; i <= totalPages; i++)
+                                {
+                                    <li class="page-item @(i == page ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("Customers", new { businessId = business?.Id, segment, tag, search, page = i })">@i</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+

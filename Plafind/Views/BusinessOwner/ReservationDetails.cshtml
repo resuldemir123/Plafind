@@ -1,0 +1,759 @@
+@model Plafind.Models.Reservation
+
+@{
+    ViewData["Title"] = "Rezervasyon Detayı";
+    var business = Model.Business;
+}
+
+<section class="py-4">
+    <div class="container-fluid px-3 px-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold">Rezervasyon Detayı</h2>
+                <p class="text-muted mb-0">#@Model.Id - @business?.Name</p>
+            </div>
+            <a asp-action="ReservationsAdvanced" asp-route-businessId="@business?.Id" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Rezervasyon Listesine Dön
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <!-- Sol Kolon - Müşteri ve Rezervasyon Bilgileri -->
+            <div class="col-lg-8">
+                <!-- Müşteri Bilgileri -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user me-2"></i>Müşteri Bilgileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Ad Soyad:</strong><br>
+                                @(Model.Customer?.FullName ?? Model.User?.FullName ?? Model.User?.UserName ?? Model.ContactEmail ?? Model.ContactPhone ?? "-")</p>
+                                @if (Model.Customer != null)
+                                {
+                                    <p><strong>Segment:</strong> @(Model.Customer.Segment ?? "-")</p>
+                                    <p><strong>Toplam Rezervasyon:</strong> @Model.Customer.TotalReservations</p>
+                                    <p><strong>Toplam Harcama:</strong> @Model.Customer.TotalSpent.ToString("C")</p>
+                                    @if (Model.Customer.IsVIP)
+                                    {
+                                        <span class="badge bg-warning">VIP</span>
+                                    }
+                                    @if (Model.Customer.IsReturning)
+                                    {
+                                        <span class="badge bg-info">Tekrar Gelen</span>
+                                    }
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                @if (!string.IsNullOrEmpty(Model.ContactEmail))
+                                {
+                                    <p><strong>E-posta:</strong><br>
+                                    <a href="mailto:@Model.ContactEmail">@Model.ContactEmail</a></p>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.ContactPhone))
+                                {
+                                    <p><strong>Telefon:</strong><br>
+                                    <a href="tel:@Model.ContactPhone">@Model.ContactPhone</a></p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rezervasyon Detayları -->
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Rezervasyon Detayları</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Tarih:</strong> @Model.RequestedDate.ToString("dd.MM.yyyy dddd")</p>
+                                <p><strong>Saat:</strong> @Model.RequestedTime.ToString(@"hh\:mm")</p>
+                                <p><strong>Kişi Sayısı:</strong> @Model.NumberOfPeople</p>
+                                <p><strong>Durum:</strong> 
+                                    @if (Model.Status == "Onaylandı")
+                                    {
+                                        <span class="badge bg-success">@Model.Status</span>
+                                    }
+                                    else if (Model.Status == "İptal Edildi" || Model.Status == "Reddedildi")
+                                    {
+                                        <span class="badge bg-danger">@Model.Status</span>
+                                    }
+                                    else if (Model.Status == "No-Show")
+                                    {
+                                        <span class="badge bg-dark">No-Show</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">@Model.Status</span>
+                                    }
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Kanal:</strong> @(Model.Channel ?? "-")</p>
+                                <p><strong>Paket:</strong> @(Model.PackageName ?? "-")</p>
+                                <p><strong>Oluşturulma:</strong> @Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</p>
+                                @if (Model.UpdatedDate.HasValue)
+                                {
+                                    <p><strong>Son Güncelleme:</strong> @Model.UpdatedDate.Value.ToString("dd.MM.yyyy HH:mm")</p>
+                                }
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.SpecialRequests))
+                        {
+                            <div class="mt-3">
+                                <strong>Özel İstekler:</strong>
+                                <div class="alert alert-info mb-0">@Model.SpecialRequests</div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Notes))
+                        {
+                            <div class="mt-3">
+                                <strong>Müşteri Notları:</strong>
+                                <div class="alert alert-secondary mb-0">@Model.Notes</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Check-in/out veya Tur Saatleri -->
+                @if (Model.CheckInDate.HasValue || Model.TourStartTime.HasValue)
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Check-in/out & Tur Saatleri</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @if (Model.CheckInDate.HasValue)
+                                {
+                                    <div class="col-md-6">
+                                        <p><strong>Check-in Tarihi:</strong> @Model.CheckInDate.Value.ToString("dd.MM.yyyy")</p>
+                                        @if (Model.CheckInTime.HasValue)
+                                        {
+                                            <p><strong>Check-in Saati:</strong> @Model.CheckInTime.Value.ToString(@"hh\:mm")</p>
+                                        }
+                                    </div>
+                                }
+                                @if (Model.CheckOutDate.HasValue)
+                                {
+                                    <div class="col-md-6">
+                                        <p><strong>Check-out Tarihi:</strong> @Model.CheckOutDate.Value.ToString("dd.MM.yyyy")</p>
+                                        @if (Model.CheckOutTime.HasValue)
+                                        {
+                                            <p><strong>Check-out Saati:</strong> @Model.CheckOutTime.Value.ToString(@"hh\:mm")</p>
+                                        }
+                                    </div>
+                                }
+                                @if (Model.TourStartTime.HasValue)
+                                {
+                                    <div class="col-md-6">
+                                        <p><strong>Tur Başlangıç:</strong> @Model.TourStartTime.Value.ToString("dd.MM.yyyy HH:mm")</p>
+                                    </div>
+                                }
+                                @if (Model.TourEndTime.HasValue)
+                                {
+                                    <div class="col-md-6">
+                                        <p><strong>Tur Bitiş:</strong> @Model.TourEndTime.Value.ToString("dd.MM.yyyy HH:mm")</p>
+                                    </div>
+                                }
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="showCheckInOutModal()">
+                                <i class="fas fa-edit me-1"></i>Güncelle
+                            </button>
+                        </div>
+                    </div>
+                }
+
+                <!-- Özel İstekler ve Notlar -->
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Notlar ve Etiketler</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="notesDisplay">
+                            @if (!string.IsNullOrEmpty(Model.OwnerNotes))
+                            {
+                                <div class="mb-3">
+                                    <strong>İşletme Notları:</strong>
+                                    <div class="alert alert-light">@Model.OwnerNotes</div>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Tags))
+                            {
+                                <div class="mb-3">
+                                    <strong>Etiketler:</strong>
+                                    @{
+                                        var tags = Model.Tags.Split(',');
+                                    }
+                                    @foreach (var tag in tags)
+                                    {
+                                        <span class="badge bg-primary me-1">@tag.Trim()</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="showNotesModal()">
+                            <i class="fas fa-edit me-1"></i>Not/Etiket Ekle/Düzenle
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Kolon - Ödeme ve İşlemler -->
+            <div class="col-lg-4">
+                <!-- Ödeme Durumu -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Ödeme Durumu</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Amount.HasValue)
+                        {
+                            <p><strong>Toplam Tutar:</strong><br>
+                            <h4 class="text-primary">@Model.Amount.Value.ToString("C")</h4></p>
+                            
+                            <div class="mb-3">
+                                <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input" id="prePaymentReceived" 
+                                           @(Model.IsPrePaymentReceived ? "checked" : "") 
+                                           onchange="updatePaymentStatus()">
+                                    Ön Ödeme Alındı
+                                </label>
+                                @if (Model.PrePaymentAmount.HasValue)
+                                {
+                                    <p class="ms-4 text-success">@Model.PrePaymentAmount.Value.ToString("C")</p>
+                                }
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input" id="fullPaymentReceived" 
+                                           @(Model.IsFullPaymentReceived ? "checked" : "") 
+                                           onchange="updatePaymentStatus()">
+                                    Tam Ödeme Alındı
+                                </label>
+                            </div>
+                            
+                            @if (Model.RemainingAmount.HasValue && !Model.IsFullPaymentReceived)
+                            {
+                                <p><strong>Kalan Tutar:</strong><br>
+                                <span class="text-warning">@Model.RemainingAmount.Value.ToString("C")</span></p>
+                            }
+                            
+                            <button type="button" class="btn btn-sm btn-outline-primary w-100" onclick="showPaymentModal()">
+                                <i class="fas fa-edit me-1"></i>Ödeme Bilgilerini Güncelle
+                            </button>
+                        }
+                        else
+                        {
+                            <p class="text-muted">Tutar belirtilmemiş</p>
+                            <button type="button" class="btn btn-sm btn-primary w-100" onclick="showPaymentModal()">
+                                <i class="fas fa-plus me-1"></i>Tutar Ekle
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- Hızlı İşlemler -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Hızlı İşlemler</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Status == "Beklemede")
+                        {
+                            <button type="button" class="btn btn-success w-100 mb-2" onclick="approveReservation(@Model.Id)">
+                                <i class="fas fa-check me-1"></i>Onayla
+                            </button>
+                            <button type="button" class="btn btn-danger w-100 mb-2" onclick="cancelReservation(@Model.Id)">
+                                <i class="fas fa-times me-1"></i>İptal Et
+                            </button>
+                        }
+                        @if (Model.Status == "Onaylandı" && !Model.IsNoShow)
+                        {
+                            <button type="button" class="btn btn-dark w-100 mb-2" onclick="markNoShow(@Model.Id)">
+                                <i class="fas fa-user-slash me-1"></i>No-Show İşaretle
+                            </button>
+                        }
+                        <button type="button" class="btn btn-outline-primary w-100 mb-2" onclick="showDateChangeModal()">
+                            <i class="fas fa-calendar-alt me-1"></i>Tarih Değiştir
+                        </button>
+                        <button type="button" class="btn btn-outline-info w-100 mb-2" onclick="showPeopleChangeModal()">
+                            <i class="fas fa-users me-1"></i>Kişi Sayısı Güncelle
+                        </button>
+                        <button type="button" class="btn btn-outline-warning w-100" onclick="sendNotification()">
+                            <i class="fas fa-bell me-1"></i>Bildirim Gönder
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Fatura/Fiş -->
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-file-invoice me-2"></i>Fatura/Fiş</h5>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-outline-secondary w-100 mb-2" onclick="printInvoice()">
+                            <i class="fas fa-print me-1"></i>Yazdır
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary w-100" onclick="downloadInvoice()">
+                            <i class="fas fa-download me-1"></i>İndir (PDF)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modals -->
+<!-- Not/Etiket Modal -->
+<div class="modal fade" id="notesModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Not ve Etiket Ekle/Düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Notlar</label>
+                    <textarea id="ownerNotes" class="form-control" rows="5">@Model.OwnerNotes</textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Etiketler (virgülle ayırın: VIP, Sorunlu, Tekrar Gelen)</label>
+                    <input type="text" id="tags" class="form-control" value="@Model.Tags" placeholder="VIP, Sorunlu, Tekrar Gelen">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="saveNotes()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ödeme Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ödeme Bilgileri</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Toplam Tutar</label>
+                    <input type="number" id="totalAmount" class="form-control" step="0.01" value="@(Model.Amount?.ToString("F2") ?? "")">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ön Ödeme Tutarı</label>
+                    <input type="number" id="prePayment" class="form-control" step="0.01" value="@(Model.PrePaymentAmount?.ToString("F2") ?? "")">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Kalan Tutar</label>
+                    <input type="number" id="remainingAmount" class="form-control" step="0.01" value="@(Model.RemainingAmount?.ToString("F2") ?? "")" readonly>
+                </div>
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="prePaymentReceivedCheck">
+                    <label class="form-check-label" for="prePaymentReceivedCheck">Ön Ödeme Alındı</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="fullPaymentReceivedCheck">
+                    <label class="form-check-label" for="fullPaymentReceivedCheck">Tam Ödeme Alındı</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="savePayment()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tarih Değiştir Modal -->
+<div class="modal fade" id="dateChangeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tarih Değiştir</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Yeni Tarih</label>
+                    <input type="date" id="newDate" class="form-control" value="@Model.RequestedDate.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Yeni Saat</label>
+                    <input type="time" id="newTime" class="form-control" value="@Model.RequestedTime.ToString(@"hh\:mm")">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="saveDateChange()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kişi Sayısı Değiştir Modal -->
+<div class="modal fade" id="peopleChangeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kişi Sayısı Güncelle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Yeni Kişi Sayısı</label>
+                    <input type="number" id="newPeopleCount" class="form-control" min="1" value="@Model.NumberOfPeople">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="savePeopleChange()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Check-in/out Modal -->
+<div class="modal fade" id="checkInOutModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Check-in/out Bilgileri</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Check-in Tarihi</label>
+                        <input type="date" id="checkInDate" class="form-control" value="@(Model.CheckInDate?.ToString("yyyy-MM-dd") ?? "")">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Check-in Saati</label>
+                        <input type="time" id="checkInTime" class="form-control" value="@(Model.CheckInTime?.ToString(@"hh\:mm") ?? "")">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Check-out Tarihi</label>
+                        <input type="date" id="checkOutDate" class="form-control" value="@(Model.CheckOutDate?.ToString("yyyy-MM-dd") ?? "")">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Check-out Saati</label>
+                        <input type="time" id="checkOutTime" class="form-control" value="@(Model.CheckOutTime?.ToString(@"hh\:mm") ?? "")">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tur Başlangıç</label>
+                        <input type="datetime-local" id="tourStartTime" class="form-control" value="@(Model.TourStartTime?.ToString("yyyy-MM-ddTHH:mm") ?? "")">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tur Bitiş</label>
+                        <input type="datetime-local" id="tourEndTime" class="form-control" value="@(Model.TourEndTime?.ToString("yyyy-MM-ddTHH:mm") ?? "")">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="saveCheckInOut()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const reservationId = @Model.Id;
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+    function showNotesModal() {
+        new bootstrap.Modal(document.getElementById('notesModal')).show();
+    }
+
+    function saveNotes() {
+        const notes = document.getElementById('ownerNotes').value;
+        const tags = document.getElementById('tags').value;
+        
+        fetch('@Url.Action("UpdateReservationNotes")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({ id: reservationId, notes: notes, tags: tags })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message || 'Bir hata oluştu');
+            }
+        });
+    }
+
+    function showPaymentModal() {
+        new bootstrap.Modal(document.getElementById('paymentModal')).show();
+    }
+
+    function savePayment() {
+        const totalAmount = parseFloat(document.getElementById('totalAmount').value) || 0;
+        const prePayment = parseFloat(document.getElementById('prePayment').value) || 0;
+        const remaining = totalAmount - prePayment;
+        const isPrePaymentReceived = document.getElementById('prePaymentReceivedCheck').checked;
+        const isFullPaymentReceived = document.getElementById('fullPaymentReceivedCheck').checked;
+        
+        document.getElementById('remainingAmount').value = remaining.toFixed(2);
+        
+        fetch('@Url.Action("UpdatePaymentStatus")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({
+                id: reservationId,
+                prePaymentAmount: prePayment,
+                remainingAmount: remaining,
+                isPrePaymentReceived: isPrePaymentReceived,
+                isFullPaymentReceived: isFullPaymentReceived
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message || 'Bir hata oluştu');
+            }
+        });
+    }
+
+    function updatePaymentStatus() {
+        // Checkbox değiştiğinde otomatik kaydet
+        const isPrePaymentReceived = document.getElementById('prePaymentReceived').checked;
+        const isFullPaymentReceived = document.getElementById('fullPaymentReceived').checked;
+        
+        fetch('@Url.Action("UpdatePaymentStatus")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({
+                id: reservationId,
+                prePaymentAmount: @(Model.PrePaymentAmount?.ToString("F2") ?? "0"),
+                remainingAmount: @(Model.RemainingAmount?.ToString("F2") ?? "0"),
+                isPrePaymentReceived: isPrePaymentReceived,
+                isFullPaymentReceived: isFullPaymentReceived
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+
+    function showDateChangeModal() {
+        new bootstrap.Modal(document.getElementById('dateChangeModal')).show();
+    }
+
+    function saveDateChange() {
+        const newDate = document.getElementById('newDate').value;
+        const newTime = document.getElementById('newTime').value;
+        const [hours, minutes] = newTime.split(':');
+        const timeSpan = `${hours}:${minutes}:00`;
+        
+        fetch('@Url.Action("UpdateReservationDate")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({
+                id: reservationId,
+                newDate: newDate,
+                newTime: timeSpan
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message || 'Bir hata oluştu');
+            }
+        });
+    }
+
+    function showPeopleChangeModal() {
+        new bootstrap.Modal(document.getElementById('peopleChangeModal')).show();
+    }
+
+    function savePeopleChange() {
+        const newPeopleCount = parseInt(document.getElementById('newPeopleCount').value);
+        
+        fetch('@Url.Action("UpdateReservationPeople")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({
+                id: reservationId,
+                numberOfPeople: newPeopleCount
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message || 'Bir hata oluştu');
+            }
+        });
+    }
+
+    function showCheckInOutModal() {
+        new bootstrap.Modal(document.getElementById('checkInOutModal')).show();
+    }
+
+    function saveCheckInOut() {
+        const checkInDate = document.getElementById('checkInDate').value;
+        const checkInTime = document.getElementById('checkInTime').value;
+        const checkOutDate = document.getElementById('checkOutDate').value;
+        const checkOutTime = document.getElementById('checkOutTime').value;
+        const tourStartTime = document.getElementById('tourStartTime').value;
+        const tourEndTime = document.getElementById('tourEndTime').value;
+        
+        let checkInTimeSpan = null;
+        if (checkInTime) {
+            const [hours, minutes] = checkInTime.split(':');
+            checkInTimeSpan = `${hours}:${minutes}:00`;
+        }
+        
+        let checkOutTimeSpan = null;
+        if (checkOutTime) {
+            const [hours, minutes] = checkOutTime.split(':');
+            checkOutTimeSpan = `${hours}:${minutes}:00`;
+        }
+        
+        fetch('@Url.Action("UpdateCheckInOut")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({
+                id: reservationId,
+                checkInDate: checkInDate || null,
+                checkInTime: checkInTimeSpan,
+                checkOutDate: checkOutDate || null,
+                checkOutTime: checkOutTimeSpan,
+                tourStartTime: tourStartTime || null,
+                tourEndTime: tourEndTime || null
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message || 'Bir hata oluştu');
+            }
+        });
+    }
+
+    function approveReservation(id) {
+        if (!confirm('Bu rezervasyonu onaylamak istediğinizden emin misiniz?')) return;
+        
+        fetch('@Url.Action("ApproveReservationAdvanced")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message || 'Bir hata oluştu');
+            }
+        });
+    }
+
+    function cancelReservation(id) {
+        const reason = prompt('İptal nedeni (opsiyonel):');
+        if (reason === null) return;
+        
+        fetch('@Url.Action("CancelReservationAdvanced")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({ id: id, reason: reason })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message || 'Bir hata oluştu');
+            }
+        });
+    }
+
+    function markNoShow(id) {
+        if (!confirm('Bu rezervasyonu No-Show olarak işaretlemek istediğinizden emin misiniz?')) return;
+        
+        fetch('@Url.Action("MarkNoShow")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message || 'Bir hata oluştu');
+            }
+        });
+    }
+
+    function sendNotification() {
+        alert('Bildirim gönderme özelliği yakında eklenecek (Email/SMS/WhatsApp entegrasyonu)');
+    }
+
+    function printInvoice() {
+        window.print();
+    }
+
+    function downloadInvoice() {
+        alert('PDF indirme özelliği yakında eklenecek');
+    }
+</script>
+}
+

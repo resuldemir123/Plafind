@@ -5,6 +5,7 @@ using Plafind.Models;
 using Plafind.Services;
 using Plafind.ViewModels.Compare;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Plafind.Controllers
 {
@@ -20,10 +21,16 @@ namespace Plafind.Controllers
             _compareService = compareService ?? throw new ArgumentNullException(nameof(compareService));
         }
 
+        private string? GetCurrentUserId()
+        {
+            return User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+
         // GET: Compare
         public async Task<IActionResult> Index()
         {
-            var compareIds = _compareService.GetCompareList(HttpContext.Session);
+            var userId = GetCurrentUserId();
+            var compareIds = _compareService.GetCompareList(HttpContext.Session, userId);
             var viewModel = new CompareIndexVM();
             
             if (compareIds.Count == 0)
@@ -94,8 +101,9 @@ namespace Plafind.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(int businessId)
         {
+            var userId = GetCurrentUserId();
             // Kategori kontrolü: Eğer listede işletme varsa, aynı kategoride olmalı
-            var compareIds = _compareService.GetCompareList(HttpContext.Session);
+            var compareIds = _compareService.GetCompareList(HttpContext.Session, userId);
             int? existingCategoryId = null;
 
             if (compareIds.Any())
@@ -131,7 +139,7 @@ namespace Plafind.Controllers
                 }
             }
 
-            var result = _compareService.AddToCompareList(HttpContext.Session, businessId, existingCategoryId);
+            var result = _compareService.AddToCompareList(HttpContext.Session, businessId, existingCategoryId, userId);
             return Json(new { success = result.success, message = result.message, count = result.count });
         }
 
@@ -139,7 +147,8 @@ namespace Plafind.Controllers
         [HttpPost]
         public IActionResult Remove(int businessId)
         {
-            var result = _compareService.RemoveFromCompareList(HttpContext.Session, businessId);
+            var userId = GetCurrentUserId();
+            var result = _compareService.RemoveFromCompareList(HttpContext.Session, businessId, userId);
             return Json(new { success = result.success, message = result.message, count = result.count });
         }
 
@@ -147,7 +156,8 @@ namespace Plafind.Controllers
         [HttpPost]
         public IActionResult Clear()
         {
-            _compareService.ClearCompareList(HttpContext.Session);
+            var userId = GetCurrentUserId();
+            _compareService.ClearCompareList(HttpContext.Session, userId);
             return Json(new { success = true, message = "Karşılaştırma listesi temizlendi." });
         }
 
@@ -155,7 +165,8 @@ namespace Plafind.Controllers
         [HttpGet]
         public IActionResult GetCount()
         {
-            var count = _compareService.GetCompareListCount(HttpContext.Session);
+            var userId = GetCurrentUserId();
+            var count = _compareService.GetCompareListCount(HttpContext.Session, userId);
             return Json(new { count });
         }
 
@@ -163,7 +174,8 @@ namespace Plafind.Controllers
         [HttpGet]
         public IActionResult Check(int businessId)
         {
-            var isInCompare = _compareService.IsInCompareList(HttpContext.Session, businessId);
+            var userId = GetCurrentUserId();
+            var isInCompare = _compareService.IsInCompareList(HttpContext.Session, businessId, userId);
             return Json(new { isInCompare });
         }
 
@@ -171,7 +183,8 @@ namespace Plafind.Controllers
         [HttpGet]
         public async Task<IActionResult> GetList()
         {
-            var compareIds = _compareService.GetCompareList(HttpContext.Session);
+            var userId = GetCurrentUserId();
+            var compareIds = _compareService.GetCompareList(HttpContext.Session, userId);
             
             if (compareIds.Count == 0)
             {

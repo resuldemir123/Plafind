@@ -67,9 +67,6 @@
   <data name="Map" xml:space="preserve">
     <value>Harita</value>
   </data>
-  <data name="News" xml:space="preserve">
-    <value>Haberler</value>
-  </data>
   <data name="Contact" xml:space="preserve">
     <value>İletişim</value>
   </data>

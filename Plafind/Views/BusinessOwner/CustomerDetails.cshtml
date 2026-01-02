@@ -1,0 +1,288 @@
+@model Plafind.Models.Customer
+
+@{
+    ViewData["Title"] = "Müşteri Detayı - " + Model.FullName;
+    var business = Model.Business;
+}
+
+<section class="py-4">
+    <div class="container-fluid px-3 px-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold">Müşteri Detayı</h2>
+                <p class="text-muted mb-0">@Model.FullName</p>
+            </div>
+            <a asp-action="Customers" asp-route-businessId="@business?.Id" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Müşteri Listesine Dön
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <!-- Müşteri Bilgileri -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user me-2"></i>Müşteri Bilgileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Ad Soyad:</strong> @Model.FullName</p>
+                                @if (!string.IsNullOrEmpty(Model.Email))
+                                {
+                                    <p><strong>E-posta:</strong> <a href="mailto:@Model.Email">@Model.Email</a></p>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.Phone))
+                                {
+                                    <p><strong>Telefon:</strong> <a href="tel:@Model.Phone">@Model.Phone</a></p>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Segment:</strong> @(Model.Segment ?? "-")</p>
+                                <p><strong>İlk Ziyaret:</strong> @(Model.FirstVisitDate?.ToString("dd.MM.yyyy") ?? "-")</p>
+                                <p><strong>Son Ziyaret:</strong> @(Model.LastVisitDate?.ToString("dd.MM.yyyy") ?? "-")</p>
+                                <p><strong>Toplam Rezervasyon:</strong> <span class="badge bg-info">@Model.TotalReservations</span></p>
+                                <p><strong>Toplam Harcama:</strong> <strong class="text-success">@Model.TotalSpent.ToString("C")</strong></p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            @if (Model.IsVIP)
+                            {
+                                <span class="badge bg-warning me-1">VIP</span>
+                            }
+                            @if (Model.IsReturning)
+                            {
+                                <span class="badge bg-info me-1">Tekrar Gelen</span>
+                            }
+                            @if (Model.HasIssues)
+                            {
+                                <span class="badge bg-danger me-1">Sorunlu</span>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Tags))
+                            {
+                                var tags = Model.Tags.Split(',');
+                                @foreach (var tag in tags)
+                                {
+                                    <span class="badge bg-primary me-1">@tag.Trim()</span>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notlar -->
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Notlar</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="notesDisplay">
+                            @if (!string.IsNullOrEmpty(Model.Notes))
+                            {
+                                <div class="alert alert-light">@Model.Notes</div>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Henüz not eklenmemiş</p>
+                            }
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="showNotesModal()">
+                            <i class="fas fa-edit me-1"></i>Not/Etiket Düzenle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Geçmiş Rezervasyonlar -->
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-history me-2"></i>Geçmiş Rezervasyonlar</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Reservations != null && Model.Reservations.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Tarih</th>
+                                            <th>Durum</th>
+                                            <th>Kişi</th>
+                                            <th>Tutar</th>
+                                            <th>İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var reservation in Model.Reservations.OrderByDescending(r => r.RequestedDate))
+                                        {
+                                            <tr>
+                                                <td>@reservation.RequestedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                                <td>
+                                                    @if (reservation.Status == "Onaylandı")
+                                                    {
+                                                        <span class="badge bg-success">@reservation.Status</span>
+                                                    }
+                                                    else if (reservation.Status == "İptal Edildi")
+                                                    {
+                                                        <span class="badge bg-danger">@reservation.Status</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-warning">@reservation.Status</span>
+                                                    }
+                                                </td>
+                                                <td>@reservation.NumberOfPeople</td>
+                                                <td>@(reservation.Amount?.ToString("C") ?? "-")</td>
+                                                <td>
+                                                    <a asp-action="ReservationDetails" asp-route-id="@reservation.Id" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">Henüz rezervasyon yok</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Not/Etiket Modal -->
+<div class="modal fade" id="notesModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Not ve Etiket Düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Notlar</label>
+                    <textarea id="customerNotes" class="form-control" rows="5">@Model.Notes</textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Etiketler (virgülle ayırın)</label>
+                    <input type="text" id="customerTags" class="form-control" value="@Model.Tags" placeholder="VIP, Sorunlu, Tekrar Gelen">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Segment</label>
+                    <select id="customerSegment" class="form-select">
+                        <option value="">Seçiniz</option>
+                        @if (Model.Segment == "Aile")
+                        {
+                            <option value="Aile" selected>Aile</option>
+                        }
+                        else
+                        {
+                            <option value="Aile">Aile</option>
+                        }
+                        @if (Model.Segment == "Çift")
+                        {
+                            <option value="Çift" selected>Çift</option>
+                        }
+                        else
+                        {
+                            <option value="Çift">Çift</option>
+                        }
+                        @if (Model.Segment == "İş Seyahati")
+                        {
+                            <option value="İş Seyahati" selected>İş Seyahati</option>
+                        }
+                        else
+                        {
+                            <option value="İş Seyahati">İş Seyahati</option>
+                        }
+                        @if (Model.Segment == "Yabancı Turist")
+                        {
+                            <option value="Yabancı Turist" selected>Yabancı Turist</option>
+                        }
+                        else
+                        {
+                            <option value="Yabancı Turist">Yabancı Turist</option>
+                        }
+                        @if (Model.Segment == "Grup")
+                        {
+                            <option value="Grup" selected>Grup</option>
+                        }
+                        else
+                        {
+                            <option value="Grup">Grup</option>
+                        }
+                        @if (Model.Segment == "Tekil")
+                        {
+                            <option value="Tekil" selected>Tekil</option>
+                        }
+                        else
+                        {
+                            <option value="Tekil">Tekil</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="isVIP" @(Model.IsVIP ? "checked" : "")>
+                    <label class="form-check-label" for="isVIP">VIP</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="hasIssues" @(Model.HasIssues ? "checked" : "")>
+                    <label class="form-check-label" for="hasIssues">Sorunlu</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="saveCustomerNotes()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const customerId = @Model.Id;
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+    function showNotesModal() {
+        new bootstrap.Modal(document.getElementById('notesModal')).show();
+    }
+
+    function saveCustomerNotes() {
+        const notes = document.getElementById('customerNotes').value;
+        const tags = document.getElementById('customerTags').value;
+        const segment = document.getElementById('customerSegment').value;
+        const isVIP = document.getElementById('isVIP').checked;
+        const hasIssues = document.getElementById('hasIssues').checked;
+        
+        fetch('@Url.Action("UpdateCustomerNotes")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({
+                id: customerId,
+                notes: notes,
+                tags: tags,
+                segment: segment,
+                isVIP: isVIP,
+                hasIssues: hasIssues
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message || 'Bir hata oluştu');
+            }
+        });
+    }
+</script>
+}
+

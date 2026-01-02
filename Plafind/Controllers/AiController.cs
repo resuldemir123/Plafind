@@ -2,11 +2,13 @@ using System.Threading.Tasks;
 using Plafind.Services;
 using Plafind.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Plafind.Controllers
 {
     [ApiController]
     [Route("api/ai")]
+    [Authorize]
     public class AiController : ControllerBase
     {
         private readonly IGeminiChatService _chatService;

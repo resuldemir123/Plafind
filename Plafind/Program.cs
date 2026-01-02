@@ -112,6 +112,9 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 // RAZOR PAGES
 builder.Services.AddRazorPages();
 
+// SIGNALR
+builder.Services.AddSignalR();
+
 // Desteklenen dilleri tanımla
 const string defaultCulture = "tr-TR";
 var supportedCultures = new[]
@@ -155,18 +158,13 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddHttpContextAccessor();
 
-// GOOGLE NEWS SERVICE - Timeout ve retry ayarları ile
-builder.Services.AddHttpClient<IGoogleNewsService, GoogleNewsService>(client =>
-{
-    client.Timeout = TimeSpan.FromSeconds(30); // 30 saniye timeout
-    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
-});
-
-// BACKGROUND SERVICE - Turizm haberlerini otomatik senkronize et
-builder.Services.AddHostedService<TourismNewsBackgroundService>();
-
 builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("GoogleGemini"));
 builder.Services.AddHttpClient<IGeminiChatService, GeminiChatService>();
+
+// AI SERVICES
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddScoped<ISentimentAnalysisService, SentimentAnalysisService>();
+
 builder.Services.Configure<GoogleMapsOptions>(builder.Configuration.GetSection("GoogleMaps"));
 builder.Services.Configure<TomTomOptions>(builder.Configuration.GetSection("TomTom"));
 
@@ -291,5 +289,9 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
+
+// SignalR Hub mapping
+app.MapHub<Plafind.Hubs.ReviewHub>("/reviewHub");
+app.MapHub<Plafind.Hubs.ReservationHub>("/reservationHub");
 
 app.Run();

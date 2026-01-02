@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Linq;
 using Plafind.Services;
+using Microsoft.AspNetCore.SignalR;
+using Plafind.Hubs;
 
 namespace Plafind.Controllers
 {
@@ -22,6 +24,7 @@ namespace Plafind.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IWebHostEnvironment _environment;
         private readonly IEmailService _emailService;
+        private readonly IHubContext<ReviewHub> _hubContext;
 
         private static readonly string[] _defaultAvatars = new[]
         {
@@ -36,13 +39,15 @@ namespace Plafind.Controllers
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IWebHostEnvironment environment,
-            IEmailService emailService)
+            IEmailService emailService,
+            IHubContext<ReviewHub> hubContext)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+            _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
         }
 
         public async Task<IActionResult> Index()
@@ -216,6 +221,30 @@ namespace Plafind.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            // Yorumu tekrar yükle (User bilgisiyle birlikte)
+            var reviewWithUser = await _context.Reviews
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(r => r.Id == review.Id);
+
+            // SignalR ile tüm o işletmeye bağlı kullanıcılara yeni yorumu gönder
+            if (reviewWithUser != null)
+            {
+                var reviewData = new
+                {
+                    id = reviewWithUser.Id,
+                    comment = reviewWithUser.Comment,
+                    rating = reviewWithUser.Rating,
+                    createdDate = reviewWithUser.CreatedDate.ToString("dd MMMM yyyy HH:mm"),
+                    userName = reviewWithUser.User?.DisplayName ?? reviewWithUser.User?.UserName ?? "Anonim",
+                    userAvatar = reviewWithUser.User?.AvatarUrl ?? "/images/avatars/avatar-1.svg",
+                    businessId = businessId,
+                    averageRating = business?.AverageRating ?? 0,
+                    totalReviews = business?.TotalReviews ?? 0
+                };
+
+                await _hubContext.Clients.Group($"business-{businessId}").SendAsync("NewReview", reviewData);
+            }
 
             return Json(new { success = true, message = "Yorumunuz eklendi" });
         }

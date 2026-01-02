@@ -1,0 +1,101 @@
+@model IEnumerable<Plafind.Models.Campaign>
+
+@{
+    var business = ViewBag.Business as Plafind.Models.Business;
+    ViewData["Title"] = "Kampanya Yönetimi - " + (business?.Name ?? "");
+}
+
+<section class="py-4">
+    <div class="container-fluid px-3 px-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold">Kampanya Yönetimi</h2>
+                <p class="text-muted mb-0">@business?.Name - Fiyatlandırma & Kampanyalar</p>
+            </div>
+            <div>
+                <a asp-action="CampaignForm" asp-route-businessId="@business?.Id" class="btn btn-primary me-2">
+                    <i class="fas fa-plus me-1"></i>Yeni Kampanya Ekle
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>İşletmelerime Dön
+                </a>
+            </div>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>Henüz kampanya tanımlanmamış.
+                <a asp-action="CampaignForm" asp-route-businessId="@business?.Id" class="alert-link">İlk kampanyayı oluşturun</a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var campaign in Model)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 @(campaign.IsActive && campaign.StartDate <= DateTime.Now && campaign.EndDate >= DateTime.Now ? "border-success" : "border-secondary")">
+                            @if (!string.IsNullOrEmpty(campaign.ImageUrl))
+                            {
+                                <img src="@campaign.ImageUrl" class="card-img-top" style="height: 150px; object-fit: cover;" alt="@campaign.Title">
+                            }
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title mb-0">@campaign.Title</h5>
+                                    @if (campaign.IsActive && campaign.StartDate <= DateTime.Now && campaign.EndDate >= DateTime.Now)
+                                    {
+                                        <span class="badge bg-success">Aktif</span>
+                                    }
+                                    else if (campaign.StartDate > DateTime.Now)
+                                    {
+                                        <span class="badge bg-info">Yakında</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Bitiş</span>
+                                    }
+                                </div>
+                                <p class="card-text text-muted small">@(campaign.Description.Length > 100 ? campaign.Description.Substring(0, 100) + "..." : campaign.Description)</p>
+                                
+                                <div class="mb-2">
+                                    @if (campaign.DiscountPercentage.HasValue)
+                                    {
+                                        <span class="badge bg-danger">%@campaign.DiscountPercentage İndirim</span>
+                                    }
+                                    @if (campaign.DiscountAmount.HasValue)
+                                    {
+                                        <span class="badge bg-warning">@campaign.DiscountAmount.Value.ToString("C") İndirim</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(campaign.CouponCode))
+                                    {
+                                        <span class="badge bg-primary">Kod: @campaign.CouponCode</span>
+                                    }
+                                </div>
+
+                                <div class="small text-muted mb-2">
+                                    <div><i class="fas fa-calendar me-1"></i>@campaign.StartDate.ToString("dd.MM.yyyy") - @campaign.EndDate.ToString("dd.MM.yyyy")</div>
+                                    <div><i class="fas fa-users me-1"></i>@campaign.CurrentUses / @(campaign.MaxUses?.ToString() ?? "∞") kullanım</div>
+                                    @if (campaign.TotalRevenueImpact > 0)
+                                    {
+                                        <div><i class="fas fa-chart-line me-1"></i>Gelir Etkisi: @campaign.TotalRevenueImpact.ToString("C")</div>
+                                    }
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <a asp-action="CampaignForm" asp-route-businessId="@campaign.BusinessId" asp-route-id="@campaign.Id" class="btn btn-sm btn-outline-primary flex-fill">
+                                        <i class="fas fa-edit"></i> Düzenle
+                                    </a>
+                                    <a asp-action="CampaignPerformance" asp-route-id="@campaign.Id" class="btn btn-sm btn-outline-info flex-fill">
+                                        <i class="fas fa-chart-bar"></i> Performans
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+

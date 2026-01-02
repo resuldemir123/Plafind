@@ -67,32 +67,21 @@
                                                             <span class="badge bg-@(interaction.InteractionType == "Reservation" ? "primary" : interaction.InteractionType == "Review" ? "warning" : interaction.InteractionType == "Message" ? "info" : "secondary") me-2">
                                                                 @interaction.InteractionType
                                                             </span>
-                                                            @interaction.Subject
                                                         </h6>
                                                         @if (interaction.Customer != null)
                                                         {
                                                             <small class="text-muted">
-                                                                <i class="fas fa-user me-1"></i>@(interaction.Customer.FullName ?? interaction.Customer.UserName ?? "Müşteri")
+                                                                <i class="fas fa-user me-1"></i>@interaction.Customer.FullName
                                                             </small>
                                                         }
                                                     </div>
                                                     <div class="text-end">
                                                         <small class="text-muted">@interaction.InteractionDate.ToString("dd MMM yyyy HH:mm")</small>
-                                                        <br />
-                                                        <span class="badge bg-@(interaction.Status == "Completed" ? "success" : interaction.Status == "Pending" ? "warning" : "secondary")">
-                                                            @interaction.Status
-                                                        </span>
                                                     </div>
                                                 </div>
                                                 @if (!string.IsNullOrEmpty(interaction.Notes))
                                                 {
                                                     <p class="mb-2">@interaction.Notes</p>
-                                                }
-                                                @if (!string.IsNullOrEmpty(interaction.InternalNotes))
-                                                {
-                                                    <div class="alert alert-light mb-0">
-                                                        <strong>İç Not:</strong> @interaction.InternalNotes
-                                                    </div>
                                                 }
                                             </div>
                                         </div>

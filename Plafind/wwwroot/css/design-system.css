@@ -63,21 +63,133 @@
     --z-modal: 1050;
     --z-popover: 1060;
     --z-tooltip: 1070;
+    
+    /* Font Families - PlaceFind Design System */
+    --font-playfair: 'Playfair Display', serif;  /* Başlıklar için */
+    --font-sans: 'Inter', sans-serif;             /* Gövde metni için */
 }
 
-[data-theme="light"] {
-    --bg-body: #F8FAFC;
-    --bg-surface: #FFFFFF;
-    --text-title: #0F172A;
-    --text-body: #1E293B;
-    --text-muted: #64748B;
-    --border-color: #E2E8F0;
-    
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+/* ========================================
+   Typography System - PlaceFind
+   ======================================== */
+body {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    color: hsl(var(--foreground));
 }
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-playfair);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    color: hsl(var(--foreground));
+}
+
+h1 { font-size: var(--font-size-4xl); }
+h2 { font-size: var(--font-size-3xl); }
+h3 { font-size: var(--font-size-2xl); }
+h4 { font-size: var(--font-size-xl); }
+h5 { font-size: var(--font-size-lg); }
+h6 { font-size: var(--font-size-base); }
+
+/* ========================================
+   Animations - PlaceFind Design System
+   ======================================== */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide-in-left {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slide-in-right {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Animation Classes */
+.animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+}
+
+.animate-slide-up {
+    animation: slide-up 0.5s ease-out;
+}
+
+.animate-slide-down {
+    animation: slide-down 0.5s ease-out;
+}
+
+.animate-slide-in-left {
+    animation: slide-in-left 0.5s ease-out;
+}
+
+.animate-slide-in-right {
+    animation: slide-in-right 0.5s ease-out;
+}
+
+.animate-scale-in {
+    animation: scale-in 0.3s ease-out;
+}
+
+/* Animation Delays */
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+.animate-delay-500 { animation-delay: 500ms; }
 
 /* ========================================
    Component: Button System
@@ -97,32 +209,32 @@
 }
 
 .btn:focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid hsl(var(--primary));
     outline-offset: 2px;
 }
 
 .btn-primary {
-    background-color: var(--color-primary);
-    color: #FFFFFF;
-    border-color: var(--color-primary);
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border-color: hsl(var(--primary));
 }
 
 .btn-primary:hover {
-    background-color: var(--color-primary-hover);
-    border-color: var(--color-primary-hover);
+    background-color: hsl(var(--primary-hover));
+    border-color: hsl(var(--primary-hover));
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
 
 .btn-outline-primary {
     background-color: transparent;
-    color: var(--color-primary);
-    border-color: var(--color-primary);
+    color: hsl(var(--primary));
+    border-color: hsl(var(--primary));
 }
 
 .btn-outline-primary:hover {
-    background-color: var(--color-primary);
-    color: #FFFFFF;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
 }
 
 .btn-sm {
@@ -150,40 +262,41 @@
 }
 
 .badge-primary {
-    background-color: var(--color-primary-soft);
-    color: var(--color-primary);
+    background-color: hsl(var(--primary) / 0.15);
+    color: hsl(var(--primary));
 }
 
 .badge-success {
-    background-color: var(--color-success-soft);
-    color: var(--color-success);
+    background-color: hsl(var(--success) / 0.15);
+    color: hsl(var(--success));
 }
 
 .badge-warning {
-    background-color: var(--color-warning-soft);
-    color: var(--color-warning);
+    background-color: hsl(var(--warning) / 0.15);
+    color: hsl(var(--warning));
 }
 
 .badge-danger {
-    background-color: var(--color-danger-soft);
-    color: var(--color-danger);
+    background-color: hsl(var(--danger) / 0.15);
+    color: hsl(var(--danger));
 }
 
 .badge-info {
-    background-color: var(--color-info-soft);
-    color: var(--color-info);
+    background-color: hsl(var(--info) / 0.15);
+    color: hsl(var(--info));
 }
 
 /* ========================================
    Component: Card System
    ======================================== */
 .card {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-color);
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
     overflow: hidden;
     transition: all var(--transition-base);
+    color: hsl(var(--card-foreground));
 }
 
 .card:hover {
@@ -193,7 +306,7 @@
 
 .card-header {
     padding: var(--spacing-lg);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid hsl(var(--border));
 }
 
 .card-body {
@@ -202,8 +315,8 @@
 
 .card-footer {
     padding: var(--spacing-lg);
-    border-top: 1px solid var(--border-color);
-    background-color: var(--bg-body);
+    border-top: 1px solid hsl(var(--border));
+    background-color: hsl(var(--background));
 }
 
 /* ========================================
@@ -211,11 +324,11 @@
    ======================================== */
 .form-control,
 .form-select {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-color);
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
     border-radius: var(--radius-md);
     padding: var(--spacing-sm) var(--spacing-md);
-    color: var(--text-body);
+    color: hsl(var(--card-foreground));
     transition: all var(--transition-base);
     font-size: var(--font-size-base);
 }
@@ -223,20 +336,20 @@
 .form-control:focus,
 .form-select:focus {
     outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px var(--color-primary-soft);
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15);
 }
 
 .form-label {
     font-weight: var(--font-weight-medium);
-    color: var(--text-title);
+    color: hsl(var(--foreground));
     margin-bottom: var(--spacing-xs);
     display: block;
 }
 
 .form-text {
     font-size: var(--font-size-sm);
-    color: var(--text-muted);
+    color: hsl(var(--muted-foreground));
     margin-top: var(--spacing-xs);
 }
 
@@ -253,27 +366,27 @@
 }
 
 .alert-success {
-    background-color: var(--color-success-soft);
-    border-color: var(--color-success);
-    color: var(--color-success);
+    background-color: hsl(var(--success) / 0.15);
+    border-color: hsl(var(--success));
+    color: hsl(var(--success));
 }
 
 .alert-warning {
-    background-color: var(--color-warning-soft);
-    border-color: var(--color-warning);
-    color: var(--color-warning);
+    background-color: hsl(var(--warning) / 0.15);
+    border-color: hsl(var(--warning));
+    color: hsl(var(--warning));
 }
 
 .alert-danger {
-    background-color: var(--color-danger-soft);
-    border-color: var(--color-danger);
-    color: var(--color-danger);
+    background-color: hsl(var(--danger) / 0.15);
+    border-color: hsl(var(--danger));
+    color: hsl(var(--danger));
 }
 
 .alert-info {
-    background-color: var(--color-info-soft);
-    border-color: var(--color-info);
-    color: var(--color-info);
+    background-color: hsl(var(--info) / 0.15);
+    border-color: hsl(var(--info));
+    color: hsl(var(--info));
 }
 
 /* ========================================
@@ -322,8 +435,8 @@
     position: absolute;
     top: -40px;
     left: 0;
-    background: var(--color-primary);
-    color: #FFFFFF;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
     padding: var(--spacing-md);
     text-decoration: none;
     z-index: var(--z-tooltip);
@@ -335,7 +448,7 @@
 
 /* Focus visible for keyboard navigation */
 *:focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid hsl(var(--primary));
     outline-offset: 2px;
 }
 

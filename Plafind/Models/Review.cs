@@ -11,6 +11,12 @@ namespace Plafind.Models
         public int? BranchId { get; set; } // Şube bilgisi (opsiyonel)
         public string? Comment { get; set; }
         public int Rating { get; set; }
+        
+        // Alt kategori puanları (1-5 arası)
+        public int? ServiceRating { get; set; } // Hizmet puanı
+        public int? TasteRating { get; set; } // Lezzet puanı
+        public int? ValueRating { get; set; } // Fiyat/Performans puanı
+        
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public bool IsApproved { get; set; } = false;
         public bool IsActive { get; set; } = true;

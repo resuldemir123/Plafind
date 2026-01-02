@@ -32,7 +32,7 @@ namespace Plafind.Features.Reviews.Controllers
             _mapper = mapper;
         }
 
-        [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> Index(int businessId, string? sortBy = "newest", int? minRating = null, int? maxRating = null, bool? withPhotosOnly = null)
         {
             var reviews = await _reviewService.GetBusinessReviewsAsync(businessId, sortBy, minRating, maxRating, withPhotosOnly);

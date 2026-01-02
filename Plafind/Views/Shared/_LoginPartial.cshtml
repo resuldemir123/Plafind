@@ -81,7 +81,6 @@
                 else if (User?.IsInRole("BusinessOwner") ?? false)
                 {
                     <li><a class="dropdown-item profile-menu-item" href="@Url.Action("Index", "BusinessOwner")"><i class="fas fa-store"></i><span>İşletme Paneli</span></a></li>
-                    <li><a class="dropdown-item profile-menu-item" href="@Url.Action("Create", "BusinessOwner")"><i class="fas fa-plus-circle"></i><span>Yeni İşletme Ekle</span></a></li>
                     <li><a class="dropdown-item profile-menu-item" href="@Url.Action("Profile", "User")"><i class="fas fa-id-card"></i><span>Profil Ayarları</span></a></li>
                 }
                 else if (User?.IsInRole("User") ?? false)

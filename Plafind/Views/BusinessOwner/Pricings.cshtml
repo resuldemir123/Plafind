@@ -1,0 +1,130 @@
+@model IEnumerable<Plafind.Models.Pricing>
+
+@{
+    var business = ViewBag.Business as Plafind.Models.Business;
+    ViewData["Title"] = "Fiyatlandırma Yönetimi - " + (business?.Name ?? "");
+}
+
+<section class="py-4">
+    <div class="container-fluid px-3 px-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold">Fiyatlandırma Yönetimi</h2>
+                <p class="text-muted mb-0">@business?.Name - Sezonluk fiyatlar ve paket fiyatları</p>
+            </div>
+            <div>
+                <a asp-action="PricingForm" asp-route-businessId="@business?.Id" class="btn btn-primary me-2">
+                    <i class="fas fa-plus me-1"></i>Yeni Fiyatlandırma Ekle
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>İşletmelerime Dön
+                </a>
+            </div>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>Henüz fiyatlandırma tanımlanmamış.
+                <a asp-action="PricingForm" asp-route-businessId="@business?.Id" class="alert-link">İlk fiyatlandırmayı oluşturun</a>
+            </div>
+        }
+        else
+        {
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Fiyatlandırmalar (@Model.Count() adet)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Ad</th>
+                                    <th>Başlangıç</th>
+                                    <th>Bitiş</th>
+                                    <th>Fiyat Türü</th>
+                                    <th>Temel Fiyat</th>
+                                    <th>Kişi/Night/Saat</th>
+                                    <th>Min/Max Kişi</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var pricing in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@pricing.Name</strong>
+                                            @if (!string.IsNullOrEmpty(pricing.Description))
+                                            {
+                                                <br><small class="text-muted">@pricing.Description</small>
+                                            }
+                                        </td>
+                                        <td>@pricing.StartDate.ToString("dd.MM.yyyy")</td>
+                                        <td>@pricing.EndDate.ToString("dd.MM.yyyy")</td>
+                                        <td>
+                                            <span class="badge bg-secondary">@pricing.PricingType</span>
+                                        </td>
+                                        <td>
+                                            <strong>@pricing.BasePrice.ToString("C")</strong>
+                                        </td>
+                                        <td>
+                                            @if (pricing.PricePerPerson.HasValue)
+                                            {
+                                                <div>Kişi: @pricing.PricePerPerson.Value.ToString("C")</div>
+                                            }
+                                            @if (pricing.PricePerNight.HasValue)
+                                            {
+                                                <div>Gece: @pricing.PricePerNight.Value.ToString("C")</div>
+                                            }
+                                            @if (pricing.PricePerHour.HasValue)
+                                            {
+                                                <div>Saat: @pricing.PricePerHour.Value.ToString("C")</div>
+                                            }
+                                            @if (pricing.WeekendPrice.HasValue)
+                                            {
+                                                <div class="text-warning">Hafta Sonu: @pricing.WeekendPrice.Value.ToString("C")</div>
+                                            }
+                                            @if (pricing.HolidayPrice.HasValue)
+                                            {
+                                                <div class="text-danger">Tatil: @pricing.HolidayPrice.Value.ToString("C")</div>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (pricing.MinPeople.HasValue || pricing.MaxPeople.HasValue)
+                                            {
+                                                <div>@(pricing.MinPeople?.ToString() ?? "-") - @(pricing.MaxPeople?.ToString() ?? "-") kişi</div>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (pricing.IsActive)
+                                            {
+                                                <span class="badge bg-success">Aktif</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Pasif</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <a asp-action="PricingForm" asp-route-businessId="@pricing.BusinessId" asp-route-id="@pricing.Id" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i> Düzenle
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+

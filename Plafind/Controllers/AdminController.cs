@@ -334,7 +334,7 @@ namespace Plafind.Controllers
             return View(reviews);
         }
 
-        public async Task<IActionResult> ApproveReview(int id)
+        public async Task<IActionResult> ApproveReviewOld(int id)
         {
             var review = await _context.Reviews.FindAsync(id);
             if (review != null)
@@ -569,15 +569,6 @@ namespace Plafind.Controllers
             return View(categories);
         }
 
-        public async Task<IActionResult> News()
-        {
-            var news = await _context.News
-                .Include(n => n.Author)
-                .OrderByDescending(n => n.PublishDate)
-                .ToListAsync();
-            return View(news);
-        }
-
         // ==================== ANALYTICS MODULE ====================
         public async Task<IActionResult> Analytics()
         {
@@ -615,6 +606,147 @@ namespace Plafind.Controllers
 
             ViewBag.Reports = reports;
             return View();
+        }
+
+        // İşletme sahipleri için raporlama
+        public async Task<IActionResult> BusinessReports(int? businessId = null)
+        {
+            var sevenDaysAgo = DateTime.Now.AddDays(-7);
+            var thirtyDaysAgo = DateTime.Now.AddDays(-30);
+            
+            var query = _context.Businesses.AsQueryable();
+            if (businessId.HasValue)
+            {
+                query = query.Where(b => b.Id == businessId.Value);
+            }
+            
+            var reports = await query
+                .Select(b => new
+                {
+                    BusinessId = b.Id,
+                    BusinessName = b.Name,
+                    TotalViews = b.ViewCount ?? 0,
+                    ViewsLast7Days = 0, // Bu bilgiyi ViewCountHistory tablosundan alabilirsiniz
+                    ViewsLast30Days = 0,
+                    TotalReviews = b.TotalReviews,
+                    NewReviewsLast7Days = b.Reviews.Count(r => r.CreatedDate >= sevenDaysAgo),
+                    NewReviewsLast30Days = b.Reviews.Count(r => r.CreatedDate >= thirtyDaysAgo),
+                    AverageRating = b.AverageRating,
+                    TotalFavorites = b.Favorites.Count,
+                    NewFavoritesLast7Days = b.Favorites.Count(f => f.AddedDate >= sevenDaysAgo),
+                    TotalReservations = b.Reservations.Count,
+                    NewReservationsLast7Days = b.Reservations.Count(r => r.CreatedDate >= sevenDaysAgo)
+                })
+                .ToListAsync();
+            
+            ViewBag.Reports = reports;
+            ViewBag.BusinessId = businessId;
+            return View();
+        }
+
+        // Moderasyon Kuyruğu
+        public async Task<IActionResult> ModerationQueue()
+        {
+            // Onay bekleyen yorumlar
+            var pendingReviews = await _context.Reviews
+                .Where(r => !r.IsApproved && r.IsActive)
+                .Include(r => r.User)
+                .Include(r => r.Business)
+                .OrderByDescending(r => r.CreatedDate)
+                .ToListAsync();
+            
+            // Onay bekleyen fotoğraflar (ReviewImage)
+            var pendingImages = await _context.ReviewImages
+                .Where(ri => !ri.IsApproved && ri.IsActive)
+                .Include(ri => ri.Review)
+                    .ThenInclude(r => r.User)
+                .Include(ri => ri.Review)
+                    .ThenInclude(r => r.Business)
+                .OrderByDescending(ri => ri.CreatedDate)
+                .ToListAsync();
+            
+            ViewBag.PendingReviews = pendingReviews;
+            ViewBag.PendingImages = pendingImages;
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApproveReview(int reviewId)
+        {
+            var review = await _context.Reviews.FindAsync(reviewId);
+            if (review == null) return NotFound();
+            
+            review.IsApproved = true;
+            _context.Reviews.Update(review);
+            
+            // İşletmenin ortalama puanını güncelle
+            var business = await _context.Businesses
+                .Include(b => b.Reviews)
+                .FirstOrDefaultAsync(b => b.Id == review.BusinessId);
+            
+            if (business != null)
+            {
+                var approvedReviews = business.Reviews.Where(r => r.IsApproved && r.IsActive).ToList();
+                business.AverageRating = approvedReviews.Any() ? approvedReviews.Average(r => r.Rating) : 0;
+                business.TotalReviews = approvedReviews.Count;
+                _context.Businesses.Update(business);
+            }
+            
+            await _context.SaveChangesAsync();
+            await LogAdminAction("Approve", "Review", reviewId.ToString(), $"Yorum onaylandı: {review.Id}");
+            
+            TempData["Success"] = "Yorum onaylandı.";
+            return RedirectToAction(nameof(ModerationQueue));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectReview(int reviewId, string? reason = null)
+        {
+            var review = await _context.Reviews.FindAsync(reviewId);
+            if (review == null) return NotFound();
+            
+            review.IsActive = false;
+            review.IsApproved = false;
+            _context.Reviews.Update(review);
+            await _context.SaveChangesAsync();
+            
+            await LogAdminAction("Reject", "Review", reviewId.ToString(), $"Yorum reddedildi: {review.Id}, Sebep: {reason ?? "Belirtilmedi"}");
+            
+            TempData["Success"] = "Yorum reddedildi.";
+            return RedirectToAction(nameof(ModerationQueue));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApproveImage(int imageId)
+        {
+            var image = await _context.ReviewImages.FindAsync(imageId);
+            if (image == null) return NotFound();
+            
+            image.IsApproved = true;
+            _context.ReviewImages.Update(image);
+            await _context.SaveChangesAsync();
+            
+            await LogAdminAction("Approve", "ReviewImage", imageId.ToString(), $"Fotoğraf onaylandı: {image.Id}");
+            
+            TempData["Success"] = "Fotoğraf onaylandı.";
+            return RedirectToAction(nameof(ModerationQueue));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectImage(int imageId, string? reason = null)
+        {
+            var image = await _context.ReviewImages.FindAsync(imageId);
+            if (image == null) return NotFound();
+            
+            image.IsActive = false;
+            image.IsApproved = false;
+            _context.ReviewImages.Update(image);
+            await _context.SaveChangesAsync();
+            
+            await LogAdminAction("Reject", "ReviewImage", imageId.ToString(), $"Fotoğraf reddedildi: {image.Id}, Sebep: {reason ?? "Belirtilmedi"}");
+            
+            TempData["Success"] = "Fotoğraf reddedildi.";
+            return RedirectToAction(nameof(ModerationQueue));
         }
 
         // ==================== SYSTEM SETTINGS MODULE ====================

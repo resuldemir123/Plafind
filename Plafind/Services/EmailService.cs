@@ -36,7 +36,7 @@ namespace Plafind.Services
 
                 if (string.IsNullOrEmpty(smtpHost) || string.IsNullOrEmpty(smtpUsername) || string.IsNullOrEmpty(smtpPassword))
                 {
-                    _logger.LogWarning("E-posta ayarları yapılandırılmamış. E-posta gönderilemedi.");
+                    _logger.LogDebug("E-posta ayarları yapılandırılmamış. E-posta gönderilemedi.");
                     return false;
                 }
 

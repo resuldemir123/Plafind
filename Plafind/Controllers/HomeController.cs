@@ -7,10 +7,10 @@ using Plafind.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 namespace Plafind.Controllers
 {
-    [AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -24,6 +24,7 @@ namespace Plafind.Controllers
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             try
@@ -46,6 +47,7 @@ namespace Plafind.Controllers
                     .Where(b => b.IsActive && b.IsApproved && b.IsFeatured)
                     .Include(b => b.Category)
                     .Include(b => b.Reviews)
+                        .ThenInclude(r => r.User)
                     .OrderByDescending(b => b.AverageRating)
                     .Take(6)
                     .ToListAsync();
@@ -54,28 +56,23 @@ namespace Plafind.Controllers
                     .Where(b => b.IsActive && b.IsApproved)
                     .Include(b => b.Category)
                     .Include(b => b.Reviews)
+                        .ThenInclude(r => r.User)
                     .OrderByDescending(b => b.AverageRating)
                     .ThenByDescending(b => b.TotalReviews)
                     .Take(6)
                     .ToListAsync();
 
                 var categories = await _context.Categories
-                    .Where(c => c.Businesses != null && c.Businesses.Any(b => b.IsActive && b.IsApproved))
+                    .Where(c => _context.Businesses.Any(b => b.CategoryId == c.Id && b.IsActive && b.IsApproved))
                     .Select(c => c.Name)
                     .Distinct()
+                    .OrderBy(c => c)
                     .Take(8)
-                    .ToListAsync();
-
-                var latestNews = await _context.News
-                    .Include(n => n.Author)
-                    .OrderByDescending(n => n.PublishDate)
-                    .Take(3)
                     .ToListAsync();
 
                 ViewBag.FeaturedBusinesses = featuredBusinesses;
                 ViewBag.TopRatedBusinesses = topRatedBusinesses;
                 ViewBag.Categories = categories;
-                ViewBag.LatestNews = latestNews;
 
                 return View();
             }
@@ -86,6 +83,7 @@ namespace Plafind.Controllers
             }
         }
 
+        [Authorize]
         public async Task<IActionResult> Search(string? query, string? category, string? minRating, 
             string? priceRange, string? sortBy = "featured")
         {
@@ -148,6 +146,26 @@ namespace Plafind.Controllers
 
                 var businesses = await businessesQuery.ToListAsync();
 
+                // FeaturesJson'ı deserialize edip Features listesine dönüştür
+                foreach (var business in businesses)
+                {
+                    if (!string.IsNullOrEmpty(business.FeaturesJson))
+                    {
+                        try
+                        {
+                            business.Features = JsonSerializer.Deserialize<List<BusinessFeature>>(business.FeaturesJson);
+                        }
+                        catch
+                        {
+                            business.Features = new List<BusinessFeature>();
+                        }
+                    }
+                    else
+                    {
+                        business.Features = new List<BusinessFeature>();
+                    }
+                }
+
                 ViewBag.Query = query;
                 ViewBag.Category = category;
                 ViewBag.MinRating = minRating;
@@ -156,9 +174,10 @@ namespace Plafind.Controllers
                 
                 // Get all categories for filter dropdown
                 ViewBag.Categories = await _context.Categories
-                    .Where(c => c.Businesses != null && c.Businesses.Any(b => b.IsActive && b.IsApproved))
+                    .Where(c => _context.Businesses.Any(b => b.CategoryId == c.Id && b.IsActive && b.IsApproved))
                     .Select(c => c.Name)
                     .Distinct()
+                    .OrderBy(c => c)
                     .ToListAsync();
 
                 return View(businesses);
@@ -170,6 +189,7 @@ namespace Plafind.Controllers
             }
         }
 
+        [AllowAnonymous]
         public IActionResult Contact()
         {
             ViewData["Title"] = "İletişim - Alanya İşletme Rehberi";
@@ -178,6 +198,7 @@ namespace Plafind.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> Contact(ContactViewModel model)
         {
             ViewData["Title"] = "İletişim - Alanya İşletme Rehberi";
@@ -232,18 +253,21 @@ namespace Plafind.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
         public IActionResult Privacy()
         {
             ViewData["Title"] = "Gizlilik Politikası - Alanya İşletme Rehberi";
             return View();
         }
 
+        [AllowAnonymous]
         public IActionResult Help()
         {
             ViewData["Title"] = "Yardım - Alanya İşletme Rehberi";
             return View();
         }
 
+        [AllowAnonymous]
         public IActionResult About()
         {
             ViewData["Title"] = "Hakkımızda - Alanya İşletme Rehberi";
@@ -251,6 +275,7 @@ namespace Plafind.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult SetLanguage(string culture, string returnUrl)
         {
             // Kullanıcının tercih ettiği dili çereze kaydet
@@ -277,6 +302,7 @@ namespace Plafind.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [AllowAnonymous]
         public IActionResult Error()
         {
             var model = new ErrorViewModel

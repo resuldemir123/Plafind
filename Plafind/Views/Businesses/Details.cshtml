@@ -199,25 +199,147 @@
                     </div>
                 }
 
+                <!-- Kampanyalar -->
+                @{
+                    var campaigns = ViewBag.Campaigns as List<Plafind.Models.Campaign> ?? new List<Plafind.Models.Campaign>();
+                    var allCampaignsCount = ViewBag.AllCampaignsCount as int? ?? 0;
+                    var activeCampaignsCount = ViewBag.ActiveCampaignsCount as int? ?? 0;
+                }
+                @if (campaigns != null && campaigns.Any())
+                {
+                    <div class="section-card mb-4">
+                        <div class="section-header">
+                            <i class="fas fa-tags me-2 text-danger"></i>
+                            <h3 class="section-title">Kampanyalar ve Fırsatlar</h3>
+                            <span class="badge bg-danger ms-auto">
+                                <i class="fas fa-fire me-1"></i>@campaigns.Count Kampanya
+                            </span>
+                        </div>
+                        <div class="row g-3">
+                            @foreach (var campaign in campaigns)
+                            {
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card h-100 border-@(campaign.IsFeatured ? "danger" : "primary") shadow-sm campaign-card" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                                        @if (!string.IsNullOrEmpty(campaign.ImageUrl))
+                                        {
+                                            <img src="@campaign.ImageUrl" class="card-img-top" style="height: 150px; object-fit: cover;" alt="@campaign.Title" />
+                                        }
+                                        else
+                                        {
+                                            <div class="card-img-top bg-@(campaign.IsFeatured ? "danger" : "primary") text-white d-flex align-items-center justify-content-center" style="height: 150px;">
+                                                <i class="fas fa-tags fa-3x"></i>
+                                            </div>
+                                        }
+                                        <div class="card-body d-flex flex-column">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h5 class="card-title mb-0">@campaign.Title</h5>
+                                                @if (campaign.IsFeatured)
+                                                {
+                                                    <span class="badge bg-danger"><i class="fas fa-star me-1"></i>Öne Çıkan</span>
+                                                }
+                                            </div>
+                                            <p class="card-text text-muted small flex-grow-1">@(campaign.Description?.Length > 100 ? campaign.Description.Substring(0, 100) + "..." : campaign.Description)</p>
+                                            
+                                            <div class="mb-2">
+                                                @if (campaign.DiscountPercentage.HasValue)
+                                                {
+                                                    <span class="badge bg-danger me-1 mb-1">
+                                                        <i class="fas fa-percent me-1"></i>%@campaign.DiscountPercentage İndirim
+                                                    </span>
+                                                }
+                                                @if (campaign.DiscountAmount.HasValue)
+                                                {
+                                                    <span class="badge bg-warning text-dark me-1 mb-1">
+                                                        <i class="fas fa-lira-sign me-1"></i>@campaign.DiscountAmount.Value.ToString("C") İndirim
+                                                    </span>
+                                                }
+                                                @if (!string.IsNullOrEmpty(campaign.CouponCode))
+                                                {
+                                                    <span class="badge bg-info text-white me-1 mb-1">
+                                                        <i class="fas fa-ticket-alt me-1"></i>Promosyon Kodu
+                                                    </span>
+                                                }
+                                            </div>
+
+                                            <div class="small text-muted mb-2">
+                                                <div class="mb-1">
+                                                    <i class="fas fa-calendar-alt me-1 text-primary"></i>
+                                                    <strong>Geçerlilik:</strong> @campaign.StartDate.ToString("dd.MM.yyyy") - @campaign.EndDate.ToString("dd.MM.yyyy")
+                                                </div>
+                                                @if (campaign.MinimumPurchaseAmount.HasValue)
+                                                {
+                                                    <div class="mb-1">
+                                                        <i class="fas fa-lira-sign me-1 text-success"></i>
+                                                        <strong>Min. Tutar:</strong> @campaign.MinimumPurchaseAmount.Value.ToString("C")
+                                                    </div>
+                                                }
+                                                @if (campaign.MinimumPeople.HasValue)
+                                                {
+                                                    <div class="mb-1">
+                                                        <i class="fas fa-users me-1 text-info"></i>
+                                                        <strong>Min. Kişi:</strong> @campaign.MinimumPeople
+                                                    </div>
+                                                }
+                                                @if (campaign.MaxUses.HasValue && campaign.MaxUses > 0)
+                                                {
+                                                    <div class="mb-1">
+                                                        <i class="fas fa-ticket-alt me-1 text-warning"></i>
+                                                        <strong>Kalan:</strong> @(campaign.MaxUses - campaign.CurrentUses) kullanım
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            @if (!string.IsNullOrEmpty(campaign.CouponCode))
+                                            {
+                                                <div class="mt-auto">
+                                                    <label class="form-label small mb-1"><strong>Promosyon Kodu:</strong></label>
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" class="form-control" value="@campaign.CouponCode" id="coupon-@campaign.Id" readonly style="font-weight: 600; letter-spacing: 1px;" />
+                                                        <button class="btn btn-outline-primary" type="button" onclick="copyCouponCode('coupon-@campaign.Id')" title="Kodu Kopyala">
+                                                            <i class="fas fa-copy"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
                 <div class="section-card mb-4">
                     <div class="section-header">
                         <i class="fas fa-comments me-2 text-warning"></i>
                         <h3 class="section-title">Yorumlar</h3>
                         @{
                             var activeReviewCount = business.Reviews?.Count(r => r.IsActive && r.IsApproved) ?? 0;
+                            var totalReviewCount = business.TotalReviews;
                         }
-                        <span class="badge bg-warning text-dark ms-auto">@activeReviewCount</span>
+                        <span class="badge bg-warning text-dark ms-auto">
+                            <i class="fas fa-comment me-1"></i>@totalReviewCount yorum
+                        </span>
                     </div>
 
                     @if (business.Reviews != null && business.Reviews.Any(r => r.IsActive && r.IsApproved))
                     {
-                        <div class="reviews-list">
+                        <div class="reviews-list" id="reviewsList">
                             @foreach (var review in business.Reviews.Where(r => r.IsActive && r.IsApproved).OrderByDescending(r => r.CreatedDate).Take(5))
                             {
-                                <div class="review-card">
+                                <div class="review-card" data-review-id="@review.Id">
                                     <div class="review-header">
                                         <div class="review-user">
-                                            <div class="avatar"><i class="fas fa-user"></i></div>
+                                            <div class="avatar">
+                                                @if (!string.IsNullOrEmpty(review.User?.AvatarUrl))
+                                                {
+                                                    <img src="@review.User.AvatarUrl" alt="@(review.User?.FullName ?? review.User?.UserName ?? "Kullanıcı")" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-user"></i>
+                                                }
+                                            </div>
                                             <div>
                                                 <h6>@(review.User?.FullName ?? review.User?.UserName ?? "Anonim Kullanıcı")</h6>
                                                 <div class="review-stars">
@@ -835,6 +957,47 @@
 
     .review-date {
         color: rgba(226,232,240,0.55);
+    }
+
+    /* Yorum bildirimi */
+    .review-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: var(--shadow-xl);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transform: translateX(400px);
+        opacity: 0;
+        transition: all 0.3s ease;
+        max-width: 350px;
+    }
+
+    .review-notification.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .review-notification i {
+        font-size: 1.2rem;
+    }
+
+    @@keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
         font-size: .9rem;
     }
 
@@ -1453,7 +1616,161 @@
 
             updateCompareCount();
         });
+
+        // SignalR - Yorum Akışı
+        const businessId = @business.Id;
+        let reviewConnection;
+
+        // SignalR bağlantısını başlat
+        function startReviewConnection() {
+            if (typeof signalR === 'undefined') {
+                console.error("SignalR yüklenemedi");
+                return;
+            }
+            
+            reviewConnection = new signalR.HubConnectionBuilder()
+                .withUrl("/reviewHub")
+                .build();
+
+            reviewConnection.start()
+                .then(function () {
+                    console.log("SignalR bağlantısı kuruldu");
+                    // İşletme grubuna katıl
+                    reviewConnection.invoke("JoinBusinessGroup", businessId)
+                        .catch(function (err) {
+                            console.error("Grup katılımı hatası:", err);
+                        });
+                })
+                .catch(function (err) {
+                    console.error("SignalR bağlantı hatası:", err);
+                });
+
+            // Yeni yorum geldiğinde
+            reviewConnection.on("NewReview", function (reviewData) {
+                console.log("Yeni yorum geldi:", reviewData);
+                addReviewToPage(reviewData);
+                updateBusinessRating(reviewData.averageRating, reviewData.totalReviews);
+            });
+        }
+
+        // Sayfaya yeni yorum ekle
+        function addReviewToPage(reviewData) {
+            const reviewsList = document.getElementById("reviewsList");
+            if (!reviewsList) return;
+
+            // Aynı yorum zaten varsa ekleme
+            const existingReview = reviewsList.querySelector(`[data-review-id="${reviewData.id}"]`);
+            if (existingReview) return;
+
+            // Yeni yorum kartı oluştur
+            const reviewCard = document.createElement("div");
+            reviewCard.className = "review-card";
+            reviewCard.setAttribute("data-review-id", reviewData.id);
+            reviewCard.style.animation = "slideInDown 0.5s ease";
+            
+            const starsHtml = Array.from({ length: 5 }, (_, i) => 
+                `<i class="${i < reviewData.rating ? 'fas' : 'far'} fa-star"></i>`
+            ).join('');
+
+            reviewCard.innerHTML = `
+                <div class="review-header">
+                    <div class="review-user">
+                        <div class="avatar">
+                            <img src="${reviewData.userAvatar}" alt="${reviewData.userName}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+                        </div>
+                        <div>
+                            <h6>${reviewData.userName}</h6>
+                            <div class="review-stars">${starsHtml}</div>
+                        </div>
+                    </div>
+                    <span class="review-date">${reviewData.createdDate}</span>
+                </div>
+                ${reviewData.comment ? `<p class="review-text">${reviewData.comment}</p>` : ''}
+            `;
+
+            // En üste ekle
+            reviewsList.insertBefore(reviewCard, reviewsList.firstChild);
+
+            // Toast bildirimi göster
+            showReviewNotification(reviewData.userName);
+        }
+
+        // İşletme puanını güncelle
+        function updateBusinessRating(averageRating, totalReviews) {
+            const ratingElement = document.querySelector('.hero-rating .score');
+            const ratingCountElement = document.querySelector('.hero-rating .rating-count');
+            const badgeElement = document.querySelector('.section-header .badge');
+            
+            if (ratingElement) {
+                ratingElement.textContent = averageRating.toFixed(1);
+            }
+            
+            if (ratingCountElement) {
+                ratingCountElement.textContent = `${totalReviews} değerlendirme`;
+            }
+            
+            if (badgeElement) {
+                badgeElement.innerHTML = `<i class="fas fa-comment me-1"></i>${totalReviews} yorum`;
+            }
+
+            // Yıldızları güncelle
+            const stars = document.querySelectorAll('.hero-rating .stars i');
+            const roundedRating = Math.round(averageRating);
+            stars.forEach((star, index) => {
+                if (index < roundedRating) {
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                } else {
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                }
+            });
+        }
+
+        // Yorum bildirimi göster
+        function showReviewNotification(userName) {
+            const notification = document.createElement("div");
+            notification.className = "review-notification";
+            notification.innerHTML = `
+                <i class="fas fa-comment-dots me-2"></i>
+                <strong>${userName}</strong> yeni bir yorum yaptı
+            `;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add("show");
+            }, 100);
+
+            setTimeout(() => {
+                notification.classList.remove("show");
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Sayfa yüklendiğinde SignalR bağlantısını başlat
+        if (typeof signalR !== 'undefined') {
+            startReviewConnection();
+        } else {
+            // SignalR script'i yüklenene kadar bekle
+            const checkSignalR = setInterval(() => {
+                if (typeof signalR !== 'undefined') {
+                    clearInterval(checkSignalR);
+                    startReviewConnection();
+                }
+            }, 100);
+        }
+
+        // Sayfa kapatılırken bağlantıyı kapat
+        window.addEventListener("beforeunload", function() {
+            if (reviewConnection) {
+                reviewConnection.invoke("LeaveBusinessGroup", businessId)
+                    .catch(function(err) {
+                        console.error("Grup ayrılma hatası:", err);
+                    });
+            }
+        });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@7.0.0/dist/browser/signalr.js"></script>
     <script src="~/js/nearby-places.js" asp-append-version="true"></script>
     @if (hasLocation && !string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string))
     {
@@ -1492,4 +1809,70 @@
             });
         </script>
     }
+
+    <script>
+        // Kampanya kupon kodu kopyalama
+        function copyCouponCode(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.select();
+                input.setSelectionRange(0, 99999); // Mobil için
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(input.value).then(() => {
+                        showCopySuccess(input);
+                    }).catch(() => {
+                        // Fallback: eski yöntem
+                        document.execCommand('copy');
+                        showCopySuccess(input);
+                    });
+                } else {
+                    // Fallback: eski yöntem
+                    document.execCommand('copy');
+                    showCopySuccess(input);
+                }
+            }
+        }
+
+        function showCopySuccess(input) {
+            const button = input.nextElementSibling;
+            if (button) {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Kopyalandı!';
+                button.classList.remove('btn-outline-primary');
+                button.classList.add('btn-success');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-outline-primary');
+                }, 2000);
+            }
+        }
+    </script>
+    
+    <style>
+        .campaign-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .campaign-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        .campaign-card .card-img-top {
+            transition: transform 0.3s ease;
+        }
+        
+        .campaign-card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+        
+        .campaign-card .badge {
+            font-size: 0.75rem;
+            padding: 0.375rem 0.5rem;
+        }
+    </style>
 }

@@ -18,7 +18,6 @@ namespace Plafind.Data
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
-        public DbSet<News> News { get; set; }
         public DbSet<UserFavorite> UserFavorites { get; set; }
         public DbSet<AdminLog> AdminLogs { get; set; }
         public DbSet<UserPhoto> UserPhotos { get; set; }
@@ -43,6 +42,10 @@ namespace Plafind.Data
         public DbSet<ReviewReport> ReviewReports { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<Collection> Collections { get; set; }
+        public DbSet<CollectionBusiness> CollectionBusinesses { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Pricing> Pricings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -116,14 +119,6 @@ namespace Plafind.Data
                 entity.HasOne(f => f.User)
                       .WithMany(u => u.Favorites)
                       .HasForeignKey(f => f.UserId)
-                      .OnDelete(DeleteBehavior.Cascade);
-            });
-
-            modelBuilder.Entity<News>(entity =>
-            {
-                entity.HasOne(n => n.Author)
-                      .WithMany()
-                      .HasForeignKey(n => n.AuthorId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
@@ -317,33 +312,7 @@ namespace Plafind.Data
                       .OnDelete(DeleteBehavior.SetNull);
             });
 
-            modelBuilder.Entity<CustomerInteraction>(entity =>
-            {
-                entity.HasOne(ci => ci.Business)
-                      .WithMany()
-                      .HasForeignKey(ci => ci.BusinessId)
-                      .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(ci => ci.Customer)
-                      .WithMany()
-                      .HasForeignKey(ci => ci.CustomerId)
-                      .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(ci => ci.RelatedReservation)
-                      .WithMany()
-                      .HasForeignKey(ci => ci.RelatedReservationId)
-                      .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(ci => ci.RelatedReview)
-                      .WithMany()
-                      .HasForeignKey(ci => ci.RelatedReviewId)
-                      .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(ci => ci.RelatedMessage)
-                      .WithMany()
-                      .HasForeignKey(ci => ci.RelatedMessageId)
-                      .OnDelete(DeleteBehavior.Restrict);
-            });
+            // CustomerInteraction configuration - moved to end with Customer configuration
 
             modelBuilder.Entity<Reservation>(entity =>
             {
@@ -352,7 +321,53 @@ namespace Plafind.Data
                       .HasForeignKey(r => r.BranchId)
                       .OnDelete(DeleteBehavior.Restrict);
                 
+                entity.HasOne(r => r.Customer)
+                      .WithMany(c => c.Reservations)
+                      .HasForeignKey(r => r.CustomerId)
+                      .OnDelete(DeleteBehavior.SetNull);
+                
                 entity.Property(r => r.Amount)
+                      .HasPrecision(18, 2);
+                entity.Property(r => r.PrePaymentAmount)
+                      .HasPrecision(18, 2);
+                entity.Property(r => r.RemainingAmount)
+                      .HasPrecision(18, 2);
+            });
+
+            modelBuilder.Entity<Customer>(entity =>
+            {
+                entity.HasOne(c => c.Business)
+                      .WithMany()
+                      .HasForeignKey(c => c.BusinessId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(c => c.User)
+                      .WithMany()
+                      .HasForeignKey(c => c.UserId)
+                      .OnDelete(DeleteBehavior.SetNull);
+                
+                entity.Property(c => c.TotalSpent)
+                      .HasPrecision(18, 2);
+            });
+
+            modelBuilder.Entity<Pricing>(entity =>
+            {
+                entity.HasOne(p => p.Business)
+                      .WithMany()
+                      .HasForeignKey(p => p.BusinessId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.Property(p => p.BasePrice)
+                      .HasPrecision(18, 2);
+                entity.Property(p => p.PricePerPerson)
+                      .HasPrecision(18, 2);
+                entity.Property(p => p.PricePerNight)
+                      .HasPrecision(18, 2);
+                entity.Property(p => p.PricePerHour)
+                      .HasPrecision(18, 2);
+                entity.Property(p => p.WeekendPrice)
+                      .HasPrecision(18, 2);
+                entity.Property(p => p.HolidayPrice)
                       .HasPrecision(18, 2);
             });
 
@@ -361,7 +376,13 @@ namespace Plafind.Data
             {
                 entity.Property(c => c.DiscountPercentage)
                       .HasPrecision(18, 2);
+                entity.Property(c => c.DiscountAmount)
+                      .HasPrecision(18, 2);
                 entity.Property(c => c.MinimumPurchaseAmount)
+                      .HasPrecision(18, 2);
+                entity.Property(c => c.TotalRevenueImpact)
+                      .HasPrecision(18, 2);
+                entity.Property(c => c.AverageDiscountApplied)
                       .HasPrecision(18, 2);
             });
 
@@ -443,6 +464,29 @@ namespace Plafind.Data
                       .HasConversion<int>();
             });
 
+            // Collection configuration
+            modelBuilder.Entity<Collection>(entity =>
+            {
+                entity.HasIndex(c => c.IsActive);
+                entity.HasIndex(c => c.IsFeatured);
+            });
+
+            // CollectionBusiness configuration
+            modelBuilder.Entity<CollectionBusiness>(entity =>
+            {
+                entity.HasIndex(cb => new { cb.CollectionId, cb.BusinessId }).IsUnique();
+                
+                entity.HasOne(cb => cb.Collection)
+                      .WithMany(c => c.CollectionBusinesses)
+                      .HasForeignKey(cb => cb.CollectionId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(cb => cb.Business)
+                      .WithMany()
+                      .HasForeignKey(cb => cb.BusinessId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
             // AdminLog configuration
             modelBuilder.Entity<AdminLog>(entity =>
             {
@@ -454,6 +498,32 @@ namespace Plafind.Data
                       .WithMany()
                       .HasForeignKey(al => al.AdminUserId)
                       .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Customer configuration
+            modelBuilder.Entity<Customer>(entity =>
+            {
+                entity.HasOne(c => c.Business)
+                      .WithMany()
+                      .HasForeignKey(c => c.BusinessId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(c => c.User)
+                      .WithMany()
+                      .HasForeignKey(c => c.UserId)
+                      .OnDelete(DeleteBehavior.SetNull);
+                
+                entity.Property(c => c.TotalSpent)
+                      .HasPrecision(18, 2);
+            });
+
+            // CustomerInteraction configuration
+            modelBuilder.Entity<CustomerInteraction>(entity =>
+            {
+                entity.HasOne(ci => ci.Customer)
+                      .WithMany(c => c.Interactions)
+                      .HasForeignKey(ci => ci.CustomerId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

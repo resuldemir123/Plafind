@@ -5,11 +5,29 @@
 
 @{
     ViewData["Title"] = "PlaceFind - " + Localizer["Home"].Value;
+    ViewData["OgTitle"] = "PlaceFind - Alanya İşletme Rehberi";
+    ViewData["OgDescription"] = "Alanya'nın en kapsamlı işletme rehberi. Restoranlar, oteller, mağazalar ve daha fazlasını keşfedin. En iyi işletmeleri bulun, yorumları okuyun, rezervasyon yapın.";
+    ViewData["OgImage"] = Url.Content("~/images/Logo.png");
     var featuredBusinesses = ViewBag.FeaturedBusinesses as List<Plafind.Models.Business>;
     var topRatedBusinesses = ViewBag.TopRatedBusinesses as List<Plafind.Models.Business>;
     var categories = ViewBag.Categories as List<string>;
-    var latestNews = ViewBag.LatestNews as List<Plafind.Models.News>;
 }
+
+<!-- Structured Data for SEO -->
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "WebSite",
+    "name": "PlaceFind",
+    "url": "@Context.Request.Scheme://@Context.Request.Host",
+    "description": "Alanya'nın en kapsamlı işletme rehberi",
+    "potentialAction": {
+        "@@type": "SearchAction",
+        "target": "@Context.Request.Scheme://@Context.Request.Host/Home/Search?query={search_term_string}",
+        "query-input": "required name=search_term_string"
+    }
+}
+</script>
 
 <!-- Hero Section -->
 <div class="hero-section">
@@ -64,12 +82,6 @@
                             {
                                 <a href="@Url.Action("Index", "Admin")" class="btn btn-primary btn-lg mb-2">
                                     <i class="fas fa-cog"></i> @Localizer["AdminPanel"]
-                                </a>
-                            }
-                            else if (User.IsInRole("BusinessOwner"))
-                            {
-                                <a href="@Url.Action("Index", "BusinessOwner")" class="btn btn-primary btn-lg mb-2">
-                                    <i class="fas fa-store"></i> @Localizer["BusinessPanel"]
                                 </a>
                             }
                             else if (User.IsInRole("User"))
@@ -146,6 +158,35 @@
                                         <li><i class="fas fa-dollar-sign"></i> @business.PriceRange</li>
                                         @* Website bağlantısı şimdilik gösterilmiyor *@
                                     </ul>
+                                    
+                                    @* Yorumlar Bölümü *@
+                                    @{
+                                        var latestReview = business.Reviews?.Where(r => r.IsActive && r.IsApproved && !string.IsNullOrEmpty(r.Comment)).OrderByDescending(r => r.CreatedDate).FirstOrDefault();
+                                    }
+                                    @if (latestReview != null)
+                                    {
+                                        <div class="review-preview-card mt-3 mb-3 p-3" style="background-color: rgba(0,0,0,0.05); border-radius: 8px; border-left: 3px solid #0d6efd;">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <div class="text-warning me-2">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        <i class="@(i <= latestReview.Rating ? "fas" : "far") fa-star" style="font-size: 0.8rem;"></i>
+                                                    }
+                                                </div>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user me-1"></i>@(latestReview.User?.FullName ?? latestReview.User?.UserName ?? "Anonim")
+                                                </small>
+                                                <small class="text-muted ms-auto">
+                                                    <i class="fas fa-calendar me-1"></i>@latestReview.CreatedDate.ToString("dd.MM.yyyy")
+                                                </small>
+                                            </div>
+                                            <p class="mb-0 text-muted small" style="font-style: italic;">
+                                                <i class="fas fa-quote-left me-1" style="color: #0d6efd;"></i>
+                                                @(latestReview.Comment.Length > 80 ? latestReview.Comment.Substring(0, 80) + "..." : latestReview.Comment)
+                                            </p>
+                                        </div>
+                                    }
+                                    
                                     <div class="mt-auto">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <div class="text-warning">
@@ -162,10 +203,11 @@
                                                             <i class="far fa-star"></i>
                                                         }
                                                     }
+                                                    <span class="ms-1" style="color: #2563EB; font-weight: 600;">@business.AverageRating.ToString("F1")</span>
                                                 }
                                             </div>
                                             <small class="text-muted">
-                                                <i class="fas fa-comments"></i> @business.TotalReviews @Localizer["Reviews"]
+                                                <i class="fas fa-comments"></i> @business.TotalReviews yorum
                                             </small>
                                         </div>
                                         <div class="d-flex gap-2 mb-2">
@@ -255,65 +297,6 @@
         </section>
     }
 
-    <!-- Son Haberler -->
-    @if (latestNews != null && latestNews.Any())
-    {
-        <section class="py-5" style="background-color: var(--bg-surface);">
-            <div class="container-fluid px-4">
-                <div class="row mb-5">
-                    <div class="col-12 text-center">
-                        <h2 class="display-5 fw-bold text-primary mb-3">📰 @Localizer["LatestNews"]</h2>
-                        <p class="lead text-muted">@Localizer["LatestNewsSubtitle"]</p>
-                    </div>
-                </div>
-                <div class="row">
-                    @foreach (var news in latestNews)
-                    {
-                        <div class="col-lg-4 col-md-6 mb-4">
-                            <div class="card news-card shadow-lg h-100 border-0">
-                                <div class="card-body d-flex flex-column">
-                                    <div class="news-header mb-3">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <span class="badge bg-warning text-dark">
-                                                <i class="fas fa-newspaper me-1"></i>@Localizer["News"]
-                                            </span>
-                                            <small class="text-muted">
-                                                <i class="fas fa-calendar me-1"></i>@news.PublishDate.ToString("dd MMM yyyy")
-                                            </small>
-                                        </div>
-                                        <h5 class="card-title fw-bold text-primary">@news.Title</h5>
-                                    </div>
-                                    <div class="news-content flex-grow-1">
-                                        <p class="card-text text-muted">
-                                            @if (!string.IsNullOrEmpty(news.Content))
-                                            {
-                                                @(news.Content.Length > 150 ? news.Content.Substring(0, 150) + "..." : news.Content)
-                                            }
-                                        </p>
-                                    </div>
-                                    <div class="news-footer mt-auto">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <small class="text-muted">
-                                                <i class="fas fa-user me-1"></i>@(news.Author?.UserName ?? "Admin")
-                                            </small>
-                                            <a href="@Url.Action("Index", "News")" class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-arrow-right me-1"></i>@Localizer["ReadMore"]
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-                <div class="text-center mt-4">
-                    <a href="@Url.Action("Index", "News")" class="btn btn-primary btn-lg">
-                        <i class="fas fa-newspaper me-2"></i> @Localizer["ViewAllNews"]
-                    </a>
-                </div>
-            </div>
-        </section>
-    }
 
     <!-- En Çok Beğenilen İşletmeler -->
     @if (topRatedBusinesses != null && topRatedBusinesses.Any())
@@ -367,6 +350,35 @@
                                             <li><i class="fas fa-globe"></i> <a href="@business.Website" target="_blank" class="text-decoration-none">@business.Website</a></li>
                                         }
                                     </ul>
+                                    
+                                    @* Yorumlar Bölümü *@
+                                    @{
+                                        var latestReviewTop = business.Reviews?.Where(r => r.IsActive && r.IsApproved && !string.IsNullOrEmpty(r.Comment)).OrderByDescending(r => r.CreatedDate).FirstOrDefault();
+                                    }
+                                    @if (latestReviewTop != null)
+                                    {
+                                        <div class="review-preview-card mt-3 mb-3 p-3" style="background-color: rgba(0,0,0,0.05); border-radius: 8px; border-left: 3px solid #0d6efd;">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <div class="text-warning me-2">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        <i class="@(i <= latestReviewTop.Rating ? "fas" : "far") fa-star" style="font-size: 0.8rem;"></i>
+                                                    }
+                                                </div>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user me-1"></i>@(latestReviewTop.User?.FullName ?? latestReviewTop.User?.UserName ?? "Anonim")
+                                                </small>
+                                                <small class="text-muted ms-auto">
+                                                    <i class="fas fa-calendar me-1"></i>@latestReviewTop.CreatedDate.ToString("dd.MM.yyyy")
+                                                </small>
+                                            </div>
+                                            <p class="mb-0 text-muted small" style="font-style: italic;">
+                                                <i class="fas fa-quote-left me-1" style="color: #0d6efd;"></i>
+                                                @(latestReviewTop.Comment.Length > 80 ? latestReviewTop.Comment.Substring(0, 80) + "..." : latestReviewTop.Comment)
+                                            </p>
+                                        </div>
+                                    }
+                                    
                                     <div class="mt-auto">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <div class="text-warning">
@@ -383,6 +395,7 @@
                                                             <i class="far fa-star"></i>
                                                         }
                                                     }
+                                                    <span class="ms-1" style="color: #2563EB; font-weight: 600;">@business.AverageRating.ToString("F1")</span>
                                                 }
                                             </div>
                                             <small class="text-muted">

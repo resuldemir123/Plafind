@@ -1,0 +1,381 @@
+@model Plafind.Models.Campaign?
+
+@{
+    var business = ViewBag.Business as Plafind.Models.Business;
+    var campaignTypes = ViewBag.CampaignTypes as string[] ?? new string[0];
+    var packageTypes = ViewBag.PackageTypes as string[] ?? new string[0];
+    var isEdit = Model != null && Model.Id > 0;
+    ViewData["Title"] = (isEdit ? "Kampanya Düzenle" : "Yeni Kampanya") + " - " + (business?.Name ?? "");
+    
+    // Model null ise yeni bir Campaign oluştur
+    var campaign = Model ?? new Plafind.Models.Campaign();
+}
+
+<section class="py-4">
+    <div class="container-fluid px-3 px-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold">@(isEdit ? "Kampanya Düzenle" : "Yeni Kampanya")</h2>
+                <p class="text-muted mb-0">@business?.Name</p>
+            </div>
+            <a asp-action="Campaigns" asp-route-businessId="@business?.Id" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Kampanya Listesine Dön
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Kampanya Bilgileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="CampaignForm" method="post" enctype="multipart/form-data">
+                            <input type="hidden" asp-for="Id" value="@campaign.Id" />
+                            <input type="hidden" name="BusinessId" value="@business?.Id" />
+                            
+                            <div class="mb-3">
+                                <label asp-for="Title" class="form-label">Başlık <span class="text-danger">*</span></label>
+                                @{
+                                    var campaignTemplates = ViewBag.CampaignTemplates as Dictionary<string, List<Plafind.Controllers.CampaignTemplate>>;
+                                    var categoryName = ViewBag.CategoryName as string ?? "";
+                                }
+                                @if (campaignTemplates != null && campaignTemplates.Any() && campaign.Id == 0)
+                                {
+                                    <div class="alert alert-info mb-2">
+                                        <i class="fas fa-lightbulb me-2"></i>
+                                        <strong>@categoryName</strong> kategorisi için önerilen kampanya şablonları:
+                                    </div>
+                                    <div class="row g-2 mb-2" id="campaignTemplates">
+                                        @foreach (var templateGroup in campaignTemplates)
+                                        {
+                                            @foreach (var template in templateGroup.Value)
+                                            {
+                                                <div class="col-md-6 col-lg-4">
+                                                    <div class="card border-primary template-card" style="cursor: pointer;" 
+                                                         onclick="applyTemplate('@template.Title', '@template.Description', @(template.DiscountPercentage?.ToString() ?? "null"), @(template.DiscountAmount?.ToString() ?? "null"), '@(template.PackageType ?? "")', @(template.StayNights?.ToString() ?? "null"), @(template.PayNights?.ToString() ?? "null"), @(template.MinimumPeople?.ToString() ?? "null"), @(template.MinimumPurchaseAmount?.ToString() ?? "null"), @template.IsPackageCampaign.ToString().ToLower())">
+                                                        <div class="card-body p-2">
+                                                            <h6 class="card-title mb-1 text-primary">@template.Title</h6>
+                                                            <p class="card-text small text-muted mb-1">@template.Description</p>
+                                                            @if (template.DiscountPercentage.HasValue)
+                                                            {
+                                                                <span class="badge bg-danger">%@template.DiscountPercentage İndirim</span>
+                                                            }
+                                                            @if (template.DiscountAmount.HasValue)
+                                                            {
+                                                                <span class="badge bg-warning text-dark">@template.DiscountAmount TL İndirim</span>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                    <div class="mb-2">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearTemplate()">
+                                            <i class="fas fa-times me-1"></i>Şablonları Temizle
+                                        </button>
+                                    </div>
+                                }
+                                <input asp-for="Title" class="form-control" value="@campaign.Title" required id="campaignTitle" />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                                <small class="form-text text-muted">Veya yukarıdaki şablonlardan birini seçerek otomatik doldurun</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label">Açıklama <span class="text-danger">*</span></label>
+                                <textarea asp-for="Description" class="form-control" rows="4" required>@campaign.Description</textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="CampaignType" class="form-label">Kampanya Türü <span class="text-danger">*</span></label>
+                                    <select asp-for="CampaignType" class="form-select" required onchange="updateCampaignFields()">
+                                        <option value="">Seçiniz</option>
+                                        @foreach (var type in campaignTypes)
+                                        {
+                                            if (campaign.CampaignType == type)
+                                            {
+                                                <option value="@type" selected>@type</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@type">@type</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="CampaignType" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="PackageType" class="form-label">Paket Türü</label>
+                                    <select asp-for="PackageType" class="form-select" onchange="updatePackageFields()">
+                                        <option value="">Yok</option>
+                                        @foreach (var type in packageTypes)
+                                        {
+                                            if (campaign.PackageType == type)
+                                            {
+                                                <option value="@type" selected>@type</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@type">@type</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="DiscountPercentage" class="form-label">İndirim Yüzdesi (%)</label>
+                                    <input asp-for="DiscountPercentage" type="number" step="0.01" min="0" max="100" class="form-control" value="@campaign.DiscountPercentage" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="DiscountAmount" class="form-label">İndirim Tutarı (TL)</label>
+                                    <input asp-for="DiscountAmount" type="number" step="0.01" min="0" class="form-control" value="@campaign.DiscountAmount" />
+                                </div>
+                            </div>
+
+                            <div id="packageFields" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="StayNights" class="form-label">Kalınacak Gece Sayısı (N)</label>
+                                        <input asp-for="StayNights" type="number" class="form-control" value="@campaign.StayNights" />
+                                        <small class="text-muted">Örn: "3 gece kal" için 3</small>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="PayNights" class="form-label">Ödenecek Gece Sayısı (M)</label>
+                                        <input asp-for="PayNights" type="number" class="form-control" value="@campaign.PayNights" />
+                                        <small class="text-muted">Örn: "2 öde" için 2</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="CouponCode" class="form-label">Promosyon Kodu</label>
+                                    <input asp-for="CouponCode" class="form-control" value="@campaign.CouponCode" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="MinimumPurchaseAmount" class="form-label">Minimum Tutar</label>
+                                    <input asp-for="MinimumPurchaseAmount" type="number" step="0.01" class="form-control" value="@campaign.MinimumPurchaseAmount" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="MinimumPeople" class="form-label">Minimum Kişi Sayısı</label>
+                                    <input asp-for="MinimumPeople" type="number" class="form-control" value="@campaign.MinimumPeople" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="MaxUses" class="form-label">Maksimum Kullanım (Boş = Sınırsız)</label>
+                                    <input asp-for="MaxUses" type="number" class="form-control" value="@campaign.MaxUses" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="StartDate" class="form-label">Başlangıç Tarihi <span class="text-danger">*</span></label>
+                                    <input asp-for="StartDate" type="date" class="form-control" value="@(campaign.StartDate != default(DateTime) ? campaign.StartDate.ToString("yyyy-MM-dd") : "")" required />
+                                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="EndDate" class="form-label">Bitiş Tarihi <span class="text-danger">*</span></label>
+                                    <input asp-for="EndDate" type="date" class="form-control" value="@(campaign.EndDate != default(DateTime) ? campaign.EndDate.ToString("yyyy-MM-dd") : "")" required />
+                                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Kampanya Görseli</label>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                                @if (!string.IsNullOrEmpty(campaign.ImageUrl))
+                                {
+                                    <div class="mt-2">
+                                        <img src="@campaign.ImageUrl" alt="Kampanya görseli" style="max-height: 200px;" />
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                                        <label asp-for="IsActive" class="form-check-label">Aktif</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="IsVisibleToCustomers" class="form-check-input" type="checkbox" checked="@(campaign.Id == 0 ? true : campaign.IsVisibleToCustomers)" />
+                                        <label asp-for="IsVisibleToCustomers" class="form-check-label">Müşteriler Görebilir</label>
+                                        <small class="form-text text-muted d-block">Kampanyanın müşteriler tarafından görüntülenmesini sağlar</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="IsFeatured" class="form-check-input" type="checkbox" />
+                                        <label asp-for="IsFeatured" class="form-check-label">Öne Çıkar</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Kaydet
+                                </button>
+                                <a asp-action="Campaigns" asp-route-businessId="@business?.Id" class="btn btn-outline-secondary">
+                                    İptal
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    function updateCampaignFields() {
+        const campaignType = document.getElementById('CampaignType').value;
+        // Gerekirse kampanya türüne göre alanları göster/gizle
+    }
+
+    function updatePackageFields() {
+        const packageType = document.getElementById('PackageType').value;
+        const packageFields = document.getElementById('packageFields');
+        
+        if (packageType && packageType !== '') {
+            packageFields.style.display = 'block';
+        } else {
+            packageFields.style.display = 'none';
+        }
+    }
+
+    // Şablon uygulama fonksiyonu
+    function applyTemplate(title, description, discountPercentage, discountAmount, packageType, stayNights, payNights, minimumPeople, minimumPurchaseAmount, isPackageCampaign) {
+        // Başlık ve açıklama
+        const titleInput = document.getElementById('campaignTitle') || document.querySelector('input[name="Title"]');
+        const descTextarea = document.querySelector('textarea[name="Description"]') || document.getElementById('Description');
+        
+        if (titleInput) titleInput.value = title;
+        if (descTextarea) descTextarea.value = description;
+
+        // İndirim bilgileri
+        const discountPctInput = document.querySelector('input[name="DiscountPercentage"]') || document.getElementById('DiscountPercentage');
+        const discountAmtInput = document.querySelector('input[name="DiscountAmount"]') || document.getElementById('DiscountAmount');
+        
+        if (discountPercentage && discountPercentage !== 'null' && discountPctInput) {
+            discountPctInput.value = discountPercentage;
+        }
+        if (discountAmount && discountAmount !== 'null' && discountAmtInput) {
+            discountAmtInput.value = discountAmount;
+        }
+
+        // Paket türü
+        const packageTypeSelect = document.querySelector('select[name="PackageType"]') || document.getElementById('PackageType');
+        if (packageType && packageType !== '' && packageTypeSelect) {
+            packageTypeSelect.value = packageType;
+            updatePackageFields();
+        }
+
+        // Paket detayları
+        const stayNightsInput = document.querySelector('input[name="StayNights"]') || document.getElementById('StayNights');
+        const payNightsInput = document.querySelector('input[name="PayNights"]') || document.getElementById('PayNights');
+        
+        if (stayNights && stayNights !== 'null' && stayNightsInput) {
+            stayNightsInput.value = stayNights;
+        }
+        if (payNights && payNights !== 'null' && payNightsInput) {
+            payNightsInput.value = payNights;
+        }
+
+        // Minimum kişi sayısı
+        const minPeopleInput = document.querySelector('input[name="MinimumPeople"]') || document.getElementById('MinimumPeople');
+        if (minimumPeople && minimumPeople !== 'null' && minPeopleInput) {
+            minPeopleInput.value = minimumPeople;
+        }
+
+        // Minimum tutar
+        const minPurchaseInput = document.querySelector('input[name="MinimumPurchaseAmount"]') || document.getElementById('MinimumPurchaseAmount');
+        if (minimumPurchaseAmount && minimumPurchaseAmount !== 'null' && minPurchaseInput) {
+            minPurchaseInput.value = minimumPurchaseAmount;
+        }
+
+        // Şablon kartlarını vurgula
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.classList.remove('border-success', 'bg-light');
+        });
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('border-success', 'bg-light');
+        }
+
+        // Sayfayı şablon alanına kaydır
+        if (titleInput) {
+            titleInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            titleInput.focus();
+        }
+    }
+
+    function clearTemplate() {
+        const titleInput = document.getElementById('campaignTitle') || document.querySelector('input[name="Title"]');
+        const descTextarea = document.querySelector('textarea[name="Description"]') || document.getElementById('Description');
+        const discountPctInput = document.querySelector('input[name="DiscountPercentage"]');
+        const discountAmtInput = document.querySelector('input[name="DiscountAmount"]');
+        const packageTypeSelect = document.querySelector('select[name="PackageType"]');
+        const stayNightsInput = document.querySelector('input[name="StayNights"]');
+        const payNightsInput = document.querySelector('input[name="PayNights"]');
+        const minPeopleInput = document.querySelector('input[name="MinimumPeople"]');
+        const minPurchaseInput = document.querySelector('input[name="MinimumPurchaseAmount"]');
+        
+        if (titleInput) titleInput.value = '';
+        if (descTextarea) descTextarea.value = '';
+        if (discountPctInput) discountPctInput.value = '';
+        if (discountAmtInput) discountAmtInput.value = '';
+        if (packageTypeSelect) packageTypeSelect.value = '';
+        if (stayNightsInput) stayNightsInput.value = '';
+        if (payNightsInput) payNightsInput.value = '';
+        if (minPeopleInput) minPeopleInput.value = '';
+        if (minPurchaseInput) minPurchaseInput.value = '';
+        
+        updatePackageFields();
+        
+        // Şablon kartlarını temizle
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.classList.remove('border-success', 'bg-light');
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        updatePackageFields();
+        
+        // Şablon kartlarına hover efekti
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = 'none';
+            });
+        });
+    });
+</script>
+
+<style>
+    .template-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .template-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+    }
+    .template-card.border-success {
+        border-width: 2px !important;
+    }
+</style>
+}
+

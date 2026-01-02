@@ -113,7 +113,29 @@
                                 <span><i class="fas fa-star" style="color: #2563EB;"></i>@business.AverageRating.ToString("F1")</span>
                                 <span><i class="fas fa-comment"></i>@business.TotalReviews yorum</span>
                                 <span><i class="fas fa-tag"></i>@business.Category?.Name</span>
+                                @if (!string.IsNullOrEmpty(business.PriceRange))
+                                {
+                                    <span><i class="fas fa-dollar-sign"></i>@business.PriceRange</span>
+                                }
                             </div>
+                            @if (business.Features != null && business.Features.Any())
+                            {
+                                <div class="business-features">
+                                    @foreach (var feature in business.Features.Take(3))
+                                    {
+                                        <span class="feature-badge">@feature.Name</span>
+                                    }
+                                </div>
+                            }
+                            @{
+                                var latestReview = business.Reviews?.Where(r => r.IsActive && r.IsApproved && !string.IsNullOrEmpty(r.Comment)).OrderByDescending(r => r.CreatedDate).FirstOrDefault();
+                            }
+                            @if (latestReview != null)
+                            {
+                                <div class="review-preview">
+                                    <p class="review-text">@(latestReview.Comment.Length > 60 ? latestReview.Comment.Substring(0, 60) + "..." : latestReview.Comment)</p>
+                                </div>
+                            }
                             <a asp-controller="Businesses" asp-action="Details" asp-route-id="@business.Id" class="btn btn-primary btn-sm rounded-pill">İncele</a>
                         </div>
                     </article>
@@ -137,6 +159,19 @@
                         <div>
                             <h3>@business.Name</h3>
                             <p>@business.Category?.Name</p>
+                            @if (!string.IsNullOrEmpty(business.PriceRange))
+                            {
+                                <span class="price-badge"><i class="fas fa-dollar-sign"></i>@business.PriceRange</span>
+                            }
+                            @if (business.Features != null && business.Features.Any())
+                            {
+                                <div class="business-features-compact">
+                                    @foreach (var feature in business.Features.Take(2))
+                                    {
+                                        <span class="feature-badge-small">@feature.Name</span>
+                                    }
+                                </div>
+                            }
                         </div>
                         <div class="rating">
                             <strong>@business.AverageRating.ToString("F1")</strong>
@@ -171,16 +206,38 @@
                                     {
                                         <p class="muted">@business.Category.Name</p>
                                     }
+                                    @if (!string.IsNullOrEmpty(business.PriceRange))
+                                    {
+                                        <span class="price-badge"><i class="fas fa-dollar-sign"></i>@business.PriceRange</span>
+                                    }
                                 </div>
                                 <div class="rating">
                                     <strong>@business.AverageRating.ToString("F1")</strong>
                                     <span>@business.TotalReviews yorum</span>
                                 </div>
                             </div>
+                            @if (business.Features != null && business.Features.Any())
+                            {
+                                <div class="business-features">
+                                    @foreach (var feature in business.Features.Take(4))
+                                    {
+                                        <span class="feature-badge">@feature.Name</span>
+                                    }
+                                </div>
+                            }
                             <p class="address">
                                 <i class="fas fa-map-marker-alt me-1"></i>
                                 @(string.IsNullOrWhiteSpace(business.Address) ? "Adres bilgisi eklenmemiş" : business.Address)
                             </p>
+                            @{
+                                var latestReviewBasic = business.Reviews?.Where(r => r.IsActive && r.IsApproved && !string.IsNullOrEmpty(r.Comment)).OrderByDescending(r => r.CreatedDate).FirstOrDefault();
+                            }
+                            @if (latestReviewBasic != null)
+                            {
+                                <div class="review-preview">
+                                    <p class="review-text">@(latestReviewBasic.Comment.Length > 80 ? latestReviewBasic.Comment.Substring(0, 80) + "..." : latestReviewBasic.Comment)</p>
+                                </div>
+                            }
                             <div class="card-actions">
                                 @if (!string.IsNullOrEmpty(business.Phone))
                                 {
@@ -541,6 +598,70 @@
     .empty-state p {
         color: #94A3B8 !important;
         margin: 0;
+    }
+
+    .business-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 0.75rem 0;
+    }
+
+    .feature-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: rgba(37, 99, 235, 0.15);
+        border: 1px solid rgba(37, 99, 235, 0.3);
+        border-radius: 999px;
+        font-size: 0.75rem;
+        color: #60A5FA !important;
+        font-weight: 500;
+    }
+
+    .business-features-compact {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-top: 0.5rem;
+    }
+
+    .feature-badge-small {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        background: rgba(37, 99, 235, 0.15);
+        border: 1px solid rgba(37, 99, 235, 0.3);
+        border-radius: 999px;
+        font-size: 0.7rem;
+        color: #60A5FA !important;
+        font-weight: 500;
+    }
+
+    .price-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: rgba(20, 184, 166, 0.15);
+        border: 1px solid rgba(20, 184, 166, 0.3);
+        border-radius: 999px;
+        font-size: 0.75rem;
+        color: #14B8A6 !important;
+        font-weight: 600;
+        margin-left: 0.5rem;
+    }
+
+    .review-preview {
+        margin: 0.75rem 0;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-left: 3px solid #2563EB;
+        border-radius: 0.5rem;
+    }
+
+    .review-text {
+        color: #94A3B8 !important;
+        font-size: 0.875rem;
+        font-style: italic;
+        margin: 0;
+        line-height: 1.5;
     }
 
     @@media (max-width: 768px) {

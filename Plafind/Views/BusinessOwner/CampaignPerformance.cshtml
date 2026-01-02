@@ -1,0 +1,194 @@
+@model Plafind.Models.Campaign
+
+@{
+    ViewData["Title"] = "Kampanya Performansı - " + Model.Title;
+    var performance = ViewBag.Performance as dynamic;
+    var business = Model.Business;
+}
+
+<section class="py-4">
+    <div class="container-fluid px-3 px-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold">Kampanya Performansı</h2>
+                <p class="text-muted mb-0">@Model.Title</p>
+            </div>
+            <a asp-action="Campaigns" asp-route-businessId="@business?.Id" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Kampanya Listesine Dön
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <!-- Performans İstatistikleri -->
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-white-50">Toplam Kullanım</h6>
+                        <h3 class="mb-0">@(performance?.TotalUses ?? 0)</h3>
+                        <small class="text-white-50">@(Model.MaxUses.HasValue ? $" / {Model.MaxUses}" : " / Sınırsız")</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-white-50">Toplam Gelir Etkisi</h6>
+                        <h3 class="mb-0">@((performance?.TotalRevenueImpact ?? 0).ToString("C"))</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-white-50">Ortalama İndirim</h6>
+                        <h3 class="mb-0">@((performance?.AverageDiscount ?? 0).ToString("C"))</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-white-50">Kalan Kullanım</h6>
+                        <h3 class="mb-0">@(Model.MaxUses.HasValue ? (Model.MaxUses.Value - Model.CurrentUses) : -1)</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kampanya Detayları -->
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Kampanya Detayları</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Başlangıç:</strong> @Model.StartDate.ToString("dd.MM.yyyy")</p>
+                        <p><strong>Bitiş:</strong> @Model.EndDate.ToString("dd.MM.yyyy")</p>
+                        <p><strong>Tür:</strong> @Model.CampaignType</p>
+                        @if (!string.IsNullOrEmpty(Model.CouponCode))
+                        {
+                            <p><strong>Promosyon Kodu:</strong> <span class="badge bg-primary">@Model.CouponCode</span></p>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        @if (Model.DiscountPercentage.HasValue)
+                        {
+                            <p><strong>İndirim:</strong> %@Model.DiscountPercentage</p>
+                        }
+                        @if (Model.DiscountAmount.HasValue)
+                        {
+                            <p><strong>İndirim Tutarı:</strong> @Model.DiscountAmount.Value.ToString("C")</p>
+                        }
+                        @if (Model.MinimumPurchaseAmount.HasValue)
+                        {
+                            <p><strong>Minimum Tutar:</strong> @Model.MinimumPurchaseAmount.Value.ToString("C")</p>
+                        }
+                        @if (Model.MinimumPeople.HasValue)
+                        {
+                            <p><strong>Minimum Kişi:</strong> @Model.MinimumPeople</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kullanım Geçmişi -->
+        @if (Model.Usages != null && Model.Usages.Any())
+        {
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Kullanım Geçmişi</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Kullanıcı</th>
+                                    <th>Uygulanan İndirim</th>
+                                    <th>Notlar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var usage in Model.Usages.OrderByDescending(u => u.UsedDate))
+                                {
+                                    <tr>
+                                        <td>@usage.UsedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>@(usage.User?.FullName ?? usage.User?.UserName ?? usage.UserId)</td>
+                                        <td>@(usage.DiscountApplied?.ToString("C") ?? "-")</td>
+                                        <td>@(usage.Notes ?? "-")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mt-4">
+                <i class="fas fa-info-circle me-2"></i>Henüz bu kampanya kullanılmamış.
+            </div>
+        }
+
+        <!-- Günlük Kullanım Grafiği -->
+        @if (performance?.UsageByDate != null)
+        {
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Günlük Kullanım Trendi</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="usageChart" height="80"></canvas>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    @if (performance?.UsageByDate != null)
+    {
+        <text>
+        const usageData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(performance.UsageByDate));
+        const ctx = document.getElementById('usageChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: usageData.map(d => {
+                        const date = new Date(d.date);
+                        return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
+                    }),
+                    datasets: [{
+                        label: 'Kullanım Sayısı',
+                        data: usageData.map(d => d.count),
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgb(75, 192, 192)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        </text>
+    }
+</script>
+}
+

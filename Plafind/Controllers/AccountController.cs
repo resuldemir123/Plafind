@@ -8,9 +8,11 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Plafind.Controllers
 {
+    [AllowAnonymous]
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -18,19 +20,22 @@ namespace Plafind.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ISmsService _smsService;
         private readonly IMemoryCache _cache;
+        private readonly ICompareService _compareService;
 
         public AccountController(
             UserManager<ApplicationUser> userManager, 
             SignInManager<ApplicationUser> signInManager, 
             RoleManager<IdentityRole> roleManager,
             ISmsService smsService,
-            IMemoryCache cache)
+            IMemoryCache cache,
+            ICompareService compareService)
         {
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
             _roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
             _smsService = smsService ?? throw new ArgumentNullException(nameof(smsService));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _compareService = compareService ?? throw new ArgumentNullException(nameof(compareService));
         }
 
         public IActionResult Login()
@@ -318,14 +323,6 @@ namespace Plafind.Controllers
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout()
-        {
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
-        }
-
         public IActionResult AccessDenied()
         {
             return View();
@@ -522,6 +519,21 @@ namespace Plafind.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            // Karşılaştırma listesini temizle
+            var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userId))
+            {
+                _compareService.ClearCompareList(HttpContext.Session, userId);
+            }
+
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
     }
 }

@@ -1,0 +1,399 @@
+@model IEnumerable<Plafind.Models.Reservation>
+
+@{
+    var business = ViewBag.Business as Plafind.Models.Business;
+    ViewData["Title"] = "Gelişmiş Rezervasyon Yönetimi - " + (business?.Name ?? "");
+    var status = ViewBag.Status as string ?? "all";
+    var startDate = ViewBag.StartDate as DateTime?;
+    var endDate = ViewBag.EndDate as DateTime?;
+    var channel = ViewBag.Channel as string;
+    var package = ViewBag.Package as string;
+    var customerName = ViewBag.CustomerName as string;
+    var page = ViewBag.Page as int? ?? 1;
+    var pageSize = ViewBag.PageSize as int? ?? 20;
+    var totalCount = ViewBag.TotalCount as int? ?? 0;
+    var totalPages = ViewBag.TotalPages as int? ?? 1;
+    var statuses = ViewBag.Statuses as string[] ?? new string[0];
+    var channels = ViewBag.Channels as List<string> ?? new List<string>();
+    var packages = ViewBag.Packages as List<string> ?? new List<string>();
+}
+
+<section class="py-4">
+    <div class="container-fluid px-3 px-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold">Gelişmiş Rezervasyon Yönetimi</h2>
+                <p class="text-muted mb-0">@business?.Name - Filtreli rezervasyon listesi</p>
+            </div>
+            <div>
+                <a asp-action="ReservationsCalendar" asp-route-businessId="@business?.Id" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-calendar me-1"></i>Takvim Görünümü
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>İşletmelerime Dön
+                </a>
+            </div>
+        </div>
+
+        <!-- Filtreler -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtreler</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" asp-action="ReservationsAdvanced" asp-route-businessId="@business?.Id">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Durum</label>
+                            <select name="status" class="form-select">
+                                @if (status == "all")
+                                {
+                                    <option value="all" selected>Tümü</option>
+                                }
+                                else
+                                {
+                                    <option value="all">Tümü</option>
+                                }
+                                @foreach (var s in statuses)
+                                {
+                                    if (status == s)
+                                    {
+                                        <option value="@s" selected>@s</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@s">@s</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Başlangıç Tarihi</label>
+                            <input type="date" name="startDate" class="form-control" value="@(startDate?.ToString("yyyy-MM-dd"))" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Bitiş Tarihi</label>
+                            <input type="date" name="endDate" class="form-control" value="@(endDate?.ToString("yyyy-MM-dd"))" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Kanal</label>
+                            <select name="channel" class="form-select">
+                                <option value="">Tümü</option>
+                                @foreach (var c in channels)
+                                {
+                                    if (channel == c)
+                                    {
+                                        <option value="@c" selected>@c</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@c">@c</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Paket</label>
+                            <select name="package" class="form-select">
+                                <option value="">Tümü</option>
+                                @foreach (var p in packages)
+                                {
+                                    if (package == p)
+                                    {
+                                        <option value="@p" selected>@p</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@p">@p</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Müşteri Adı/Arama</label>
+                            <input type="text" name="customerName" class="form-control" value="@customerName" placeholder="Müşteri adı, telefon, email..." />
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Filtrele
+                            </button>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <a asp-action="ReservationsAdvanced" asp-route-businessId="@business?.Id" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-redo me-2"></i>Temizle
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Rezervasyon Listesi -->
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>Filtre kriterlerinize uygun rezervasyon bulunamadı.
+            </div>
+        }
+        else
+        {
+            <div class="card">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Rezervasyonlar (@totalCount adet)</h5>
+                        <div>
+                            <a href="@Url.Action("ReservationsCalendar", new { businessId = business?.Id })" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-calendar me-1"></i>Takvim Görünümü
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tarih/Saat</th>
+                                    <th>Müşteri</th>
+                                    <th>İletişim</th>
+                                    <th>Kişi</th>
+                                    <th>Durum</th>
+                                    <th>Kanal</th>
+                                    <th>Ödeme</th>
+                                    <th>Etiketler</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var r in Model)
+                                {
+                                    <tr class="@(r.IsNoShow ? "table-danger" : r.Status == "Onaylandı" ? "table-success" : r.Status == "İptal Edildi" ? "table-secondary" : "")">
+                                        <td>
+                                            <strong>@r.RequestedDate.ToString("dd.MM.yyyy")</strong><br>
+                                            <small class="text-muted">@r.RequestedTime.ToString(@"hh\:mm")</small>
+                                            @if (r.CheckInDate.HasValue)
+                                            {
+                                                <br><small class="text-success"><i class="fas fa-sign-in-alt"></i> @r.CheckInDate.Value.ToString("dd.MM.yyyy")</small>
+                                            }
+                                        </td>
+                                        <td>
+                                            @{
+                                                var customerNameDisplay = r.Customer?.FullName 
+                                                    ?? r.User?.FullName 
+                                                    ?? r.User?.UserName 
+                                                    ?? r.ContactEmail 
+                                                    ?? r.ContactPhone 
+                                                    ?? "-";
+                                            }
+                                            <i class="fas fa-user me-1"></i>@customerNameDisplay
+                                            @if (r.Customer?.IsVIP == true)
+                                            {
+                                                <span class="badge bg-warning ms-1">VIP</span>
+                                            }
+                                            @if (r.Customer?.IsReturning == true)
+                                            {
+                                                <span class="badge bg-info ms-1">Tekrar Gelen</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(r.ContactEmail))
+                                            {
+                                                <div><i class="fas fa-envelope me-1 text-primary"></i><a href="mailto:@r.ContactEmail">@r.ContactEmail</a></div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(r.ContactPhone))
+                                            {
+                                                <div><i class="fas fa-phone me-1 text-success"></i><a href="tel:@r.ContactPhone">@r.ContactPhone</a></div>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-users me-1"></i>@r.NumberOfPeople
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if (r.Status == "Onaylandı")
+                                            {
+                                                <span class="badge bg-success">@r.Status</span>
+                                            }
+                                            else if (r.Status == "Reddedildi" || r.Status == "İptal Edildi")
+                                            {
+                                                <span class="badge bg-danger">@r.Status</span>
+                                            }
+                                            else if (r.Status == "No-Show")
+                                            {
+                                                <span class="badge bg-dark">No-Show</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">@r.Status</span>
+                                            }
+                                            @if (r.IsNoShow)
+                                            {
+                                                <br><small class="text-danger"><i class="fas fa-exclamation-triangle"></i> No-Show</small>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(r.Channel))
+                                            {
+                                                <span class="badge bg-secondary">@r.Channel</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (r.Amount.HasValue)
+                                            {
+                                                <div><strong>@r.Amount.Value.ToString("C")</strong></div>
+                                                @if (r.IsPrePaymentReceived)
+                                                {
+                                                    <small class="text-success">Ön ödeme: @(r.PrePaymentAmount?.ToString("C") ?? "-")</small>
+                                                }
+                                                @if (r.IsFullPaymentReceived)
+                                                {
+                                                    <small class="text-success"><i class="fas fa-check"></i> Ödendi</small>
+                                                }
+                                                else if (r.RemainingAmount.HasValue)
+                                                {
+                                                    <small class="text-warning">Kalan: @r.RemainingAmount.Value.ToString("C")</small>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(r.Tags))
+                                            {
+                                                var tags = r.Tags.Split(',');
+                                                @foreach (var tag in tags)
+                                                {
+                                                    <span class="badge bg-primary me-1">@tag.Trim()</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group-vertical btn-group-sm" role="group">
+                                                <a asp-action="ReservationDetails" asp-route-id="@r.Id" class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-eye"></i> Detay
+                                                </a>
+                                                @if (r.Status == "Beklemede")
+                                                {
+                                                    <button type="button" class="btn btn-success btn-sm" onclick="approveReservation(@r.Id)">
+                                                        <i class="fas fa-check"></i> Onayla
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="cancelReservation(@r.Id)">
+                                                        <i class="fas fa-times"></i> İptal
+                                                    </button>
+                                                }
+                                                @if (r.Status == "Onaylandı" && !r.IsNoShow)
+                                                {
+                                                    <button type="button" class="btn btn-dark btn-sm" onclick="markNoShow(@r.Id)">
+                                                        <i class="fas fa-user-slash"></i> No-Show
+                                                    </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                @if (totalPages > 1)
+                {
+                    <div class="card-footer">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                @for (int i = 1; i <= totalPages; i++)
+                                {
+                                    <li class="page-item @(i == page ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("ReservationsAdvanced", new { businessId = business?.Id, status, startDate = startDate?.ToString("yyyy-MM-dd"), endDate = endDate?.ToString("yyyy-MM-dd"), channel, package, customerName, page = i })">@i</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    function approveReservation(id) {
+        if (!confirm('Bu rezervasyonu onaylamak istediğinizden emin misiniz?')) return;
+        
+        fetch('@Url.Action("ApproveReservationAdvanced")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message || 'Bir hata oluştu');
+            }
+        });
+    }
+
+    function cancelReservation(id) {
+        const reason = prompt('İptal nedeni (opsiyonel):');
+        if (reason === null) return; // Kullanıcı iptal etti
+        
+        fetch('@Url.Action("CancelReservationAdvanced")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify({ id: id, reason: reason })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message || 'Bir hata oluştu');
+            }
+        });
+    }
+
+    function markNoShow(id) {
+        if (!confirm('Bu rezervasyonu No-Show olarak işaretlemek istediğinizden emin misiniz?')) return;
+        
+        fetch('@Url.Action("MarkNoShow")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message || 'Bir hata oluştu');
+            }
+        });
+    }
+</script>
+}
+

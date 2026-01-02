@@ -177,69 +177,51 @@ namespace Plafind.Data
                 await context.SaveChangesAsync();
             }
 
-            // Haber kontrolü ve ekleme
-            if (!await context.News.AnyAsync())
+            // Tüm işletmelere varsayılan fiyat aralığı ata (eğer yoksa)
+            var businessesWithoutPriceRange = await context.Businesses
+                .Where(b => string.IsNullOrEmpty(b.PriceRange))
+                .ToListAsync();
+
+            if (businessesWithoutPriceRange.Any())
             {
-                var news = new List<News>
+                var random = new Random();
+                var priceRanges = new[] { "$", "$$", "$$$", "$$$$" };
+                
+                foreach (var business in businessesWithoutPriceRange)
                 {
-                    new News 
-                    { 
-                        Title = "Alanya'da Turizm Sezonu Rekor Kırdı", 
-                        Content = "2024 yılı turizm sezonunda Alanya, geçen yıla göre %15 artışla 2.5 milyon turist ağırladı. Özellikle Avrupa'dan gelen turist sayısında önemli artış görülürken, şehirdeki otel doluluk oranları %85'i aştı. Alanya Belediye Başkanı, bu başarının şehrin turizm altyapısındaki yatırımların sonucu olduğunu belirtti.",
-                        PublishDate = DateTime.Now.AddDays(-1),
-                        AuthorId = null
-                    },
-                    new News 
-                    { 
-                        Title = "Kleopatra Plajı'nda Yeni Aktivite Merkezi Açıldı", 
-                        Content = "Alanya'nın ünlü Kleopatra Plajı'nda yeni bir su sporları ve aktivite merkezi hizmete girdi. Merkezde dalış, jet ski, parasailing ve su kayağı gibi aktiviteler sunuluyor. Merkez müdürü, güvenlik önlemlerinin en üst seviyede tutulduğunu ve deneyimli eğitmenlerle hizmet verdiklerini açıkladı.",
-                        PublishDate = DateTime.Now.AddDays(-3),
-                        AuthorId = null
-                    },
-                    new News 
-                    { 
-                        Title = "Alanya Kalesi'nde Restorasyon Çalışmaları Tamamlandı", 
-                        Content = "UNESCO Dünya Mirası Geçici Listesi'nde yer alan Alanya Kalesi'nde yapılan restorasyon çalışmaları başarıyla tamamlandı. 2 yıl süren çalışmalar sonucunda kale surları ve iç yapılar güçlendirildi. Kale müzesi de yenilendi ve ziyaretçilere daha iyi hizmet verecek şekilde düzenlendi.",
-                        PublishDate = DateTime.Now.AddDays(-5),
-                        AuthorId = null
-                    },
-                    new News 
-                    { 
-                        Title = "Alanya'da Gastronomi Festivali Düzenlendi", 
-                        Content = "Alanya Belediyesi tarafından düzenlenen 3. Uluslararası Gastronomi Festivali büyük ilgi gördü. Festivalde yerel lezzetler tanıtılırken, dünyaca ünlü şefler de katılımcılara özel menüler sundu. Festival kapsamında 50'den fazla restoran ve kafe stant açtı.",
-                        PublishDate = DateTime.Now.AddDays(-7),
-                        AuthorId = null
-                    },
-                    new News 
-                    { 
-                        Title = "Alanya Havalimanı'na Yeni Uçuş Seferleri", 
-                        Content = "Gazipaşa-Alanya Havalimanı'na yeni uçuş seferleri eklendi. Almanya'nın Frankfurt ve Münih şehirlerinden direkt uçuşlar başladı. Ayrıca İngiltere'nin Manchester şehrinden de charter uçuşlar düzenlenecek. Bu gelişmelerle Alanya'nın turizm potansiyeli daha da artacak.",
-                        PublishDate = DateTime.Now.AddDays(-10),
-                        AuthorId = null
-                    },
-                    new News 
-                    { 
-                        Title = "Alanya'da Sürdürülebilir Turizm Projesi Başlatıldı", 
-                        Content = "Alanya Belediyesi ve çevre örgütleri işbirliğiyle sürdürülebilir turizm projesi hayata geçirildi. Proje kapsamında plajlarda çevre dostu uygulamalar başlatılırken, otellerde enerji tasarrufu önlemleri alınıyor. Ayrıca turistlere çevre bilinci konusunda eğitimler verilecek.",
-                        PublishDate = DateTime.Now.AddDays(-12),
-                        AuthorId = null
-                    },
-                    new News 
-                    { 
-                        Title = "Alanya Marina'sında Yeni Tekne Turları", 
-                        Content = "Alanya Marina'sında hizmet veren tekne turu şirketleri, yeni rotalar ekledi. Antalya'nın Kaş ve Kalkan bölgelerine günlük turlar düzenlenirken, Akdeniz'in en güzel koylarına da özel turlar organize ediliyor. Teknelerde güvenlik ekipmanları ve deneyimli kaptanlar bulunuyor.",
-                        PublishDate = DateTime.Now.AddDays(-15),
-                        AuthorId = null
-                    },
-                    new News 
-                    { 
-                        Title = "Alanya'da Kültür ve Sanat Merkezi Açıldı", 
-                        Content = "Alanya'nın merkezinde yeni bir kültür ve sanat merkezi hizmete girdi. Merkezde sergi salonları, konferans salonu ve sanat atölyeleri bulunuyor. İlk sergi olarak 'Alanya'nın Tarihi' konulu fotoğraf sergisi açıldı. Merkez, yerel sanatçılara da destek veriyor.",
-                        PublishDate = DateTime.Now.AddDays(-18),
-                        AuthorId = null
+                    // Kategoriye göre varsayılan fiyat aralığı belirle
+                    if (business.Category != null)
+                    {
+                        switch (business.Category.Name)
+                        {
+                            case "Otel":
+                                business.PriceRange = priceRanges[random.Next(2, 4)]; // $$ veya $$$ veya $$$$
+                                break;
+                            case "Restoran":
+                                business.PriceRange = priceRanges[random.Next(1, 4)]; // $ veya $$ veya $$$ veya $$$$
+                                break;
+                            case "Spa & Wellness":
+                                business.PriceRange = priceRanges[random.Next(2, 4)]; // $$ veya $$$ veya $$$$
+                                break;
+                            case "Mağaza":
+                                business.PriceRange = priceRanges[random.Next(1, 4)]; // $ veya $$ veya $$$ veya $$$$
+                                break;
+                            case "Kafe":
+                                business.PriceRange = priceRanges[random.Next(1, 3)]; // $ veya $$
+                                break;
+                            default:
+                                business.PriceRange = priceRanges[random.Next(1, 3)]; // $ veya $$
+                                break;
+                        }
                     }
-                };
-                await context.News.AddRangeAsync(news);
+                    else
+                    {
+                        // Kategori yoksa rastgele bir fiyat aralığı ata
+                        business.PriceRange = priceRanges[random.Next(0, 4)];
+                    }
+                }
+
+                context.Businesses.UpdateRange(businessesWithoutPriceRange);
                 await context.SaveChangesAsync();
             }
         }

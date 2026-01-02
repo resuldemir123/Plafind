@@ -9,6 +9,7 @@ namespace Plafind.Models
         public int DisplayOrder { get; set; } = 0;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public bool IsActive { get; set; } = true;
+        public bool IsApproved { get; set; } = false; // Admin onayı için
 
         // Navigation property
         public Review? Review { get; set; }

@@ -162,6 +162,25 @@
 
 <div class="user-dashboard">
     <div class="container-fluid">
+        <!-- AI Recommendation Banner -->
+        <div class="recommendation-banner card shadow-lg mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+            <div class="card-body text-white p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h3 class="mb-2">
+                            <i class="fas fa-magic me-2"></i>Bugün Ne Yapsam?
+                        </h3>
+                        <p class="mb-0">AI destekli kişiselleştirilmiş işletme önerileri ile Alanya'da harika bir gün geçirin</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="@Url.Action("Index", "Recommendation")" class="btn btn-light btn-lg">
+                            <i class="fas fa-sparkles me-2"></i>Önerileri Al
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Header -->
         <div class="dashboard-header">
             <div class="d-flex justify-content-between align-items-center flex-wrap">

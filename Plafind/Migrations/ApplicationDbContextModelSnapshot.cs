@@ -529,6 +529,10 @@ namespace Plafind.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("AverageDiscountApplied")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("BusinessId")
                         .HasColumnType("int");
 
@@ -556,7 +560,8 @@ namespace Plafind.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<decimal?>("DiscountAmount")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("DiscountPercentage")
                         .HasPrecision(18, 2)
@@ -578,26 +583,58 @@ namespace Plafind.Migrations
                     b.Property<bool>("IsFeatured")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<bool>("IsVisibleToCustomers")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int?>("MaxUses")
                         .HasColumnType("int");
 
                     b.Property<int?>("MaxUsesPerUser")
                         .HasColumnType("int");
 
+                    b.Property<int?>("MinimumPeople")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("MinimumPurchaseAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("PackageType")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<int?>("PayNights")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("StayNights")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
+                    b.Property<decimal>("TotalRevenueImpact")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ValidDates")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("ValidDaysOfWeek")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("ValidProducts")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.HasKey("Id");
 
@@ -658,6 +695,78 @@ namespace Plafind.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("Plafind.Models.Collection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsFeatured")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("IsFeatured");
+
+                    b.ToTable("Collections");
+                });
+
+            modelBuilder.Entity("Plafind.Models.CollectionBusiness", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BusinessId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CollectionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessId");
+
+                    b.HasIndex("CollectionId", "BusinessId")
+                        .IsUnique();
+
+                    b.ToTable("CollectionBusinesses");
                 });
 
             modelBuilder.Entity("Plafind.Models.ContactMessage", b =>
@@ -742,6 +851,83 @@ namespace Plafind.Migrations
                     b.ToTable("Conversations");
                 });
 
+            modelBuilder.Entity("Plafind.Models.Customer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BusinessId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTime?>("FirstVisitDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<bool>("HasIssues")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsReturning")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsVIP")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime?>("LastVisitDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Segment")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Tags")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<int>("TotalReservations")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalSpent")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Customers");
+                });
+
             modelBuilder.Entity("Plafind.Models.CustomerInteraction", b =>
                 {
                     b.Property<int>("Id")
@@ -762,6 +948,9 @@ namespace Plafind.Migrations
                     b.Property<string>("CustomerId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
+
+                    b.Property<int?>("CustomerId1")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("InteractionDate")
                         .HasColumnType("datetime(6)");
@@ -801,6 +990,8 @@ namespace Plafind.Migrations
                     b.HasIndex("BusinessId");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("CustomerId1");
 
                     b.HasIndex("RelatedMessageId");
 
@@ -1059,51 +1250,6 @@ namespace Plafind.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("Plafind.Models.News", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AuthorId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ExternalSource")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("IsExternal")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<DateTime>("PublishDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("SourceUrl")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<int?>("ViewCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
-
-                    b.ToTable("News");
-                });
-
             modelBuilder.Entity("Plafind.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -1325,6 +1471,82 @@ namespace Plafind.Migrations
                     b.ToTable("Permissions");
                 });
 
+            modelBuilder.Entity("Plafind.Models.Pricing", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BasePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("BusinessId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal?>("HolidayPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int?>("MaxPeople")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MinPeople")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<decimal?>("PricePerHour")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PricePerNight")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PricePerPerson")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PricingType")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal?>("WeekendPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessId");
+
+                    b.ToTable("Pricings");
+                });
+
             modelBuilder.Entity("Plafind.Models.Reservation", b =>
                 {
                     b.Property<int>("Id")
@@ -1346,6 +1568,22 @@ namespace Plafind.Migrations
                     b.Property<int>("BusinessId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Channel")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime?>("CheckInDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<TimeSpan?>("CheckInTime")
+                        .HasColumnType("time(6)");
+
+                    b.Property<DateTime?>("CheckOutDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<TimeSpan?>("CheckOutTime")
+                        .HasColumnType("time(6)");
+
                     b.Property<string>("ContactEmail")
                         .HasColumnType("longtext");
 
@@ -1355,11 +1593,42 @@ namespace Plafind.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsFullPaymentReceived")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsNoShow")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsPrePaymentReceived")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime?>("NoShowDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Notes")
                         .HasColumnType("longtext");
 
                     b.Property<int>("NumberOfPeople")
                         .HasColumnType("int");
+
+                    b.Property<string>("OwnerNotes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<string>("PackageName")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<decimal?>("PrePaymentAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("RemainingAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("RequestedDate")
                         .HasColumnType("datetime(6)");
@@ -1370,8 +1639,22 @@ namespace Plafind.Migrations
                     b.Property<DateTime>("ReservationDate")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("SpecialRequests")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
                     b.Property<string>("Status")
                         .HasColumnType("longtext");
+
+                    b.Property<string>("Tags")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTime?>("TourEndTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("TourStartTime")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime(6)");
@@ -1384,6 +1667,8 @@ namespace Plafind.Migrations
                     b.HasIndex("BranchId");
 
                     b.HasIndex("BusinessId");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("UserId");
 
@@ -1419,8 +1704,17 @@ namespace Plafind.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ServiceRating")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TasteRating")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .HasColumnType("varchar(255)");
+
+                    b.Property<int?>("ValueRating")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -1455,6 +1749,9 @@ namespace Plafind.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsApproved")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<int>("ReviewId")
@@ -1878,6 +2175,25 @@ namespace Plafind.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Plafind.Models.CollectionBusiness", b =>
+                {
+                    b.HasOne("Plafind.Models.Business", "Business")
+                        .WithMany()
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Plafind.Models.Collection", "Collection")
+                        .WithMany("CollectionBusinesses")
+                        .HasForeignKey("CollectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Business");
+
+                    b.Navigation("Collection");
+                });
+
             modelBuilder.Entity("Plafind.Models.Conversation", b =>
                 {
                     b.HasOne("Plafind.Models.ApplicationUser", "User1")
@@ -1897,6 +2213,24 @@ namespace Plafind.Migrations
                     b.Navigation("User2");
                 });
 
+            modelBuilder.Entity("Plafind.Models.Customer", b =>
+                {
+                    b.HasOne("Plafind.Models.Business", "Business")
+                        .WithMany()
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Plafind.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Business");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Plafind.Models.CustomerInteraction", b =>
                 {
                     b.HasOne("Plafind.Models.Business", "Business")
@@ -1910,6 +2244,10 @@ namespace Plafind.Migrations
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Plafind.Models.Customer", null)
+                        .WithMany("Interactions")
+                        .HasForeignKey("CustomerId1");
 
                     b.HasOne("Plafind.Models.Message", "RelatedMessage")
                         .WithMany()
@@ -2018,16 +2356,6 @@ namespace Plafind.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("Plafind.Models.News", b =>
-                {
-                    b.HasOne("Plafind.Models.ApplicationUser", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Author");
-                });
-
             modelBuilder.Entity("Plafind.Models.Notification", b =>
                 {
                     b.HasOne("Plafind.Models.ApplicationUser", "User")
@@ -2068,6 +2396,17 @@ namespace Plafind.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Plafind.Models.Pricing", b =>
+                {
+                    b.HasOne("Plafind.Models.Business", "Business")
+                        .WithMany()
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Business");
+                });
+
             modelBuilder.Entity("Plafind.Models.Reservation", b =>
                 {
                     b.HasOne("Plafind.Models.Branch", "Branch")
@@ -2081,6 +2420,11 @@ namespace Plafind.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Plafind.Models.Customer", "Customer")
+                        .WithMany("Reservations")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Plafind.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
@@ -2088,6 +2432,8 @@ namespace Plafind.Migrations
                     b.Navigation("Branch");
 
                     b.Navigation("Business");
+
+                    b.Navigation("Customer");
 
                     b.Navigation("User");
                 });
@@ -2301,6 +2647,18 @@ namespace Plafind.Migrations
             modelBuilder.Entity("Plafind.Models.Category", b =>
                 {
                     b.Navigation("Businesses");
+                });
+
+            modelBuilder.Entity("Plafind.Models.Collection", b =>
+                {
+                    b.Navigation("CollectionBusinesses");
+                });
+
+            modelBuilder.Entity("Plafind.Models.Customer", b =>
+                {
+                    b.Navigation("Interactions");
+
+                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("Plafind.Models.Event", b =>

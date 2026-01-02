@@ -1,0 +1,319 @@
+@{
+    ViewData["Title"] = "Bugün Ne Yapsam? - Kişiselleştirilmiş Öneriler";
+}
+
+<div class="recommendation-page">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="recommendation-header text-center mb-5">
+                    <h1 class="display-5 fw-bold mb-3" style="color: var(--text-title);">
+                        <i class="fas fa-magic me-3" style="color: var(--color-primary);"></i>Bugün Ne Yapsam?
+                    </h1>
+                    <p class="lead" style="color: var(--text-muted);">
+                        Size özel hazırlanmış işletme önerileri ile Alanya'da harika bir gün geçirin
+                    </p>
+                </div>
+
+                <!-- Filtreler -->
+                <div class="recommendation-filters card shadow-lg mb-4" style="background: var(--bg-surface); border-color: var(--border-color);">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" style="color: var(--text-default);">Zaman Dilimi</label>
+                                <select id="timeOfDay" class="form-select">
+                                    <option value="">Şu anki saat</option>
+                                    <option value="Sabah">Sabah (06:00 - 12:00)</option>
+                                    <option value="Öğlen">Öğlen (12:00 - 17:00)</option>
+                                    <option value="Akşamüstü">Akşamüstü (17:00 - 21:00)</option>
+                                    <option value="Akşam">Akşam (21:00 - 24:00)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold" style="color: var(--text-default);">Hava Durumu</label>
+                                <select id="weather" class="form-select">
+                                    <option value="Güneşli">Güneşli</option>
+                                    <option value="Bulutlu">Bulutlu</option>
+                                    <option value="Yağmurlu">Yağmurlu</option>
+                                    <option value="Rüzgarlı">Rüzgarlı</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button id="getRecommendations" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-sparkles me-2"></i>Önerileri Al
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="text-center py-5" style="display: none;">
+                    <div class="spinner-border" role="status" style="width: 3rem; height: 3rem; color: var(--color-primary);">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                    <p class="mt-3" style="color: var(--text-muted);">AI önerilerinizi hazırlıyor...</p>
+                </div>
+
+                <!-- Recommendation Results -->
+                <div id="recommendationResults" style="display: none;">
+                    <!-- Recommendation Text -->
+                    <div class="recommendation-text card shadow-lg mb-4" style="background: var(--bg-surface); border-color: var(--border-color);">
+                        <div class="card-body">
+                            <h3 class="card-title mb-3" style="color: var(--text-title);">
+                                <i class="fas fa-robot me-2" style="color: var(--color-primary);"></i>Size Özel Öneriler
+                            </h3>
+                            <div id="recommendationText" class="recommendation-content"></div>
+                        </div>
+                    </div>
+
+                    <!-- Recommended Businesses -->
+                    <div class="recommended-businesses">
+                        <h4 class="mb-4" style="color: var(--text-title);">
+                            <i class="fas fa-star me-2" style="color: var(--color-warning);"></i>Önerilen İşletmeler
+                        </h4>
+                        <div id="businessesGrid" class="row g-4"></div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="errorState" class="alert alert-danger" style="display: none; background: var(--color-danger-soft); border-color: var(--color-danger); color: #FFFFFF;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="errorMessage"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .recommendation-page {
+        background: var(--bg-body);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .recommendation-header h1 {
+        color: var(--text-title);
+    }
+
+    .recommendation-filters {
+        background: var(--bg-surface);
+        border-color: var(--border-color);
+        border-radius: 15px;
+    }
+
+    .recommendation-text {
+        background: var(--bg-surface);
+        border-color: var(--border-color);
+        border-radius: 15px;
+    }
+
+    .recommendation-content {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-body);
+        white-space: pre-wrap;
+    }
+
+    .business-card-recommendation {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        height: 100%;
+    }
+
+    .business-card-recommendation:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--color-primary);
+    }
+
+    .business-card-image {
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        background-color: var(--bg-surface);
+    }
+
+    .business-card-body {
+        padding: 1.5rem;
+        background: var(--bg-surface);
+    }
+
+    .business-card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-title);
+        margin-bottom: 0.5rem;
+    }
+
+    .business-card-category {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .business-card-reason {
+        color: var(--text-body);
+        font-size: 0.95rem;
+        font-style: italic;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: rgba(37, 99, 235, 0.1);
+        border-left: 3px solid var(--color-primary);
+        border-radius: 5px;
+    }
+
+    .business-card-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .rating-stars {
+        color: var(--color-warning);
+        font-size: 1rem;
+    }
+
+    .recommended-businesses h4 {
+        color: var(--text-title);
+    }
+
+    .business-card-category {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .business-card-category i {
+        color: var(--color-primary);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const getRecommendationsBtn = document.getElementById('getRecommendations');
+        const loadingState = document.getElementById('loadingState');
+        const recommendationResults = document.getElementById('recommendationResults');
+        const errorState = document.getElementById('errorState');
+        const errorMessage = document.getElementById('errorMessage');
+
+        getRecommendationsBtn.addEventListener('click', async function() {
+            const timeOfDay = document.getElementById('timeOfDay').value;
+            const weather = document.getElementById('weather').value;
+
+            // UI durumlarını ayarla
+            loadingState.style.display = 'block';
+            recommendationResults.style.display = 'none';
+            errorState.style.display = 'none';
+            getRecommendationsBtn.disabled = true;
+            getRecommendationsBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Hazırlanıyor...';
+
+            try {
+                const response = await fetch('@Url.Action("GetRecommendations", "Recommendation")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({
+                        timeOfDay: timeOfDay,
+                        weather: weather
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Öneri metnini göster
+                    document.getElementById('recommendationText').textContent = data.recommendationText;
+
+                    // İşletmeleri göster
+                    const businessesGrid = document.getElementById('businessesGrid');
+                    businessesGrid.innerHTML = '';
+
+                    if (data.recommendedBusinesses && data.recommendedBusinesses.length > 0) {
+                        data.recommendedBusinesses.forEach(function(business) {
+                            const businessCard = createBusinessCard(business);
+                            businessesGrid.appendChild(businessCard);
+                        });
+                    }
+
+                    loadingState.style.display = 'none';
+                    recommendationResults.style.display = 'block';
+                } else {
+                    throw new Error(data.message || 'Öneriler alınırken bir hata oluştu');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = error.message || 'Öneriler alınırken bir hata oluştu. Lütfen tekrar deneyin.';
+                loadingState.style.display = 'none';
+                errorState.style.display = 'block';
+            } finally {
+                getRecommendationsBtn.disabled = false;
+                getRecommendationsBtn.innerHTML = '<i class="fas fa-sparkles me-2"></i>Önerileri Al';
+            }
+        });
+
+        function createBusinessCard(business) {
+            const col = document.createElement('div');
+            col.className = 'col-md-6 col-lg-4';
+
+            const card = document.createElement('div');
+            card.className = 'business-card-recommendation';
+
+            // Property adları hem camelCase hem PascalCase destekliyor
+            const imageUrl = business.imageUrl || business.ImageUrl || '/images/190_alanya.jpg';
+            const rating = business.rating || business.Rating || 0;
+            const totalReviews = business.totalReviews || business.TotalReviews || 0;
+            const priceRange = business.priceRange || business.PriceRange || '';
+            const businessName = business.businessName || business.BusinessName || 'İsimsiz';
+            const category = business.category || business.Category || 'Kategori yok';
+            const reason = business.reason || business.Reason || 'Size uygun bir seçenek';
+            const businessId = business.businessId || business.BusinessId || 0;
+            
+            const stars = '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating));
+
+            card.innerHTML = `
+                <div class="business-card-image" style="background-image: url('${imageUrl}')"></div>
+                <div class="business-card-body">
+                    <h5 class="business-card-title">${escapeHtml(businessName)}</h5>
+                    <p class="business-card-category">
+                        <i class="fas fa-tag me-1"></i>${escapeHtml(category)}
+                    </p>
+                    ${priceRange ? `<div class="mb-2"><span class="badge" style="background: rgba(20, 184, 166, 0.15); color: var(--color-accent); border: 1px solid rgba(20, 184, 166, 0.3); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.85rem;"><i class="fas fa-dollar-sign me-1"></i>${escapeHtml(priceRange)}</span></div>` : ''}
+                    <div class="business-card-reason">
+                        <i class="fas fa-lightbulb me-2" style="color: var(--color-warning);"></i>${escapeHtml(reason)}
+                    </div>
+                    <div class="business-card-rating">
+                        <span class="rating-stars">${stars}</span>
+                        <span style="color: var(--text-muted);">${rating.toFixed(1)}</span>
+                        <span style="color: var(--text-muted); margin-left: 0.75rem;">
+                            <i class="fas fa-comment me-1"></i>${totalReviews} yorum
+                        </span>
+                    </div>
+                    <a href="/Businesses/Details/${businessId}" class="btn btn-primary btn-sm w-100 mt-2">
+                        <i class="fas fa-eye me-1"></i>Detayları Gör
+                    </a>
+                </div>
+            `;
+
+            col.appendChild(card);
+            return col;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    });
+</script>
+

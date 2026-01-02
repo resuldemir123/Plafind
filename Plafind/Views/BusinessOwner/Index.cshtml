@@ -7,21 +7,126 @@
 
 <section class="py-4">
     <div class="container-fluid px-3 px-md-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="fw-bold">İşletme Sahibi Paneli</h2>
-                <p class="text-muted mb-0">İşletmelerinizi yönetin, rezervasyonları görüntüleyin</p>
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="fw-bold mb-1">İşletme Sahibi Paneli</h2>
+                    <p class="text-muted mb-0">İşletmelerinizi yönetin, rezervasyonları görüntüleyin ve analiz edin</p>
+                </div>
             </div>
-            <a asp-action="Create" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Yeni İşletme Ekle
-            </a>
+            
+            <!-- Hızlı Erişim Butonları -->
+            <div class="row g-3 mb-4">
+                <div class="col-lg-3 col-md-6">
+                    <a asp-action="Create" class="card text-decoration-none h-100 border-primary shadow-sm hover-lift">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-plus fa-2x"></i>
+                                </div>
+                            </div>
+                            <h5 class="card-title mb-0">Yeni İşletme Ekle</h5>
+                            <p class="text-muted small mb-0 mt-2">Yeni bir işletme kaydı oluştur</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <a asp-action="Create" class="card text-decoration-none h-100 border-success shadow-sm hover-lift">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-store fa-2x"></i>
+                                </div>
+                            </div>
+                            <h5 class="card-title mb-0">İşletme Oluştur</h5>
+                            <p class="text-muted small mb-0 mt-2">Detaylı işletme oluşturma formu</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <a href="@Url.Action("Search", "Home")" class="card text-decoration-none h-100 border-info shadow-sm hover-lift">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-search fa-2x"></i>
+                                </div>
+                            </div>
+                            <h5 class="card-title mb-0">İşletme Ara</h5>
+                            <p class="text-muted small mb-0 mt-2">Tüm işletmeleri keşfet</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <a href="@Url.Action("Index", "Home")" class="card text-decoration-none h-100 border-warning shadow-sm hover-lift">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-home fa-2x"></i>
+                                </div>
+                            </div>
+                            <h5 class="card-title mb-0">Ana Sayfa</h5>
+                            <p class="text-muted small mb-0 mt-2">Ana sayfaya dön</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
+        
+        <style>
+            .hover-lift {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .hover-lift:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+            }
+        </style>
 
         @if (TempData["Success"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- İşletme Seçimi -->
+        @{
+            var selectedBusiness = ViewBag.SelectedBusiness as Plafind.Models.Business;
+        }
+        @if (Model.Any() && selectedBusiness != null)
+        {
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">İşletme Seçin:</label>
+                            <select id="businessSelector" class="form-select" onchange="changeBusiness(this.value)">
+                                @foreach (var biz in Model)
+                                {
+                                    if (biz.Id == selectedBusiness.Id)
+                                    {
+                                        <option value="@biz.Id" selected>@biz.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@biz.Id">@biz.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <div class="btn-group" role="group">
+                                <a href="@Url.Action("ReservationsAdvanced", new { businessId = selectedBusiness.Id })" class="btn btn-primary">
+                                    <i class="fas fa-calendar-alt me-2"></i>Gelişmiş Rezervasyon Yönetimi
+                                </a>
+                                <a href="@Url.Action("ReservationsCalendar", new { businessId = selectedBusiness.Id })" class="btn btn-outline-primary">
+                                    <i class="fas fa-calendar me-2"></i>Takvim Görünümü
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         }
 
@@ -34,10 +139,11 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h6 class="card-subtitle mb-2 text-white-50">Toplam İşletme</h6>
-                                    <h3 class="mb-0">@stats.TotalBusinesses</h3>
+                                    <h6 class="card-subtitle mb-2 text-white-50">Ortalama Puan</h6>
+                                    <h3 class="mb-0">@stats.AverageRating.ToString("F1")</h3>
+                                    <small class="text-white-50">@stats.TotalReviews yorum</small>
                                 </div>
-                                <i class="fas fa-store fa-2x opacity-50"></i>
+                                <i class="fas fa-star fa-2x opacity-50"></i>
                             </div>
                         </div>
                     </div>
@@ -47,10 +153,10 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h6 class="card-subtitle mb-2 text-white-50">Aktif İşletme</h6>
-                                    <h3 class="mb-0">@stats.ActiveBusinesses</h3>
+                                    <h6 class="card-subtitle mb-2 text-white-50">Toplam Rezervasyon</h6>
+                                    <h3 class="mb-0">@stats.TotalReservations</h3>
                                 </div>
-                                <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                                <i class="fas fa-calendar-check fa-2x opacity-50"></i>
                             </div>
                         </div>
                     </div>
@@ -60,10 +166,10 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h6 class="card-subtitle mb-2 text-white-50">Onay Bekleyen</h6>
-                                    <h3 class="mb-0">@stats.PendingApprovals</h3>
+                                    <h6 class="card-subtitle mb-2 text-white-50">İptal Oranı</h6>
+                                    <h3 class="mb-0">@stats.CancellationRate%</h3>
                                 </div>
-                                <i class="fas fa-clock fa-2x opacity-50"></i>
+                                <i class="fas fa-times-circle fa-2x opacity-50"></i>
                             </div>
                         </div>
                     </div>
@@ -73,22 +179,110 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h6 class="card-subtitle mb-2 text-white-50">Toplam Rezervasyon</h6>
-                                    <h3 class="mb-0">@stats.TotalReservations</h3>
+                                    <h6 class="card-subtitle mb-2 text-white-50">Aktif İşletme</h6>
+                                    <h3 class="mb-0">@stats.ActiveBusinesses</h3>
                                 </div>
-                                <i class="fas fa-calendar-alt fa-2x opacity-50"></i>
+                                <i class="fas fa-store fa-2x opacity-50"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- 14 Günlük Rezervasyon Trendi -->
+            @if (stats.ReservationTrend != null)
+            {
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>14 Günlük Rezervasyon Trendi</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="reservationTrendChart" height="80"></canvas>
+                    </div>
+                </div>
+            }
         }
 
+        <!-- Hızlı Erişim Menüsü -->
+        @if (selectedBusiness != null)
+        {
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <a href="@Url.Action("ReservationsAdvanced", new { businessId = selectedBusiness.Id })" class="card text-decoration-none h-100 border-primary shadow-sm hover-lift">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-calendar-check fa-2x"></i>
+                                </div>
+                            </div>
+                            <h5 class="card-title mb-0">Rezervasyon Yönetimi</h5>
+                            <p class="text-muted small mb-0 mt-2">Filtreli rezervasyon listesi</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="@Url.Action("ReservationsCalendar", new { businessId = selectedBusiness.Id })" class="card text-decoration-none h-100 border-success shadow-sm hover-lift">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-calendar fa-2x"></i>
+                                </div>
+                            </div>
+                            <h5 class="card-title mb-0">Takvim Görünümü</h5>
+                            <p class="text-muted small mb-0 mt-2">Rezervasyonları takvimde gör</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="@Url.Action("Customers", new { businessId = selectedBusiness.Id })" class="card text-decoration-none h-100 border-info shadow-sm hover-lift">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-users fa-2x"></i>
+                                </div>
+                            </div>
+                            <h5 class="card-title mb-0">Müşteri Yönetimi</h5>
+                            <p class="text-muted small mb-0 mt-2">CRM - Müşteri listesi</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="@Url.Action("Campaigns", new { businessId = selectedBusiness.Id })" class="card text-decoration-none h-100 border-warning shadow-sm hover-lift">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-tags fa-2x"></i>
+                                </div>
+                            </div>
+                            <h5 class="card-title mb-0">Kampanya Yönetimi</h5>
+                            <p class="text-muted small mb-0 mt-2">Fiyatlandırma & Kampanyalar</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+
+        <!-- İşletmelerim Başlığı -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold mb-0">
+                <i class="fas fa-briefcase me-2 text-warning"></i>İşletmelerim
+            </h3>
+            <span class="badge bg-primary fs-6">@Model.Count() İşletme</span>
+        </div>
+        
         @if (!Model.Any())
         {
             <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i>
-                Henüz işletmeniz yok. <a asp-action="Create" class="alert-link">Yeni işletme ekleyerek</a> başlayabilirsiniz.
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle fa-2x me-3"></i>
+                    <div>
+                        <h5 class="alert-heading mb-2">Henüz işletmeniz yok</h5>
+                        <p class="mb-2">İşletmenizi ekleyerek başlayabilirsiniz. İşletmeniz admin onayından sonra yayınlanacaktır.</p>
+                        <a asp-action="Create" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>İlk İşletmenizi Ekleyin
+                        </a>
+                    </div>
+                </div>
             </div>
         }
         else
@@ -143,11 +337,31 @@
                                     <a asp-action="Edit" asp-route-id="@business.Id" class="btn btn-sm btn-primary flex-fill">
                                         <i class="fas fa-edit me-1"></i>Düzenle
                                     </a>
-                                    <a asp-action="Reservations" asp-route-id="@business.Id" class="btn btn-sm btn-outline-info flex-fill">
+                                    <a asp-action="ReservationsAdvanced" asp-route-businessId="@business.Id" class="btn btn-sm btn-outline-info flex-fill">
                                         <i class="fas fa-calendar-alt me-1"></i>Rezervasyonlar
                                     </a>
+                                    <a asp-action="Customers" asp-route-businessId="@business.Id" class="btn btn-sm btn-outline-secondary flex-fill">
+                                        <i class="fas fa-users me-1"></i>Müşteriler
+                                    </a>
+                                    <a asp-action="Pricings" asp-route-businessId="@business.Id" class="btn btn-sm btn-outline-primary flex-fill">
+                                        <i class="fas fa-dollar-sign me-1"></i>Fiyatlandırma
+                                    </a>
+                                    <a asp-action="Campaigns" asp-route-businessId="@business.Id" class="btn btn-sm btn-outline-warning flex-fill">
+                                        <i class="fas fa-tags me-1"></i>Kampanyalar
+                                    </a>
+                                    <a asp-action="Reviews" asp-route-id="@business.Id" class="btn btn-sm btn-outline-warning flex-fill">
+                                        <i class="fas fa-comments me-1"></i>Yorumlar (@business.TotalReviews)
+                                    </a>
+                                    @if (business.TotalReviews > 0)
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-success flex-fill" 
+                                                onclick="analyzeReviews(@business.Id, '@business.Name')" 
+                                                title="Yorum Analizi">
+                                            <i class="fas fa-chart-line me-1"></i>Yorum Analizi
+                                        </button>
+                                    }
                                     <a asp-action="Favorites" asp-route-id="@business.Id" class="btn btn-sm btn-outline-danger flex-fill">
-                                        <i class="fas fa-heart me-1"></i>Favoriler
+                                        <i class="fas fa-heart me-1"></i>Favoriler (@business.Favorites?.Count ?? 0)
                                     </a>
                                 </div>
                             </div>
@@ -159,4 +373,364 @@
     </div>
 </section>
 
+<!-- Yorum Analizi Modal -->
+<div class="modal fade" id="analysisModal" tabindex="-1" aria-labelledby="analysisModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="analysisModalLabel">
+                    <i class="fas fa-chart-line me-2"></i>Yorum Analizi
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="analysisContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                    <p class="mt-3">Yorumlar analiz ediliyor...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    function changeBusiness(businessId) {
+        window.location.href = '@Url.Action("Index")?businessId=' + businessId;
+    }
+
+    // 14 Günlük Rezervasyon Trendi Grafiği
+    @if (stats != null && stats.ReservationTrend != null)
+    {
+        <text>
+        const trendData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(stats.ReservationTrend));
+        const ctx = document.getElementById('reservationTrendChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: trendData.map(d => {
+                        const date = new Date(d.date);
+                        return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
+                    }),
+                    datasets: [{
+                        label: 'Rezervasyon Sayısı',
+                        data: trendData.map(d => d.count),
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        </text>
+    }
+</script>
+<script>
+    function analyzeReviews(businessId, businessName) {
+        // Modal'ı aç
+        const modal = new bootstrap.Modal(document.getElementById('analysisModal'));
+        document.getElementById('analysisModalLabel').innerHTML = `<i class="fas fa-chart-line me-2"></i>Yorum Analizi - ${escapeHtml(businessName)}`;
+        modal.show();
+
+        // Loading göster
+        document.getElementById('analysisContent').innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+                <p class="mt-3">Yorumlar analiz ediliyor, lütfen bekleyin...</p>
+            </div>
+        `;
+
+        // AJAX isteği
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        
+        fetch('@Url.Action("AnalyzeReviews", "BusinessOwner")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({ id: businessId, maxReviews: 50 })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayAnalysisResults(data.data);
+            } else {
+                document.getElementById('analysisContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>${escapeHtml(data.message || 'Analiz yapılırken bir hata oluştu.')}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('analysisContent').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Bir hata oluştu. Lütfen tekrar deneyin.
+                </div>
+            `;
+        });
+    }
+
+    function displayAnalysisResults(result) {
+        const html = `
+            <div class="analysis-results">
+                <!-- Özet -->
+                <div class="card mb-3 border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Genel Özet</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">${escapeHtml(result.summary || 'Özet bulunamadı.')}</p>
+                        <small class="text-muted d-block mt-2">
+                            <i class="fas fa-chart-bar me-1"></i>${result.totalReviewsAnalyzed} yorum analiz edildi
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Genel Memnuniyet Puanı -->
+                <div class="card mb-3 border-success">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0"><i class="fas fa-star me-2"></i>Genel Memnuniyet Puanı</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <h2 class="display-4 fw-bold text-success mb-0">${result.overallSatisfactionScore.toFixed(1)}</h2>
+                        <p class="text-muted mb-0">10 üzerinden</p>
+                        <div class="progress mt-3" style="height: 25px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: ${(result.overallSatisfactionScore / 10 * 100)}%" 
+                                 aria-valuenow="${result.overallSatisfactionScore}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="10">
+                                ${(result.overallSatisfactionScore / 10 * 100).toFixed(0)}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Güçlü Yanlar -->
+                ${result.strengths && result.strengths.length > 0 ? `
+                <div class="card mb-3 border-success">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0"><i class="fas fa-thumbs-up me-2"></i>Öne Çıkan Olumlu Yönler</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            ${result.strengths.map(s => `<li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>${escapeHtml(s)}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- Zayıf Yanlar -->
+                ${result.weaknesses && result.weaknesses.length > 0 ? `
+                <div class="card mb-3 border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h6 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>En Çok Şikayet Edilen Konular</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            ${result.weaknesses.map(w => `<li class="mb-2"><i class="fas fa-times-circle text-warning me-2"></i>${escapeHtml(w)}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- İyileştirme Alanları -->
+                ${result.improvementAreas && result.improvementAreas.length > 0 ? `
+                <div class="card mb-3 border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h6 class="mb-0"><i class="fas fa-tools me-2"></i>Acil İyileştirilmesi Gereken Noktalar</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            ${result.improvementAreas.map(i => `<li class="mb-2"><i class="fas fa-arrow-right text-danger me-2"></i>${escapeHtml(i)}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- Kategori Bazlı Puanlar -->
+                ${result.categoryScores && Object.keys(result.categoryScores).length > 0 ? `
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Kategori Bazlı Puanlar</h6>
+                    </div>
+                    <div class="card-body">
+                        ${Object.entries(result.categoryScores).map(([category, score]) => `
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-semibold">${escapeHtml(category)}</span>
+                                    <span class="badge bg-primary">${score.toFixed(1)}/10</span>
+                                </div>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-info" role="progressbar" 
+                                         style="width: ${(score / 10 * 100)}%" 
+                                         aria-valuenow="${score}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="10">
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Not:</strong> Bu analiz AI (Gemini) tarafından otomatik olarak oluşturulmuştur. 
+                    Detaylı yorumları görmek için <a href="@Url.Action("Reviews", "BusinessOwner")?id=${result.businessId}" class="alert-link">Yorumlar</a> sayfasını ziyaret edebilirsiniz.
+                </div>
+            </div>
+        `;
+        document.getElementById('analysisContent').innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // SignalR - Rezervasyon Bildirimleri
+    (function() {
+        const userId = '@ViewBag.UserId';
+        if (!userId) return;
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/reservationHub")
+            .build();
+
+        // Hub'a bağlan ve işletme sahibi grubuna katıl
+        connection.start()
+            .then(() => {
+                console.log("Rezervasyon bildirimleri bağlantısı kuruldu");
+                return connection.invoke("JoinBusinessOwnerGroup", userId);
+            })
+            .catch(err => console.error("SignalR bağlantı hatası:", err));
+
+        // Yeni rezervasyon bildirimi al
+        connection.on("NewReservation", function(reservation) {
+            showReservationNotification(reservation);
+        });
+
+        // Bildirim göster
+        function showReservationNotification(reservation) {
+            // Bildirim container'ı oluştur veya bul
+            let notificationContainer = document.getElementById('reservation-notifications');
+            if (!notificationContainer) {
+                notificationContainer = document.createElement('div');
+                notificationContainer.id = 'reservation-notifications';
+                notificationContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+                document.body.appendChild(notificationContainer);
+            }
+
+            // Bildirim kartı oluştur
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-info alert-dismissible fade show shadow-lg';
+            notification.style.cssText = 'margin-bottom: 10px; animation: slideInRight 0.3s ease-out;';
+            notification.innerHTML = `
+                <div class="d-flex align-items-start">
+                    <div class="me-3">
+                        <i class="fas fa-calendar-check fa-2x text-primary"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="alert-heading mb-1">
+                            <i class="fas fa-bell me-2"></i>Yeni Rezervasyon!
+                        </h6>
+                        <p class="mb-1"><strong>${escapeHtml(reservation.businessName)}</strong></p>
+                        <p class="mb-1 small">
+                            <i class="fas fa-calendar me-1"></i>${escapeHtml(reservation.requestedDate)} 
+                            <i class="fas fa-clock ms-2 me-1"></i>${escapeHtml(reservation.requestedTime)}
+                        </p>
+                        <p class="mb-1 small">
+                            <i class="fas fa-users me-1"></i>${reservation.numberOfPeople} kişi
+                            ${reservation.contactPhone ? `<i class="fas fa-phone ms-2 me-1"></i>${escapeHtml(reservation.contactPhone)}` : ''}
+                        </p>
+                        ${reservation.notes ? `<p class="mb-1 small text-muted"><em>${escapeHtml(reservation.notes)}</em></p>` : ''}
+                        <a href="@Url.Action("Reservations", "BusinessOwner")?id=${reservation.businessId}" 
+                           class="btn btn-sm btn-primary mt-2" target="_blank">
+                            <i class="fas fa-eye me-1"></i>Detayları Gör
+                        </a>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+
+            notificationContainer.appendChild(notification);
+
+            // 10 saniye sonra otomatik kapat
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 10000);
+
+            // Sayfa üstündeki rezervasyon sayısını güncelle
+            updateReservationCount();
+        }
+
+        function updateReservationCount() {
+            // İstatistik kartındaki rezervasyon sayısını güncelle
+            const reservationCard = document.querySelector('.card.bg-info');
+            if (reservationCard) {
+                const countElement = reservationCard.querySelector('h3.mb-0');
+                if (countElement) {
+                    const currentCount = parseInt(countElement.textContent) || 0;
+                    countElement.textContent = currentCount + 1;
+                }
+            }
+        }
+
+        // Sayfa kapatılırken bağlantıyı kapat
+        window.addEventListener('beforeunload', () => {
+            if (connection.state === signalR.HubConnectionState.Connected) {
+                connection.invoke("LeaveBusinessOwnerGroup", userId).catch(err => console.error(err));
+            }
+        });
+    })();
+</script>
+
+<style>
+    @@keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+</style>
+}
 

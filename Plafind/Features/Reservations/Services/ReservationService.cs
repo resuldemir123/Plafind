@@ -1,16 +1,20 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR;
 using Plafind.Data;
 using Plafind.Models;
+using Plafind.Hubs;
 
 namespace Plafind.Features.Reservations.Services
 {
     public class ReservationService : IReservationService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHubContext<ReservationHub> _hubContext;
 
-        public ReservationService(ApplicationDbContext context)
+        public ReservationService(ApplicationDbContext context, IHubContext<ReservationHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         public async Task<IEnumerable<Reservation>> GetUserReservationsAsync(string userId)
@@ -47,6 +51,33 @@ namespace Plafind.Features.Reservations.Services
 
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
+
+            // İşletme sahibine anlık bildirim gönder
+            var business = await _context.Businesses
+                .Include(b => b.Owner)
+                .FirstOrDefaultAsync(b => b.Id == reservation.BusinessId);
+
+            if (business != null && !string.IsNullOrEmpty(business.OwnerId))
+            {
+                var reservationData = new
+                {
+                    id = reservation.Id,
+                    businessId = reservation.BusinessId,
+                    businessName = business.Name,
+                    requestedDate = reservation.RequestedDate.ToString("dd.MM.yyyy"),
+                    requestedTime = reservation.RequestedTime.ToString(@"hh\:mm"),
+                    numberOfPeople = reservation.NumberOfPeople,
+                    contactPhone = reservation.ContactPhone,
+                    contactEmail = reservation.ContactEmail,
+                    notes = reservation.Notes,
+                    status = reservation.Status,
+                    createdDate = reservation.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+                };
+
+                await _hubContext.Clients.Group($"business-owner-{business.OwnerId}")
+                    .SendAsync("NewReservation", reservationData);
+            }
+
             return reservation;
         }
 

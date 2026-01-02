@@ -13,7 +13,7 @@ namespace Plafind.Services
     /// </summary>
     public class CompareService : ICompareService
     {
-        private const string CompareSessionKey = "CompareBusinesses";
+        private const string CompareSessionKeyPrefix = "CompareBusinesses_";
         private readonly ILogger<CompareService> _logger;
 
         public CompareService(ILogger<CompareService> logger)
@@ -21,9 +21,18 @@ namespace Plafind.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public List<int> GetCompareList(ISession session)
+        private string GetSessionKey(string? userId)
         {
-            var compareJson = session.GetString(CompareSessionKey);
+            // Kullanıcı ID'si varsa kullanıcıya özel, yoksa session ID ile anonim kullanıcı için
+            return string.IsNullOrEmpty(userId) 
+                ? $"{CompareSessionKeyPrefix}Anonymous"
+                : $"{CompareSessionKeyPrefix}User_{userId}";
+        }
+
+        public List<int> GetCompareList(ISession session, string? userId = null)
+        {
+            var sessionKey = GetSessionKey(userId);
+            var compareJson = session.GetString(sessionKey);
             if (string.IsNullOrEmpty(compareJson))
                 return new List<int>();
 
@@ -38,12 +47,13 @@ namespace Plafind.Services
             }
         }
 
-        public void SaveCompareList(ISession session, List<int> businessIds)
+        public void SaveCompareList(ISession session, List<int> businessIds, string? userId = null)
         {
             try
             {
+                var sessionKey = GetSessionKey(userId);
                 var compareJson = JsonSerializer.Serialize(businessIds);
-                session.SetString(CompareSessionKey, compareJson);
+                session.SetString(sessionKey, compareJson);
             }
             catch (Exception ex)
             {
@@ -54,9 +64,10 @@ namespace Plafind.Services
         public (bool success, string message, int count) AddToCompareList(
             ISession session, 
             int businessId, 
-            int? existingCategoryId = null)
+            int? existingCategoryId = null,
+            string? userId = null)
         {
-            var compareIds = GetCompareList(session);
+            var compareIds = GetCompareList(session, userId);
 
             if (compareIds.Contains(businessId))
             {
@@ -73,14 +84,14 @@ namespace Plafind.Services
             // Burada sadece temel validasyonları yapıyoruz
 
             compareIds.Add(businessId);
-            SaveCompareList(session, compareIds);
+            SaveCompareList(session, compareIds, userId);
 
             return (true, "İşletme karşılaştırmaya eklendi.", compareIds.Count);
         }
 
-        public (bool success, string message, int count) RemoveFromCompareList(ISession session, int businessId)
+        public (bool success, string message, int count) RemoveFromCompareList(ISession session, int businessId, string? userId = null)
         {
-            var compareIds = GetCompareList(session);
+            var compareIds = GetCompareList(session, userId);
             
             if (!compareIds.Contains(businessId))
             {
@@ -88,24 +99,25 @@ namespace Plafind.Services
             }
 
             compareIds.Remove(businessId);
-            SaveCompareList(session, compareIds);
+            SaveCompareList(session, compareIds, userId);
 
             return (true, "İşletme karşılaştırmadan kaldırıldı.", compareIds.Count);
         }
 
-        public void ClearCompareList(ISession session)
+        public void ClearCompareList(ISession session, string? userId = null)
         {
-            session.Remove(CompareSessionKey);
+            var sessionKey = GetSessionKey(userId);
+            session.Remove(sessionKey);
         }
 
-        public int GetCompareListCount(ISession session)
+        public int GetCompareListCount(ISession session, string? userId = null)
         {
-            return GetCompareList(session).Count;
+            return GetCompareList(session, userId).Count;
         }
 
-        public bool IsInCompareList(ISession session, int businessId)
+        public bool IsInCompareList(ISession session, int businessId, string? userId = null)
         {
-            return GetCompareList(session).Contains(businessId);
+            return GetCompareList(session, userId).Contains(businessId);
         }
 
         public int GetPriceRangeValue(string? priceRange)

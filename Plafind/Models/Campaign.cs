@@ -42,10 +42,30 @@ namespace Plafind.Models
         public int? MaxUsesPerUser { get; set; } = 1;
         
         public decimal? MinimumPurchaseAmount { get; set; }
+        public int? MinimumPeople { get; set; } // Minimum kişi sayısı
+        
+        // Kampanya kuralları
+        [StringLength(1000)]
+        public string? ValidDates { get; set; } // JSON: Özel tarih aralıkları
+        [StringLength(500)]
+        public string? ValidProducts { get; set; } // JSON: Geçerli ürünler/paketler
+        [StringLength(500)]
+        public string? ValidDaysOfWeek { get; set; } // JSON: Geçerli hafta günleri (Pazartesi, Salı, vb.)
+        
+        // Paket kampanya özellikleri
+        [StringLength(100)]
+        public string? PackageType { get; set; } // "Stay3Pay2", "EarlyBooking", "LastMinute", vb.
+        public int? StayNights { get; set; } // "N gece kal" için N değeri
+        public int? PayNights { get; set; } // "M öde" için M değeri
+        
+        // Performans takibi
+        public decimal TotalRevenueImpact { get; set; } = 0; // Toplam gelir etkisi
+        public decimal AverageDiscountApplied { get; set; } = 0; // Ortalama uygulanan indirim
         
         public bool IsActive { get; set; } = true;
         public bool IsApproved { get; set; } = false;
         public bool IsFeatured { get; set; } = false;
+        public bool IsVisibleToCustomers { get; set; } = true; // Müşteriler görebilir mi?
         
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime? UpdatedDate { get; set; }

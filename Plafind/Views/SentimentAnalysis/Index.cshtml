@@ -1,0 +1,392 @@
+@{
+    ViewData["Title"] = "Yorum Analizi - Sentiment Analysis";
+    var businesses = ViewBag.Businesses as List<Plafind.Models.Business> ?? new List<Plafind.Models.Business>();
+    var selectedBusinessId = ViewBag.SelectedBusinessId as int?;
+}
+
+<div class="sentiment-analysis-page">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-header mb-4">
+                    <h1 class="display-5 fw-bold">
+                        <i class="fas fa-chart-line text-primary me-3"></i>Yorum Analizi
+                    </h1>
+                    <p class="lead text-muted">
+                        AI destekli yorum analizi ile işletmenizin güçlü ve zayıf yönlerini keşfedin
+                    </p>
+                </div>
+
+                <!-- İşletme Seçimi -->
+                <div class="business-selector card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">İşletme Seçin</label>
+                                <select id="businessSelect" class="form-select">
+                                    <option value="">-- İşletme seçin --</option>
+                                    @foreach (var business in businesses)
+                                    {
+                                        <option value="@business.Id" selected="@(selectedBusinessId == business.Id ? "selected" : null)">
+                                            @business.Name (@business.Category?.Name) - @business.TotalReviews yorum
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button id="analyzeBtn" class="btn btn-primary btn-lg w-100" disabled>
+                                    <i class="fas fa-brain me-2"></i>Analiz Et
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="text-center py-5" style="display: none;">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                    <p class="mt-3 text-muted">AI yorumlarınızı analiz ediyor...</p>
+                </div>
+
+                <!-- Analysis Results -->
+                <div id="analysisResults" style="display: none;">
+                    <!-- Summary Card -->
+                    <div class="summary-card card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h3 class="card-title mb-3">
+                                <i class="fas fa-file-alt text-primary me-2"></i>Özet
+                            </h3>
+                            <div id="summaryText" class="summary-content"></div>
+                        </div>
+                    </div>
+
+                    <!-- Overall Score -->
+                    <div class="score-card card shadow-sm mb-4">
+                        <div class="card-body text-center">
+                            <h4 class="mb-3">Genel Memnuniyet Puanı</h4>
+                            <div class="score-circle mx-auto mb-3">
+                                <span id="overallScore" class="score-value">0</span>
+                                <span class="score-max">/10</span>
+                            </div>
+                            <p class="text-muted mb-0">
+                                <span id="totalReviewsAnalyzed">0</span> yorum analiz edildi
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Strengths -->
+                    <div class="strengths-card card shadow-sm mb-4 border-success">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-check-circle me-2"></i>Güçlü Yönler
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul id="strengthsList" class="list-unstyled mb-0"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Weaknesses -->
+                    <div class="weaknesses-card card shadow-sm mb-4 border-warning">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Zayıf Yönler
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul id="weaknessesList" class="list-unstyled mb-0"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Improvement Areas -->
+                    <div class="improvement-card card shadow-sm mb-4 border-info">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-lightbulb me-2"></i>İyileştirme Alanları
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul id="improvementList" class="list-unstyled mb-0"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Category Scores -->
+                    <div class="category-scores-card card shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>Kategori Bazlı Puanlar
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="categoryScores" class="row g-3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="errorState" class="alert alert-danger" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="errorMessage"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .sentiment-analysis-page {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    .page-header h1 {
+        color: white;
+    }
+
+    .page-header p {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .business-selector, .summary-card, .score-card, .strengths-card, .weaknesses-card, 
+    .improvement-card, .category-scores-card {
+        background: white;
+        border-radius: 15px;
+    }
+
+    .summary-content {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #495057;
+        white-space: pre-wrap;
+    }
+
+    .score-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .score-value {
+        font-size: 3rem;
+        font-weight: bold;
+        line-height: 1;
+    }
+
+    .score-max {
+        font-size: 1.5rem;
+        opacity: 0.8;
+    }
+
+    .strengths-card ul li, .weaknesses-card ul li, .improvement-card ul li {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .strengths-card ul li:last-child, .weaknesses-card ul li:last-child, 
+    .improvement-card ul li:last-child {
+        border-bottom: none;
+    }
+
+    .strengths-card ul li::before {
+        content: "✓ ";
+        color: #28a745;
+        font-weight: bold;
+        margin-right: 0.5rem;
+    }
+
+    .weaknesses-card ul li::before {
+        content: "⚠ ";
+        color: #ffc107;
+        font-weight: bold;
+        margin-right: 0.5rem;
+    }
+
+    .improvement-card ul li::before {
+        content: "💡 ";
+        margin-right: 0.5rem;
+    }
+
+    .category-score-item {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border-left: 4px solid #007bff;
+    }
+
+    .category-score-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .category-score-bar {
+        height: 25px;
+        background: #e9ecef;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .category-score-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        transition: width 0.5s ease;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 0.5rem;
+        color: white;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const businessSelect = document.getElementById('businessSelect');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loadingState = document.getElementById('loadingState');
+        const analysisResults = document.getElementById('analysisResults');
+        const errorState = document.getElementById('errorState');
+        const errorMessage = document.getElementById('errorMessage');
+
+        businessSelect.addEventListener('change', function() {
+            analyzeBtn.disabled = !this.value;
+        });
+
+        analyzeBtn.addEventListener('click', async function() {
+            const businessId = businessSelect.value;
+            if (!businessId) return;
+
+            // UI durumlarını ayarla
+            loadingState.style.display = 'block';
+            analysisResults.style.display = 'none';
+            errorState.style.display = 'none';
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analiz ediliyor...';
+
+            try {
+                const response = await fetch('@Url.Action("Analyze", "SentimentAnalysis")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({
+                        businessId: parseInt(businessId),
+                        maxReviews: 50
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayAnalysisResults(data.analysis);
+                    loadingState.style.display = 'none';
+                    analysisResults.style.display = 'block';
+                } else {
+                    throw new Error(data.message || 'Analiz sırasında bir hata oluştu');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = error.message || 'Analiz sırasında bir hata oluştu. Lütfen tekrar deneyin.';
+                loadingState.style.display = 'none';
+                errorState.style.display = 'block';
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<i class="fas fa-brain me-2"></i>Analiz Et';
+            }
+        });
+
+        function displayAnalysisResults(analysis) {
+            // Özet
+            document.getElementById('summaryText').textContent = analysis.summary || 'Analiz tamamlandı.';
+
+            // Genel puan
+            document.getElementById('overallScore').textContent = analysis.overallSatisfactionScore.toFixed(1);
+            document.getElementById('totalReviewsAnalyzed').textContent = analysis.totalReviewsAnalyzed || 0;
+
+            // Güçlü yönler
+            const strengthsList = document.getElementById('strengthsList');
+            strengthsList.innerHTML = '';
+            if (analysis.strengths && analysis.strengths.length > 0) {
+                analysis.strengths.forEach(function(strength) {
+                    const li = document.createElement('li');
+                    li.textContent = strength;
+                    strengthsList.appendChild(li);
+                });
+            } else {
+                strengthsList.innerHTML = '<li class="text-muted">Güçlü yön bulunamadı</li>';
+            }
+
+            // Zayıf yönler
+            const weaknessesList = document.getElementById('weaknessesList');
+            weaknessesList.innerHTML = '';
+            if (analysis.weaknesses && analysis.weaknesses.length > 0) {
+                analysis.weaknesses.forEach(function(weakness) {
+                    const li = document.createElement('li');
+                    li.textContent = weakness;
+                    weaknessesList.appendChild(li);
+                });
+            } else {
+                weaknessesList.innerHTML = '<li class="text-muted">Zayıf yön bulunamadı</li>';
+            }
+
+            // İyileştirme alanları
+            const improvementList = document.getElementById('improvementList');
+            improvementList.innerHTML = '';
+            if (analysis.improvementAreas && analysis.improvementAreas.length > 0) {
+                analysis.improvementAreas.forEach(function(area) {
+                    const li = document.createElement('li');
+                    li.textContent = area;
+                    improvementList.appendChild(li);
+                });
+            } else {
+                improvementList.innerHTML = '<li class="text-muted">İyileştirme alanı bulunamadı</li>';
+            }
+
+            // Kategori puanları
+            const categoryScores = document.getElementById('categoryScores');
+            categoryScores.innerHTML = '';
+            if (analysis.categoryScores && Object.keys(analysis.categoryScores).length > 0) {
+                Object.entries(analysis.categoryScores).forEach(function([category, score]) {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-6';
+                    
+                    const item = document.createElement('div');
+                    item.className = 'category-score-item';
+                    
+                    const label = document.createElement('div');
+                    label.className = 'category-score-label';
+                    label.textContent = category;
+                    
+                    const bar = document.createElement('div');
+                    bar.className = 'category-score-bar';
+                    
+                    const fill = document.createElement('div');
+                    fill.className = 'category-score-fill';
+                    fill.style.width = (score * 10) + '%';
+                    fill.textContent = score.toFixed(1);
+                    
+                    bar.appendChild(fill);
+                    item.appendChild(label);
+                    item.appendChild(bar);
+                    col.appendChild(item);
+                    categoryScores.appendChild(col);
+                });
+            } else {
+                categoryScores.innerHTML = '<div class="col-12"><p class="text-muted">Kategori puanları bulunamadı</p></div>';
+            }
+        }
+    });
+</script>
+

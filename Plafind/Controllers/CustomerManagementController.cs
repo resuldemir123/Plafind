@@ -210,10 +210,16 @@ namespace Plafind.Controllers
                 .OrderByDescending(r => r.CreatedDate)
                 .ToListAsync();
 
-            var interactions = await _context.CustomerInteractions
-                .Where(ci => ci.BusinessId == businessId && ci.CustomerId == customerId)
-                .OrderByDescending(ci => ci.InteractionDate)
-                .ToListAsync();
+            // CustomerInteraction artık Customer modeline bağlı
+            var customerModel = await _context.Customers
+                .FirstOrDefaultAsync(c => c.BusinessId == businessId && c.UserId == customerId);
+            
+            var interactions = customerModel != null 
+                ? await _context.CustomerInteractions
+                    .Where(ci => ci.CustomerId == customerModel.Id)
+                    .OrderByDescending(ci => ci.InteractionDate)
+                    .ToListAsync()
+                : new List<CustomerInteraction>();
 
             var messages = await _context.Messages
                 .Where(m => (m.SenderId == customerId && m.RelatedBusinessId == businessId) ||
@@ -420,16 +426,37 @@ namespace Plafind.Controllers
                 return NotFound("İşletme bulunamadı.");
             }
 
-            IQueryable<CustomerInteraction> interactionsQuery = _context.CustomerInteractions
-                .Where(ci => ci.BusinessId == business.Id)
-                .Include(ci => ci.Customer)
-                .Include(ci => ci.RelatedReservation)
-                .Include(ci => ci.RelatedReview)
-                .Include(ci => ci.RelatedMessage);
-
+            // CustomerInteraction artık Customer modeline bağlı
+            IQueryable<CustomerInteraction> interactionsQuery;
+            
             if (!string.IsNullOrEmpty(customerId))
             {
-                interactionsQuery = interactionsQuery.Where(ci => ci.CustomerId == customerId);
+                var customerModel = await _context.Customers
+                    .FirstOrDefaultAsync(c => c.BusinessId == business.Id && c.UserId == customerId);
+                
+                if (customerModel != null)
+                {
+                    interactionsQuery = _context.CustomerInteractions
+                        .Where(ci => ci.CustomerId == customerModel.Id)
+                        .Include(ci => ci.Customer);
+                }
+                else
+                {
+                    interactionsQuery = _context.CustomerInteractions
+                        .Where(ci => false) // Boş sonuç
+                        .Include(ci => ci.Customer);
+                }
+            }
+            else
+            {
+                var customerIds = await _context.Customers
+                    .Where(c => c.BusinessId == business.Id)
+                    .Select(c => c.Id)
+                    .ToListAsync();
+                
+                interactionsQuery = _context.CustomerInteractions
+                    .Where(ci => customerIds.Contains(ci.CustomerId))
+                    .Include(ci => ci.Customer);
             }
 
             var interactions = await interactionsQuery
@@ -458,108 +485,131 @@ namespace Plafind.Controllers
         // POST: CustomerManagement/Interactions/Create - Yeni iletişim kaydı oluştur
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateInteraction(CustomerInteraction interaction)
+        public async Task<IActionResult> CreateInteraction(int customerId, string interactionType, string notes)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var business = await _context.Businesses.FindAsync(interaction.BusinessId);
+            var customer = await _context.Customers
+                .Include(c => c.Business)
+                .FirstOrDefaultAsync(c => c.Id == customerId);
 
-            if (business == null || (!User.IsInRole("Admin") && business.OwnerId != userId))
+            if (customer == null || customer.Business == null)
+            {
+                return NotFound();
+            }
+
+            if (!User.IsInRole("Admin") && customer.Business.OwnerId != userId)
             {
                 return Forbid();
             }
 
             if (ModelState.IsValid)
             {
-                interaction.CreatedBy = userId;
-                interaction.CreatedDate = DateTime.Now;
+                var interaction = new CustomerInteraction
+                {
+                    CustomerId = customerId,
+                    InteractionType = interactionType,
+                    Notes = notes,
+                    InteractionDate = DateTime.Now,
+                    CreatedBy = userId
+                };
+                
                 _context.Add(interaction);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Interactions), new { businessId = interaction.BusinessId, customerId = interaction.CustomerId });
+                return RedirectToAction(nameof(Interactions), new { businessId = customer.BusinessId, customerId = customer.UserId });
             }
 
-            return RedirectToAction(nameof(Interactions), new { businessId = interaction.BusinessId });
+            return RedirectToAction(nameof(Interactions), new { businessId = customer.BusinessId });
         }
 
         private async Task CreateInteractionsFromExistingData(int businessId)
         {
-            // Rezervasyonlardan
+            // Rezervasyonlardan - Customer modeli üzerinden
             var reservations = await _context.Reservations
-                .Where(r => r.BusinessId == businessId && !string.IsNullOrEmpty(r.UserId))
+                .Where(r => r.BusinessId == businessId && r.CustomerId != null)
+                .Include(r => r.Customer)
                 .ToListAsync();
 
             foreach (var reservation in reservations)
             {
+                if (reservation.Customer == null) continue;
+                
                 var existing = await _context.CustomerInteractions
-                    .FirstOrDefaultAsync(ci => ci.RelatedReservationId == reservation.Id);
+                    .FirstOrDefaultAsync(ci => ci.CustomerId == reservation.Customer.Id && 
+                                               ci.InteractionType == "Reservation" &&
+                                               ci.Notes != null && 
+                                               ci.Notes.Contains($"Rezervasyon #{reservation.Id}"));
 
                 if (existing == null)
                 {
                     _context.CustomerInteractions.Add(new CustomerInteraction
                     {
-                        BusinessId = businessId,
-                        CustomerId = reservation.UserId!,
+                        CustomerId = reservation.Customer.Id,
                         InteractionType = "Reservation",
-                        Subject = $"{reservation.NumberOfPeople} kişilik rezervasyon",
-                        Notes = reservation.Notes,
+                        Notes = $"{reservation.NumberOfPeople} kişilik rezervasyon - Rezervasyon #{reservation.Id}. {reservation.Notes}",
                         InteractionDate = reservation.CreatedDate,
-                        Status = reservation.Status == "Onaylandı" ? "Completed" : "Pending",
-                        RelatedReservationId = reservation.Id,
-                        CreatedDate = DateTime.Now
+                        CreatedBy = reservation.Customer.UserId
                     });
                 }
             }
 
-            // Yorumlardan
+            // Yorumlardan - Customer modeli üzerinden
             var reviews = await _context.Reviews
                 .Where(r => r.BusinessId == businessId && !string.IsNullOrEmpty(r.UserId) && r.IsActive && r.IsApproved)
                 .ToListAsync();
 
             foreach (var review in reviews)
             {
+                var customer = await _context.Customers
+                    .FirstOrDefaultAsync(c => c.BusinessId == businessId && c.UserId == review.UserId);
+                
+                if (customer == null) continue;
+                
                 var existing = await _context.CustomerInteractions
-                    .FirstOrDefaultAsync(ci => ci.RelatedReviewId == review.Id);
+                    .FirstOrDefaultAsync(ci => ci.CustomerId == customer.Id && 
+                                               ci.InteractionType == "Review" &&
+                                               ci.Notes != null && 
+                                               ci.Notes.Contains($"Yorum #{review.Id}"));
 
                 if (existing == null)
                 {
                     _context.CustomerInteractions.Add(new CustomerInteraction
                     {
-                        BusinessId = businessId,
-                        CustomerId = review.UserId!,
+                        CustomerId = customer.Id,
                         InteractionType = "Review",
-                        Subject = $"{review.Rating} yıldız yorum",
-                        Notes = review.Comment,
+                        Notes = $"{review.Rating} yıldız yorum - Yorum #{review.Id}. {review.Comment}",
                         InteractionDate = review.CreatedDate,
-                        Status = "Completed",
-                        RelatedReviewId = review.Id,
-                        CreatedDate = DateTime.Now
+                        CreatedBy = review.UserId
                     });
                 }
             }
 
-            // Mesajlardan
+            // Mesajlardan - Customer modeli üzerinden
             var messages = await _context.Messages
-                .Where(m => m.RelatedBusinessId == businessId)
+                .Where(m => m.RelatedBusinessId == businessId && !string.IsNullOrEmpty(m.SenderId))
                 .ToListAsync();
 
             foreach (var message in messages)
             {
-                var customerId = message.SenderId; // İşletme sahibine mesaj gönderen müşteri
+                var customer = await _context.Customers
+                    .FirstOrDefaultAsync(c => c.BusinessId == businessId && c.UserId == message.SenderId);
+                
+                if (customer == null) continue;
+                
                 var existing = await _context.CustomerInteractions
-                    .FirstOrDefaultAsync(ci => ci.RelatedMessageId == message.Id);
+                    .FirstOrDefaultAsync(ci => ci.CustomerId == customer.Id && 
+                                               ci.InteractionType == "Message" &&
+                                               ci.Notes != null && 
+                                               ci.Notes.Contains($"Mesaj #{message.Id}"));
 
                 if (existing == null)
                 {
                     _context.CustomerInteractions.Add(new CustomerInteraction
                     {
-                        BusinessId = businessId,
-                        CustomerId = customerId,
+                        CustomerId = customer.Id,
                         InteractionType = "Message",
-                        Subject = message.Subject,
-                        Notes = message.Content,
+                        Notes = $"Mesaj: {message.Subject} - Mesaj #{message.Id}. {message.Content}",
                         InteractionDate = message.CreatedDate,
-                        Status = message.IsRead ? "Completed" : "Pending",
-                        RelatedMessageId = message.Id,
-                        CreatedDate = DateTime.Now
+                        CreatedBy = message.SenderId
                     });
                 }
             }
