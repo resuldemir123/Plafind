@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plafind Test Raporu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .content { padding: 30px; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .stat-card.success { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); }
+        .stat-card.danger { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+        .stat-value { font-size: 3em; font-weight: bold; color: #2d3748; margin: 10px 0; }
+        .stat-label { font-size: 1.1em; color: #4a5568; text-transform: uppercase; }
+        .coverage-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 30px;
+            margin: 10px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        .coverage-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .test-class-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Test Istatistikleri</h1>
+            <p>Plafind Test Raporu</p>
+        </div>
+        <div class="content">
+            <div class="stats-grid">
+                <div class="stat-card success">
+                    <div class="stat-label">Toplam Test</div>
+                    <div class="stat-value">11</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-label">Basarili</div>
+                    <div class="stat-value">11</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-label">Basarisiz</div>
+                    <div class="stat-value">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Basar Orani</div>
+                    <div class="stat-value">100%</div>
+                </div>
+            </div>            <div style="background: #f7fafc; padding: 25px; border-radius: 10px; margin-bottom: 30px;">
+                <h2 style="margin-bottom: 20px; color: #2d3748;">Code Coverage</h2>
+                <div>
+                    <strong>Line Coverage:</strong>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 0%">0%</div>
+                    </div>
+                </div>
+                <div>
+                    <strong>Branch Coverage:</strong>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 0%">0%</div>
+                    </div>
+                </div>
+            </div>            <div>
+                <h2 style="margin-bottom: 20px; color: #2d3748;">Test Siniflari</h2>                <div class="test-class-card">
+                    <div style="font-size: 1.3em; font-weight: bold; color: #2d3748; margin-bottom: 10px;">
+                        [Other] BusinessServiceTests
+                    </div>
+                    <div style="color: #718096; font-size: 0.9em;">
+                        3 test metodu - BusinessServiceTests.cs
+                    </div>
+                </div>                <div class="test-class-card">
+                    <div style="font-size: 1.3em; font-weight: bold; color: #2d3748; margin-bottom: 10px;">
+                        [Other] BusinessTests
+                    </div>
+                    <div style="color: #718096; font-size: 0.9em;">
+                        3 test metodu - BusinessTests.cs
+                    </div>
+                </div>                <div class="test-class-card">
+                    <div style="font-size: 1.3em; font-weight: bold; color: #2d3748; margin-bottom: 10px;">
+                        [Other] DbSeederTests
+                    </div>
+                    <div style="color: #718096; font-size: 0.9em;">
+                        3 test metodu - DbSeederTests.cs
+                    </div>
+                </div>                <div class="test-class-card">
+                    <div style="font-size: 1.3em; font-weight: bold; color: #2d3748; margin-bottom: 10px;">
+                        [Other] HomeControllerTests
+                    </div>
+                    <div style="color: #718096; font-size: 0.9em;">
+                        2 test metodu - HomeControllerTests.cs
+                    </div>
+                </div>            </div>
+        </div>
+        <div class="footer">
+            <div style="color: #a0aec0; font-size: 0.9em;">
+                Rapor Olusturulma Tarihi: 02.01.2026 21:31:15
+            </div>
+        </div>
+    </div>
+</body>
+</html>

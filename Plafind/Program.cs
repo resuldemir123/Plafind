@@ -295,3 +295,6 @@ app.MapHub<Plafind.Hubs.ReviewHub>("/reviewHub");
 app.MapHub<Plafind.Hubs.ReservationHub>("/reservationHub");
 
 app.Run();
+
+// Test için gerekli - WebApplicationFactory için
+public partial class Program { }

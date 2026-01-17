@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="433c5715-7850-4504-a0a7-a034eb7101b5" name="resuldemir@DESKTOP-4MRKT8H 2026-01-02 20:59:17" runUser="DESKTOP-4MRKT8H\resuldemir" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-01-02T20:59:17.9310332+03:00" queuing="2026-01-02T20:59:17.9310337+03:00" start="2026-01-02T20:59:16.2502019+03:00" finish="2026-01-02T20:59:19.4248837+03:00" />
+  <TestSettings name="default" id="750d76c1-fe1a-47f2-99ca-1d1c1ae22660">
+    <Deployment runDeploymentRoot="resuldemir_DESKTOP-4MRKT8H_2026-01-02_20_59_17" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="b9608603-6879-4aa6-9daf-593ed2a15d81" testId="e840ada5-a30f-d245-623f-9ad4a535b340" testName="Plafind.Tests.Services.BusinessServiceTests.GetBusinessDetailsAsync_ShouldReturnNull_WhenNotExists" computerName="DESKTOP-4MRKT8H" duration="00:00:00.9114362" startTime="2026-01-02T20:59:17.6725952+03:00" endTime="2026-01-02T20:59:17.6725955+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b9608603-6879-4aa6-9daf-593ed2a15d81" />
+    <UnitTestResult executionId="42df0d3f-c8a2-4f2b-b46c-0ca266a9e853" testId="8a55f5bf-0c0a-e4fd-292d-fceeb441eb91" testName="Plafind.Tests.Data.DbSeederTests.SeedDataAsync_ShouldCreateBusinesses" computerName="DESKTOP-4MRKT8H" duration="00:00:00.0304093" startTime="2026-01-02T20:59:17.8577263+03:00" endTime="2026-01-02T20:59:17.8577267+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="42df0d3f-c8a2-4f2b-b46c-0ca266a9e853" />
+    <UnitTestResult executionId="e0b9629e-c8ad-48de-9da6-7ae8b4c4c2dd" testId="a341946f-55b9-7851-1094-1a3739715f1c" testName="Plafind.Tests.Models.BusinessTests.Business_ShouldHaveRequiredProperties" computerName="DESKTOP-4MRKT8H" duration="00:00:00.0037477" startTime="2026-01-02T20:59:16.7701325+03:00" endTime="2026-01-02T20:59:16.7701517+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e0b9629e-c8ad-48de-9da6-7ae8b4c4c2dd" />
+    <UnitTestResult executionId="07928c0a-83f9-4575-a875-9e3664bfffe4" testId="35a70e62-9768-fc0e-2f8a-533fbd3f0d62" testName="Plafind.Tests.Models.BusinessTests.Business_ViewCount_ShouldDefaultToZero" computerName="DESKTOP-4MRKT8H" duration="00:00:00.0029028" startTime="2026-01-02T20:59:16.7731965+03:00" endTime="2026-01-02T20:59:16.7731966+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="07928c0a-83f9-4575-a875-9e3664bfffe4" />
+    <UnitTestResult executionId="b9b3cb20-31c3-417e-b69b-6588ab4ca0ce" testId="84cda98f-588c-0825-e559-8489033ba739" testName="Plafind.Tests.Data.DbSeederTests.SeedDataAsync_ShouldCreateCategories" computerName="DESKTOP-4MRKT8H" duration="00:00:01.0661183" startTime="2026-01-02T20:59:17.8271150+03:00" endTime="2026-01-02T20:59:17.8271153+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b9b3cb20-31c3-417e-b69b-6588ab4ca0ce" />
+    <UnitTestResult executionId="96a61414-74d0-4bda-9cb9-7adf1e631081" testId="765e5d3b-b3d6-e24a-6350-d6f2f3733769" testName="Plafind.Tests.Services.BusinessServiceTests.GetBusinessDetailsAsync_ShouldReturnBusiness_WhenExists" computerName="DESKTOP-4MRKT8H" duration="00:00:00.1997032" startTime="2026-01-02T20:59:17.8724040+03:00" endTime="2026-01-02T20:59:17.8724041+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="96a61414-74d0-4bda-9cb9-7adf1e631081" />
+    <UnitTestResult executionId="5ef1ec61-1ca9-4244-b825-976f1da6a609" testId="8ad5658c-9a3d-d2ef-9f0b-adf3d7e8ee6d" testName="Plafind.Tests.Controllers.HomeControllerTests.About_ShouldReturnSuccessStatusCode" computerName="DESKTOP-4MRKT8H" duration="00:00:02.3150145" startTime="2026-01-02T20:59:19.0780577+03:00" endTime="2026-01-02T20:59:19.0780586+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5ef1ec61-1ca9-4244-b825-976f1da6a609" />
+    <UnitTestResult executionId="60b2adf1-3303-4f0b-9660-af68f5b60f06" testId="ed04779b-ccbf-ed7b-7a21-4bcab13649bb" testName="Plafind.Tests.Services.BusinessServiceTests.GetBusinessDetailsAsync_ShouldIncrementViewCount" computerName="DESKTOP-4MRKT8H" duration="00:00:00.0051509" startTime="2026-01-02T20:59:17.9015597+03:00" endTime="2026-01-02T20:59:17.9015598+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="60b2adf1-3303-4f0b-9660-af68f5b60f06" />
+    <UnitTestResult executionId="86a707e7-289e-4a5a-b566-149061ff0da1" testId="ff73e83f-042b-a421-a68a-1128f0037cf2" testName="Plafind.Tests.Models.BusinessTests.Business_AverageRating_ShouldBeBetweenZeroAndFive" computerName="DESKTOP-4MRKT8H" duration="00:00:00.0001688" startTime="2026-01-02T20:59:16.7729557+03:00" endTime="2026-01-02T20:59:16.7729558+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="86a707e7-289e-4a5a-b566-149061ff0da1" />
+    <UnitTestResult executionId="982342f7-7a0e-4eeb-9b3f-e8226c53be64" testId="3c988c81-8d3d-664e-2670-99423da5ec6d" testName="Plafind.Tests.Controllers.HomeControllerTests.Index_ShouldReturnSuccessStatusCode" computerName="DESKTOP-4MRKT8H" duration="00:00:00.2518396" startTime="2026-01-02T20:59:19.3312758+03:00" endTime="2026-01-02T20:59:19.3312761+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="982342f7-7a0e-4eeb-9b3f-e8226c53be64" />
+    <UnitTestResult executionId="faef10fa-616b-432b-b869-42c56ffb865f" testId="77d08a78-2b33-ff0b-c7c0-d4382a0aa81a" testName="Plafind.Tests.Data.DbSeederTests.SeedDataAsync_ShouldNotDuplicateCategories_WhenCalledTwice" computerName="DESKTOP-4MRKT8H" duration="00:00:00.0115229" startTime="2026-01-02T20:59:17.8693835+03:00" endTime="2026-01-02T20:59:17.8693839+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="faef10fa-616b-432b-b869-42c56ffb865f" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Plafind.Tests.Data.DbSeederTests.SeedDataAsync_ShouldCreateBusinesses" storage="c:\users\resuldemir\source\repos\plafind\plafind.tests\bin\debug\net8.0\plafind.tests.dll" id="8a55f5bf-0c0a-e4fd-292d-fceeb441eb91">
+      <Execution id="42df0d3f-c8a2-4f2b-b46c-0ca266a9e853" />
+      <TestMethod codeBase="C:\Users\resuldemir\Source\Repos\Plafind\Plafind.Tests\bin\Debug\net8.0\Plafind.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Plafind.Tests.Data.DbSeederTests" name="SeedDataAsync_ShouldCreateBusinesses" />
+    </UnitTest>
+    <UnitTest name="Plafind.Tests.Services.BusinessServiceTests.GetBusinessDetailsAsync_ShouldReturnNull_WhenNotExists" storage="c:\users\resuldemir\source\repos\plafind\plafind.tests\bin\debug\net8.0\plafind.tests.dll" id="e840ada5-a30f-d245-623f-9ad4a535b340">
+      <Execution id="b9608603-6879-4aa6-9daf-593ed2a15d81" />
+      <TestMethod codeBase="C:\Users\resuldemir\Source\Repos\Plafind\Plafind.Tests\bin\Debug\net8.0\Plafind.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Plafind.Tests.Services.BusinessServiceTests" name="GetBusinessDetailsAsync_ShouldReturnNull_WhenNotExists" />
+    </UnitTest>
+    <UnitTest name="Plafind.Tests.Data.DbSeederTests.SeedDataAsync_ShouldNotDuplicateCategories_WhenCalledTwice" storage="c:\users\resuldemir\source\repos\plafind\plafind.tests\bin\debug\net8.0\plafind.tests.dll" id="77d08a78-2b33-ff0b-c7c0-d4382a0aa81a">
+      <Execution id="faef10fa-616b-432b-b869-42c56ffb865f" />
+      <TestMethod codeBase="C:\Users\resuldemir\Source\Repos\Plafind\Plafind.Tests\bin\Debug\net8.0\Plafind.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Plafind.Tests.Data.DbSeederTests" name="SeedDataAsync_ShouldNotDuplicateCategories_WhenCalledTwice" />
+    </UnitTest>
+    <UnitTest name="Plafind.Tests.Controllers.HomeControllerTests.About_ShouldReturnSuccessStatusCode" storage="c:\users\resuldemir\source\repos\plafind\plafind.tests\bin\debug\net8.0\plafind.tests.dll" id="8ad5658c-9a3d-d2ef-9f0b-adf3d7e8ee6d">
+      <Execution id="5ef1ec61-1ca9-4244-b825-976f1da6a609" />
+      <TestMethod codeBase="C:\Users\resuldemir\Source\Repos\Plafind\Plafind.Tests\bin\Debug\net8.0\Plafind.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Plafind.Tests.Controllers.HomeControllerTests" name="About_ShouldReturnSuccessStatusCode" />
+    </UnitTest>
+    <UnitTest name="Plafind.Tests.Services.BusinessServiceTests.GetBusinessDetailsAsync_ShouldReturnBusiness_WhenExists" storage="c:\users\resuldemir\source\repos\plafind\plafind.tests\bin\debug\net8.0\plafind.tests.dll" id="765e5d3b-b3d6-e24a-6350-d6f2f3733769">
+      <Execution id="96a61414-74d0-4bda-9cb9-7adf1e631081" />
+      <TestMethod codeBase="C:\Users\resuldemir\Source\Repos\Plafind\Plafind.Tests\bin\Debug\net8.0\Plafind.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Plafind.Tests.Services.BusinessServiceTests" name="GetBusinessDetailsAsync_ShouldReturnBusiness_WhenExists" />
+    </UnitTest>
+    <UnitTest name="Plafind.Tests.Services.BusinessServiceTests.GetBusinessDetailsAsync_ShouldIncrementViewCount" storage="c:\users\resuldemir\source\repos\plafind\plafind.tests\bin\debug\net8.0\plafind.tests.dll" id="ed04779b-ccbf-ed7b-7a21-4bcab13649bb">
+      <Execution id="60b2adf1-3303-4f0b-9660-af68f5b60f06" />
+      <TestMethod codeBase="C:\Users\resuldemir\Source\Repos\Plafind\Plafind.Tests\bin\Debug\net8.0\Plafind.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Plafind.Tests.Services.BusinessServiceTests" name="GetBusinessDetailsAsync_ShouldIncrementViewCount" />
+    </UnitTest>
+    <UnitTest name="Plafind.Tests.Models.BusinessTests.Business_ShouldHaveRequiredProperties" storage="c:\users\resuldemir\source\repos\plafind\plafind.tests\bin\debug\net8.0\plafind.tests.dll" id="a341946f-55b9-7851-1094-1a3739715f1c">
+      <Execution id="e0b9629e-c8ad-48de-9da6-7ae8b4c4c2dd" />
+      <TestMethod codeBase="C:\Users\resuldemir\Source\Repos\Plafind\Plafind.Tests\bin\Debug\net8.0\Plafind.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Plafind.Tests.Models.BusinessTests" name="Business_ShouldHaveRequiredProperties" />
+    </UnitTest>
+    <UnitTest name="Plafind.Tests.Controllers.HomeControllerTests.Index_ShouldReturnSuccessStatusCode" storage="c:\users\resuldemir\source\repos\plafind\plafind.tests\bin\debug\net8.0\plafind.tests.dll" id="3c988c81-8d3d-664e-2670-99423da5ec6d">
+      <Execution id="982342f7-7a0e-4eeb-9b3f-e8226c53be64" />
+      <TestMethod codeBase="C:\Users\resuldemir\Source\Repos\Plafind\Plafind.Tests\bin\Debug\net8.0\Plafind.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Plafind.Tests.Controllers.HomeControllerTests" name="Index_ShouldReturnSuccessStatusCode" />
+    </UnitTest>
+    <UnitTest name="Plafind.Tests.Models.BusinessTests.Business_ViewCount_ShouldDefaultToZero" storage="c:\users\resuldemir\source\repos\plafind\plafind.tests\bin\debug\net8.0\plafind.tests.dll" id="35a70e62-9768-fc0e-2f8a-533fbd3f0d62">
+      <Execution id="07928c0a-83f9-4575-a875-9e3664bfffe4" />
+      <TestMethod codeBase="C:\Users\resuldemir\Source\Repos\Plafind\Plafind.Tests\bin\Debug\net8.0\Plafind.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Plafind.Tests.Models.BusinessTests" name="Business_ViewCount_ShouldDefaultToZero" />
+    </UnitTest>
+    <UnitTest name="Plafind.Tests.Models.BusinessTests.Business_AverageRating_ShouldBeBetweenZeroAndFive" storage="c:\users\resuldemir\source\repos\plafind\plafind.tests\bin\debug\net8.0\plafind.tests.dll" id="ff73e83f-042b-a421-a68a-1128f0037cf2">
+      <Execution id="86a707e7-289e-4a5a-b566-149061ff0da1" />
+      <TestMethod codeBase="C:\Users\resuldemir\Source\Repos\Plafind\Plafind.Tests\bin\Debug\net8.0\Plafind.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Plafind.Tests.Models.BusinessTests" name="Business_AverageRating_ShouldBeBetweenZeroAndFive" />
+    </UnitTest>
+    <UnitTest name="Plafind.Tests.Data.DbSeederTests.SeedDataAsync_ShouldCreateCategories" storage="c:\users\resuldemir\source\repos\plafind\plafind.tests\bin\debug\net8.0\plafind.tests.dll" id="84cda98f-588c-0825-e559-8489033ba739">
+      <Execution id="b9b3cb20-31c3-417e-b69b-6588ab4ca0ce" />
+      <TestMethod codeBase="C:\Users\resuldemir\Source\Repos\Plafind\Plafind.Tests\bin\Debug\net8.0\Plafind.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Plafind.Tests.Data.DbSeederTests" name="SeedDataAsync_ShouldCreateCategories" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="e840ada5-a30f-d245-623f-9ad4a535b340" executionId="b9608603-6879-4aa6-9daf-593ed2a15d81" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8a55f5bf-0c0a-e4fd-292d-fceeb441eb91" executionId="42df0d3f-c8a2-4f2b-b46c-0ca266a9e853" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a341946f-55b9-7851-1094-1a3739715f1c" executionId="e0b9629e-c8ad-48de-9da6-7ae8b4c4c2dd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="35a70e62-9768-fc0e-2f8a-533fbd3f0d62" executionId="07928c0a-83f9-4575-a875-9e3664bfffe4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="84cda98f-588c-0825-e559-8489033ba739" executionId="b9b3cb20-31c3-417e-b69b-6588ab4ca0ce" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="765e5d3b-b3d6-e24a-6350-d6f2f3733769" executionId="96a61414-74d0-4bda-9cb9-7adf1e631081" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8ad5658c-9a3d-d2ef-9f0b-adf3d7e8ee6d" executionId="5ef1ec61-1ca9-4244-b825-976f1da6a609" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ed04779b-ccbf-ed7b-7a21-4bcab13649bb" executionId="60b2adf1-3303-4f0b-9660-af68f5b60f06" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ff73e83f-042b-a421-a68a-1128f0037cf2" executionId="86a707e7-289e-4a5a-b566-149061ff0da1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3c988c81-8d3d-664e-2670-99423da5ec6d" executionId="982342f7-7a0e-4eeb-9b3f-e8226c53be64" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="77d08a78-2b33-ff0b-c7c0-d4382a0aa81a" executionId="faef10fa-616b-432b-b869-42c56ffb865f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Bir Listede Olmayan Sonuçlar" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Yüklenen Tüm Sonuçlar" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="11" executed="11" passed="11" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 8.0.21)&#xD;
+[xUnit.net 00:00:00.08]   Discovering: Plafind.Tests&#xD;
+[xUnit.net 00:00:00.10]   Discovered:  Plafind.Tests&#xD;
+[xUnit.net 00:00:00.11]   Starting:    Plafind.Tests&#xD;
+[xUnit.net 00:00:02.72]   Finished:    Plafind.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
